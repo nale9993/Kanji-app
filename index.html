@@ -1905,7 +1905,6 @@ function initState() {
   }
   // Ensure at least some kanji are available
   if (state.unlockedCount === 0) {
-    // Start first batch in lessons
     const startBatch = Math.min(5, KANJI_DATA.length);
     state.unlockedCount = startBatch;
     for (let i = 0; i < startBatch; i++) {
@@ -1917,6 +1916,20 @@ function initState() {
     }
     saveState();
   }
+  // Fix broken state: if too many unlocked due to old bug, trim back to MAX_IN_PROGRESS
+  // Keep any that have actual progress, remove excess unlearned ones from the end
+  while (state.unlockedCount > MAX_IN_PROGRESS) {
+    const i = state.unlockedCount - 1;
+    const c = state.cards[i];
+    // Only trim if this card has no progress at all
+    if (c && !c.meaning.learning && !c.on.learning && !c.kun.learning) {
+      delete state.cards[i];
+      state.unlockedCount--;
+    } else {
+      break; // Hit a card with progress, stop trimming
+    }
+  }
+  saveState();
 }
 
 function saveState() {
@@ -1943,8 +1956,7 @@ function isKanjiMastered(idx) {
 }
 
 function tryUnlockNext() {
-  const inProgress = getInProgressCount();
-  while (inProgress < MAX_IN_PROGRESS && state.unlockedCount < KANJI_DATA.length) {
+  while (getInProgressCount() < MAX_IN_PROGRESS && state.unlockedCount < KANJI_DATA.length) {
     const i = state.unlockedCount;
     state.cards[i] = {
       meaning: createCardState(),
@@ -2244,21 +2256,26 @@ function prevLesson() {
   if (lessonPos > 0) { lessonPos--; renderLesson(); }
 }
 
+function markCurrentLessonSeen() {
+  const item = lessonQueue[lessonPos];
+  if (item && state.cards[item.idx]) {
+    state.cards[item.idx][item.stage].learning = true;
+    state.cards[item.idx][item.stage].nextReview = Date.now();
+    saveState();
+  }
+}
+
 function nextLesson() {
+  markCurrentLessonSeen();
   if (lessonPos < lessonQueue.length - 1) {
     lessonPos++;
     renderLesson();
   } else {
-    // Mark all lesson items as "learning" and start quiz
-    lessonQueue.forEach(item => {
-      state.cards[item.idx][item.stage].learning = true;
-      state.cards[item.idx][item.stage].nextReview = Date.now(); // due now
-    });
-    saveState();
-    // Start quiz with these items
+    const quizQueue = lessonQueue.filter(item =>
+      state.cards[item.idx] && state.cards[item.idx][item.stage].learning
+    );
     session.mode = 'lesson';
-    session.queue = [...lessonQueue];
-    // Shuffle
+    session.queue = [...quizQueue];
     for (let i = session.queue.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [session.queue[i], session.queue[j]] = [session.queue[j], session.queue[i]];
