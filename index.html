@@ -1138,7 +1138,7 @@
         <div class="card-count" id="home-review-count">0</div>
       </div>
       <div class="action-card browse" onclick="showBrowse()">
-        <span class="card-icon">🗂</span>
+        <span class="card-icon">🔍</span>
         <div class="card-title">Browse Kanji</div>
         <div class="card-desc">View all kanji and your progress</div>
       </div>
@@ -5361,6 +5361,10 @@ function pretestSelectMeaning(btn, selected, correct) {
     if (b.dataset.meaning === correct) b.classList.add('correct');
     else if (b === btn && !wasCorrect) b.classList.add('wrong');
   });
+  const card = document.getElementById('pretest-card');
+  card.classList.remove('flash-correct', 'flash-wrong');
+  void card.offsetWidth;
+  card.classList.add(wasCorrect ? 'flash-correct' : 'flash-wrong');
   const idx = pretest.queue[pretest.pos];
   if (!pretest.results[idx]) pretest.results[idx] = {};
   pretest.results[idx].meaning = wasCorrect;
@@ -5384,6 +5388,10 @@ function submitPretestReading() {
   const wasCorrect = correctAnswers.some(a => checkRomajiAnswer(input.value, a));
   input.classList.add(wasCorrect ? 'correct' : 'wrong');
   input.disabled = true;
+  const card = document.getElementById('pretest-card');
+  card.classList.remove('flash-correct', 'flash-wrong');
+  void card.offsetWidth;
+  card.classList.add(wasCorrect ? 'flash-correct' : 'flash-wrong');
   if (!pretest.results[idx]) pretest.results[idx] = {};
   pretest.results[idx][pretest.stage] = wasCorrect;
   setTimeout(() => advancePretestStage(), 600);
