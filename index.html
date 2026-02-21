@@ -957,6 +957,11 @@
         <div class="card-title">Browse Kanji</div>
         <div class="card-desc">View all kanji and your progress</div>
       </div>
+      <div class="action-card" onclick="confirmReset()" style="--card-color:#666; grid-column: span 2;">
+        <span class="card-icon">🔄</span>
+        <div class="card-title">Reset Progress</div>
+        <div class="card-desc">Wipe all progress and start fresh from the beginning</div>
+      </div>
     </div>
 
     <div class="progress-section">
@@ -4774,17 +4779,24 @@ let pretest = {
 };
 
 function startPretest() {
-  // Build queue: all kanji that haven't been started yet (not learning)
+  // Include any kanji not yet fast-tracked (below PRETEST_LEVEL on any applicable stage)
   pretest.queue = [];
   for (let i = 0; i < KANJI_DATA.length; i++) {
     const c = state.cards[i];
-    // Include if not yet in lessons at all, or unlocked but not learning
-    if (!c || (!c.meaning.learning && !c.on.learning && !c.kun.learning)) {
+    const kd = KANJI_DATA[i];
+    if (!c) {
+      pretest.queue.push(i);
+      continue;
+    }
+    const meaningBelow = c.meaning.level < PRETEST_LEVEL;
+    const onBelow = kd.onYomi.length > 0 && c.on.level < PRETEST_LEVEL;
+    const kunBelow = kd.kunYomi.length > 0 && c.kun.level < PRETEST_LEVEL;
+    if (meaningBelow || onBelow || kunBelow) {
       pretest.queue.push(i);
     }
   }
   if (pretest.queue.length === 0) {
-    alert('All kanji are already in progress or mastered. Nothing to pretest!');
+    alert('All kanji are already at Level 6 or above. Nothing to pretest!');
     return;
   }
   pretest.pos = 0;
@@ -4906,23 +4918,30 @@ function submitPretestReading() {
 function advancePretestStage() {
   const idx = pretest.queue[pretest.pos];
   const kd = KANJI_DATA[idx];
+  const c = state.cards[idx];
 
   if (pretest.stage === 'meaning') {
-    // Move to on if has on, else kun, else next kanji
-    if (kd.onYomi.length > 0) { pretest.stage = 'on'; renderPretestCard(); return; }
-    if (kd.kunYomi.length > 0) { pretest.stage = 'kun'; renderPretestCard(); return; }
+    // Move to on if has on AND it's below pretest level
+    if (kd.onYomi.length > 0 && (!c || c.on.level < PRETEST_LEVEL)) {
+      pretest.stage = 'on'; renderPretestCard(); return;
+    }
+    if (kd.kunYomi.length > 0 && (!c || c.kun.level < PRETEST_LEVEL)) {
+      pretest.stage = 'kun'; renderPretestCard(); return;
+    }
   } else if (pretest.stage === 'on') {
-    if (kd.kunYomi.length > 0) { pretest.stage = 'kun'; renderPretestCard(); return; }
+    if (kd.kunYomi.length > 0 && (!c || c.kun.level < PRETEST_LEVEL)) {
+      pretest.stage = 'kun'; renderPretestCard(); return;
+    }
   }
 
-  // Done with this kanji — check if all 3 (applicable) stages passed
+  // Done with this kanji — check if all tested stages passed
   const r = pretest.results[idx] || {};
-  const meaningPassed = r.meaning !== false; // true or undefined (no test needed)
-  const onPassed = kd.onYomi.length === 0 || r.on === true;
-  const kunPassed = kd.kunYomi.length === 0 || r.kun === true;
+  const meaningPassed = r.meaning === true || (c && c.meaning.level >= PRETEST_LEVEL);
+  const onPassed = kd.onYomi.length === 0 || r.on === true || (c && c.on.level >= PRETEST_LEVEL);
+  const kunPassed = kd.kunYomi.length === 0 || r.kun === true || (c && c.kun.level >= PRETEST_LEVEL);
 
   if (meaningPassed && onPassed && kunPassed) {
-    // Fast-track this kanji to level 6
+    // Fast-track this kanji to PRETEST_LEVEL
     if (!state.cards[idx]) {
       state.cards[idx] = { meaning: createCardState(), on: createCardState(), kun: createCardState() };
       if (idx >= state.unlockedCount) state.unlockedCount = idx + 1;
@@ -4947,6 +4966,17 @@ function advancePretestStage() {
   }
   pretest.stage = 'meaning';
   renderPretestCard();
+}
+
+function confirmReset() {
+  if (confirm('Reset ALL progress? This cannot be undone.')) {
+    localStorage.removeItem('sumi_state');
+    state = { cards: {}, unlockedCount: 0 };
+    initState();
+    tryUnlockNext();
+    updateHomeStats();
+    showScreen('home');
+  }
 }
 
 // ===================================================
