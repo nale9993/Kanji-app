@@ -420,9 +420,9 @@
     background: var(--paper-dark);
     border: 1.5px solid var(--paper-darker);
     border-radius: 16px;
-    padding: 40px;
+    padding: 28px 28px 24px;
     text-align: center;
-    margin-bottom: 24px;
+    margin-bottom: 16px;
     position: relative;
     overflow: hidden;
     flex: 1;
@@ -430,6 +430,8 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    /* Prevent content from pushing layout when keyboard opens */
+    min-height: 0;
   }
 
   .quiz-card::before {
@@ -558,8 +560,19 @@
     letter-spacing: 0.05em;
   }
 
-  .romaji-input:focus {
-    border-color: var(--stage-color, var(--gold));
+  .quiz-card.flash-correct {
+    animation: flashCorrect 0.5s ease forwards;
+  }
+  .quiz-card.flash-wrong {
+    animation: flashWrong 0.5s ease forwards;
+  }
+  @keyframes flashCorrect {
+    0%   { background: color-mix(in srgb, var(--green) 30%, var(--paper-dark)); border-color: var(--green); }
+    100% { background: var(--paper-dark); border-color: var(--paper-darker); }
+  }
+  @keyframes flashWrong {
+    0%   { background: color-mix(in srgb, var(--red) 30%, var(--paper-dark)); border-color: var(--red); }
+    100% { background: var(--paper-dark); border-color: var(--paper-darker); }
   }
 
   .romaji-input.correct {
@@ -735,6 +748,136 @@
     grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
     gap: 10px;
     margin-top: 16px;
+  }
+
+  /* KANJI DETAIL MODAL */
+  .kanji-modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 100;
+    align-items: flex-end;
+    justify-content: center;
+  }
+  .kanji-modal-overlay.open {
+    display: flex;
+  }
+  .kanji-modal {
+    background: var(--paper-dark);
+    border: 1.5px solid var(--paper-darker);
+    border-radius: 20px 20px 0 0;
+    padding: 24px 24px 40px;
+    width: 100%;
+    max-width: 700px;
+    max-height: 85vh;
+    overflow-y: auto;
+    animation: slideUpModal 0.25s ease;
+  }
+  @keyframes slideUpModal {
+    from { transform: translateY(100%); }
+    to   { transform: translateY(0); }
+  }
+  .kanji-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  .kanji-modal-char {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 64px;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .kanji-modal-close {
+    background: var(--paper-darker);
+    border: none;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    font-size: 18px;
+    cursor: pointer;
+    color: var(--ink-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .kanji-modal-meanings {
+    font-size: 14px;
+    color: var(--ink);
+    margin-bottom: 20px;
+    font-weight: 500;
+  }
+  .kanji-modal-section {
+    margin-bottom: 16px;
+  }
+  .kanji-modal-section-title {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-light);
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+  .kanji-modal-readings {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .kanji-modal-reading-chip {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 16px;
+  }
+  .kanji-modal-reading-chip.on {
+    background: color-mix(in srgb, var(--stage-on) 12%, transparent);
+    border: 1px solid color-mix(in srgb, var(--stage-on) 30%, transparent);
+    color: var(--blue-light);
+  }
+  .kanji-modal-reading-chip.kun {
+    background: color-mix(in srgb, var(--stage-kun) 12%, transparent);
+    border: 1px solid color-mix(in srgb, var(--stage-kun) 30%, transparent);
+    color: var(--blue-light);
+  }
+  .kanji-modal-word-row {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--paper-darker);
+    font-size: 13px;
+  }
+  .kanji-modal-word-row:last-child { border-bottom: none; }
+  .kanji-modal-word-kanji {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 18px;
+    color: var(--ink);
+    min-width: 60px;
+  }
+  .kanji-modal-word-reading {
+    color: var(--ink-light);
+    font-family: 'Noto Sans JP', sans-serif;
+  }
+  .kanji-modal-word-meaning {
+    color: var(--ink-light);
+    font-style: italic;
+    margin-left: auto;
+    text-align: right;
+  }
+  .kanji-modal-level {
+    display: inline-block;
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-family: 'DM Mono', monospace;
+    background: var(--paper-darker);
+    color: var(--gold);
+    font-weight: 600;
+    margin-bottom: 20px;
   }
 
   .browse-kanji-card {
@@ -1034,8 +1177,15 @@
   <div class="screen" id="screen-browse">
     <button class="back-btn" onclick="goHome()">← Back</button>
     <h2 style="font-family:'DM Serif Display',serif; margin-bottom:8px;">Kanji Library</h2>
-    <p style="font-size:13px; color:var(--ink-light); margin-bottom:4px;">Your progress through all kanji.</p>
+    <p style="font-size:13px; color:var(--ink-light); margin-bottom:4px;">Tap any kanji to see details.</p>
     <div class="browse-grid" id="browse-grid"></div>
+  </div>
+
+  <!-- KANJI DETAIL MODAL -->
+  <div class="kanji-modal-overlay" id="kanji-modal-overlay" onclick="closeKanjiModal(event)">
+    <div class="kanji-modal" id="kanji-modal">
+      <!-- filled dynamically -->
+    </div>
   </div>
 
   <!-- COMPLETE SCREEN -->
@@ -4327,6 +4477,7 @@ let session = {
   answered: false,
   wasCorrect: false,
   userAnswer: '',
+  wordHistory: {}, // key: "idx-stage" → array of recently used word indices
 };
 
 // For lessons
@@ -4549,14 +4700,21 @@ function startQuiz() {
 function getWordForItem(item) {
   const kd = KANJI_DATA[item.idx];
   let words = [];
-  if (item.stage === 'on') {
-    words = kd.onWords.length > 0 ? kd.onWords : [];
-    // Add standalone if applicable
-  } else if (item.stage === 'kun') {
-    words = kd.kunWords.length > 0 ? kd.kunWords : [];
-  }
+  if (item.stage === 'on') words = kd.onWords || [];
+  else if (item.stage === 'kun') words = kd.kunWords || [];
   if (words.length === 0) return null;
-  return words[Math.floor(Math.random() * words.length)];
+  if (words.length === 1) return words[0];
+
+  // Rotate through words so all get tested — track last used per kanji+stage
+  const key = `${item.idx}-${item.stage}`;
+  if (!session.wordHistory) session.wordHistory = {};
+  const used = session.wordHistory[key] || [];
+  const unused = words.filter((_, i) => !used.includes(i));
+  const pool = unused.length > 0 ? unused : words.map((_, i) => i); // reset if all used
+  const pick = pool[Math.floor(Math.random() * pool.length)];
+  // Update history — keep last (words.length - 1) used so one is always fresh
+  session.wordHistory[key] = [...used.filter(i => i !== pick), pick].slice(-(words.length - 1));
+  return words[pick];
 }
 
 function renderQuizCard() {
@@ -4648,11 +4806,32 @@ function renderQuizCard() {
   }
 
   if (item.stage !== 'meaning') {
-    setTimeout(() => {
-      const inp = document.getElementById('romaji-input');
-      if (inp) inp.focus();
-    }, 100);
+    // Don't auto-focus on mobile (causes scroll away from word)
+    // Only auto-focus on desktop where there's no keyboard jump
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    if (!isMobile) {
+      setTimeout(() => {
+        const inp = document.getElementById('romaji-input');
+        if (inp) inp.focus();
+      }, 100);
+    } else {
+      // On mobile: when user taps the input, lock scroll position
+      setTimeout(() => {
+        const inp = document.getElementById('romaji-input');
+        if (!inp) return;
+        inp.addEventListener('focus', () => {
+          const scrollY = window.scrollY;
+          setTimeout(() => window.scrollTo(0, scrollY), 50);
+        }, { once: false });
+      }, 100);
+    }
   }
+}
+
+function toKatakana(romaji) {
+  // Convert to hiragana first, then shift to katakana range
+  const hira = toHiragana(romaji);
+  return hira.replace(/[\u3041-\u3096]/g, c => String.fromCharCode(c.charCodeAt(0) + 0x60));
 }
 
 function onRomajiInput(input) {
@@ -4662,7 +4841,8 @@ function onRomajiInput(input) {
     preview.textContent = 'type romaji below...';
     preview.className = 'kana-preview placeholder';
   } else {
-    preview.textContent = toHiragana(val);
+    const isOn = session.item && session.item.stage === 'on';
+    preview.textContent = isOn ? toKatakana(val) : toHiragana(val);
     preview.className = 'kana-preview';
   }
 }
@@ -4688,6 +4868,11 @@ function selectMeaning(btn, selected, correct) {
   });
 
   gradeCurrentCard(wasCorrect);
+  // Flash card background
+  const card = document.getElementById('quiz-card');
+  card.classList.remove('flash-correct', 'flash-wrong');
+  void card.offsetWidth; // force reflow
+  card.classList.add(wasCorrect ? 'flash-correct' : 'flash-wrong');
 
   setTimeout(() => showReviewScreen(), 700);
 }
@@ -4739,6 +4924,12 @@ function submitReading() {
   }
 
   gradeCurrentCard(wasCorrect);
+
+  // Flash card background
+  const card = document.getElementById('quiz-card');
+  card.classList.remove('flash-correct', 'flash-wrong');
+  void card.offsetWidth;
+  card.classList.add(wasCorrect ? 'flash-correct' : 'flash-wrong');
 
   setTimeout(() => showReviewScreen(), 600);
 }
@@ -4822,12 +5013,18 @@ function showReviewScreen() {
     </div>
   `;
 
-  if (word) {
+  if (word && item.stage !== 'meaning') {
+    // Show the word reading in the appropriate script
+    const isOn = item.stage === 'on';
+    // Convert reading to katakana if on'yomi
+    const displayReading = isOn
+      ? word.reading.replace(/[\u3041-\u3096]/g, c => String.fromCharCode(c.charCodeAt(0) + 0x60))
+      : word.reading;
     html += `<hr class="review-divider">`;
     html += `<div class="review-word-section"><h4>Word Used</h4>
       <div class="review-word-display">
         <span class="review-word-kanji">${word.word}</span>
-        <span class="review-word-reading">${word.reading}</span>
+        <span class="review-word-reading">${displayReading}</span>
         <span class="review-word-meaning">${word.meaning}</span>
       </div>
     </div>`;
@@ -4885,11 +5082,9 @@ function showBrowse() {
     } else if (!c) {
       levelDisplay = `<div class="browse-level-locked">—</div>`;
     } else {
-      // Show the unified/lowest level, or per-stage if not all learning yet
       const meaningLvl = c.meaning.learning ? c.meaning.level : null;
       const onLvl = kd.onYomi.length > 0 ? (c.on.learning ? c.on.level : null) : undefined;
       const kunLvl = kd.kunYomi.length > 0 ? (c.kun.learning ? c.kun.level : null) : undefined;
-
       const allLevels = [meaningLvl, onLvl, kunLvl].filter(v => v !== undefined);
       const allLearning = allLevels.every(v => v !== null);
 
@@ -4900,21 +5095,99 @@ function showBrowse() {
         const color = minLvl >= 10 ? 'var(--green-light)' : minLvl >= 5 ? 'var(--blue-light)' : 'var(--gold)';
         levelDisplay = `<div class="browse-level" style="color:${color}">Lv ${minLvl}</div>`;
       } else {
-        // Some stages not yet unlocked — show meaning level + indicators
         const color = meaningLvl >= 5 ? 'var(--blue-light)' : 'var(--gold)';
         levelDisplay = `<div class="browse-level" style="color:${color}">Lv ${meaningLvl}</div>`;
       }
     }
 
     return `
-      <div class="browse-kanji-card" style="${!unlocked ? 'opacity:0.35' : ''}">
+      <div class="browse-kanji-card" style="${!unlocked ? 'opacity:0.35' : ''}" data-idx="${i}">
         <span class="browse-kanji-char" style="${!unlocked ? 'filter:blur(2px)' : ''}">${kd.kanji}</span>
         <div class="browse-kanji-meaning">${kd.meanings[0]}</div>
         ${levelDisplay}
       </div>
     `;
   }).join('');
+
+  // Attach click handlers
+  grid.addEventListener('click', e => {
+    const card = e.target.closest('.browse-kanji-card');
+    if (card) openKanjiModal(parseInt(card.dataset.idx));
+  });
+
   showScreen('browse');
+}
+
+function openKanjiModal(idx) {
+  const kd = KANJI_DATA[idx];
+  const c = state.cards[idx];
+  const unlocked = idx < state.unlockedCount;
+
+  // Level display
+  let levelHtml = '';
+  if (!unlocked) {
+    levelHtml = `<div class="kanji-modal-level">Not yet unlocked</div>`;
+  } else if (c && c.meaning.learning) {
+    const lvl = allStagesLearning(idx) ? c.meaning.level : c.meaning.level;
+    levelHtml = `<div class="kanji-modal-level">${lvl >= MAX_SRS_LEVEL ? '⭐ Mastered' : 'Level ' + lvl}</div>`;
+  } else {
+    levelHtml = `<div class="kanji-modal-level">In lessons</div>`;
+  }
+
+  // On'yomi chips (katakana)
+  let onHtml = '';
+  if (kd.onYomi.length > 0) {
+    onHtml = `<div class="kanji-modal-section">
+      <div class="kanji-modal-section-title">On'yomi</div>
+      <div class="kanji-modal-readings">
+        ${kd.onYomi.map(r => `<span class="kanji-modal-reading-chip on">${r.kana} <small style="opacity:0.6;font-size:12px">${r.romaji}</small></span>`).join('')}
+      </div>
+      ${kd.onWords.map(w => {
+        const katReading = w.reading.replace(/[\u3041-\u3096]/g, ch => String.fromCharCode(ch.charCodeAt(0) + 0x60));
+        return `<div class="kanji-modal-word-row">
+          <span class="kanji-modal-word-kanji">${w.word}</span>
+          <span class="kanji-modal-word-reading">${katReading}</span>
+          <span class="kanji-modal-word-meaning">${w.meaning}</span>
+        </div>`;
+      }).join('')}
+    </div>`;
+  }
+
+  // Kun'yomi chips (hiragana)
+  let kunHtml = '';
+  if (kd.kunYomi.length > 0) {
+    kunHtml = `<div class="kanji-modal-section">
+      <div class="kanji-modal-section-title">Kun'yomi</div>
+      <div class="kanji-modal-readings">
+        ${kd.kunYomi.map(r => `<span class="kanji-modal-reading-chip kun">${r.kana} <small style="opacity:0.6;font-size:12px">${r.romaji}</small></span>`).join('')}
+      </div>
+      ${kd.kunWords.map(w => `<div class="kanji-modal-word-row">
+        <span class="kanji-modal-word-kanji">${w.word}</span>
+        <span class="kanji-modal-word-reading">${w.reading}</span>
+        <span class="kanji-modal-word-meaning">${w.meaning}</span>
+      </div>`).join('')}
+    </div>`;
+  }
+
+  document.getElementById('kanji-modal').innerHTML = `
+    <div class="kanji-modal-header">
+      <div>
+        <div class="kanji-modal-char">${kd.kanji}</div>
+      </div>
+      <button class="kanji-modal-close" onclick="closeKanjiModal()">✕</button>
+    </div>
+    <div class="kanji-modal-meanings">${kd.meanings.join('・')}</div>
+    ${levelHtml}
+    ${onHtml}
+    ${kunHtml}
+  `;
+  document.getElementById('kanji-modal-overlay').classList.add('open');
+}
+
+function closeKanjiModal(event) {
+  // Close if clicking the overlay itself (not the modal content)
+  if (event && event.target !== document.getElementById('kanji-modal-overlay')) return;
+  document.getElementById('kanji-modal-overlay').classList.remove('open');
 }
 
 // ===================================================
