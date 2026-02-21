@@ -560,19 +560,35 @@
     letter-spacing: 0.05em;
   }
 
-  .quiz-card.flash-correct {
-    animation: flashCorrect 0.5s ease forwards;
+  .quiz-card.flash-correct::before {
+    animation: flashStripCorrect 0.6s ease forwards;
   }
-  .quiz-card.flash-wrong {
-    animation: flashWrong 0.5s ease forwards;
+  .quiz-card.flash-wrong::before {
+    animation: flashStripWrong 0.6s ease forwards;
   }
-  @keyframes flashCorrect {
-    0%   { background: color-mix(in srgb, var(--green) 30%, var(--paper-dark)); border-color: var(--green); }
-    100% { background: var(--paper-dark); border-color: var(--paper-darker); }
+  .quiz-card.flash-correct .quiz-kanji,
+  .quiz-card.flash-correct .quiz-word-context {
+    animation: flashTextCorrect 0.6s ease forwards;
   }
-  @keyframes flashWrong {
-    0%   { background: color-mix(in srgb, var(--red) 30%, var(--paper-dark)); border-color: var(--red); }
-    100% { background: var(--paper-dark); border-color: var(--paper-darker); }
+  .quiz-card.flash-wrong .quiz-kanji,
+  .quiz-card.flash-wrong .quiz-word-context {
+    animation: flashTextWrong 0.6s ease forwards;
+  }
+  @keyframes flashStripCorrect {
+    0%   { background: var(--green); height: 8px; }
+    100% { background: var(--stage-color, var(--gold)); height: 4px; }
+  }
+  @keyframes flashStripWrong {
+    0%   { background: var(--red); height: 8px; }
+    100% { background: var(--stage-color, var(--gold)); height: 4px; }
+  }
+  @keyframes flashTextCorrect {
+    0%   { color: var(--green); }
+    100% { color: var(--ink); }
+  }
+  @keyframes flashTextWrong {
+    0%   { color: var(--red); }
+    100% { color: var(--ink); }
   }
 
   .romaji-input.correct {
@@ -4187,6 +4203,19 @@ function initState() {
   if (saved) {
     try { state = JSON.parse(saved); } catch(e) {}
   }
+  // Restore in-progress pretest if any
+  const savedPretest = localStorage.getItem('sumi_pretest');
+  if (savedPretest) {
+    try {
+      const p = JSON.parse(savedPretest);
+      pretest.queue = p.queue;
+      pretest.pos = p.pos;
+      pretest.stage = p.stage;
+      pretest.results = p.results;
+      pretest.fastTracked = p.fastTracked;
+      pretestInProgress = true;
+    } catch(e) {}
+  }
   // Ensure at least some kanji are available
   if (state.unlockedCount === 0) {
     const startBatch = Math.min(5, KANJI_DATA.length);
@@ -4218,6 +4247,18 @@ function initState() {
 
 function saveState() {
   localStorage.setItem('sumi_state', JSON.stringify(state));
+  // Also persist pretest state so it survives page reload
+  if (pretestInProgress) {
+    localStorage.setItem('sumi_pretest', JSON.stringify({
+      queue: pretest.queue,
+      pos: pretest.pos,
+      stage: pretest.stage,
+      results: pretest.results,
+      fastTracked: pretest.fastTracked,
+    }));
+  } else {
+    localStorage.removeItem('sumi_pretest');
+  }
 }
 
 function getInProgressCount() {
@@ -4806,25 +4847,10 @@ function renderQuizCard() {
   }
 
   if (item.stage !== 'meaning') {
-    // Don't auto-focus on mobile (causes scroll away from word)
-    // Only auto-focus on desktop where there's no keyboard jump
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-    if (!isMobile) {
-      setTimeout(() => {
-        const inp = document.getElementById('romaji-input');
-        if (inp) inp.focus();
-      }, 100);
-    } else {
-      // On mobile: when user taps the input, lock scroll position
-      setTimeout(() => {
-        const inp = document.getElementById('romaji-input');
-        if (!inp) return;
-        inp.addEventListener('focus', () => {
-          const scrollY = window.scrollY;
-          setTimeout(() => window.scrollTo(0, scrollY), 50);
-        }, { once: false });
-      }, 100);
-    }
+    setTimeout(() => {
+      const inp = document.getElementById('romaji-input');
+      if (inp) inp.focus({ preventScroll: true });
+    }, 150);
   }
 }
 
@@ -5307,14 +5333,23 @@ function renderPretestCard() {
   }
 
   if (pretest.stage !== 'meaning') {
-    setTimeout(() => { const i = document.getElementById('pretest-romaji-input'); if(i) i.focus(); }, 100);
+    setTimeout(() => {
+      const i = document.getElementById('pretest-romaji-input');
+      if (i) i.focus({ preventScroll: true });
+    }, 150);
   }
 }
 
 function onPretestRomajiInput(input) {
   const preview = document.getElementById('pretest-kana-preview');
-  if (!input.value) { preview.textContent = 'type romaji below...'; preview.className = 'kana-preview placeholder'; }
-  else { preview.textContent = toHiragana(input.value); preview.className = 'kana-preview'; }
+  if (!input.value) {
+    preview.textContent = 'type romaji below...';
+    preview.className = 'kana-preview placeholder';
+  } else {
+    const isOn = pretest.stage === 'on';
+    preview.textContent = isOn ? toKatakana(input.value) : toHiragana(input.value);
+    preview.className = 'kana-preview';
+  }
 }
 
 function pretestSelectMeaning(btn, selected, correct) {
@@ -5447,6 +5482,7 @@ function skipPretestKanji() {
 function confirmReset() {
   if (confirm('Reset ALL progress? This cannot be undone.')) {
     localStorage.removeItem('sumi_state');
+    localStorage.removeItem('sumi_pretest');
     // Reset all in-memory state
     state = { cards: {}, unlockedCount: 0 };
     pretestInProgress = false;
