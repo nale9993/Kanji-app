@@ -7,22 +7,22 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&family=Noto+Sans+JP:wght@300;400;500&family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root {
-    --ink: #1a1410;
-    --ink-light: #3d3028;
-    --paper: #f5f0e8;
-    --paper-dark: #e8e0d0;
-    --paper-darker: #d8cfc0;
-    --red: #c0392b;
-    --red-light: #e74c3c;
+    --ink: #f0ece4;
+    --ink-light: #a89880;
+    --paper: #111010;
+    --paper-dark: #1c1a18;
+    --paper-darker: #2a2622;
+    --red: #e05545;
+    --red-light: #f07060;
     --gold: #c9a84c;
     --gold-light: #f0c040;
-    --blue: #2c5f8a;
-    --blue-light: #3a7ab5;
-    --green: #2d6a4f;
-    --green-light: #40916c;
-    --stage-meaning: #8b5e3c;
-    --stage-on: #2c5f8a;
-    --stage-kun: #2d6a4f;
+    --blue: #4a8ec2;
+    --blue-light: #6aaee0;
+    --green: #4a9e72;
+    --green-light: #60c090;
+    --stage-meaning: #c07a50;
+    --stage-on: #4a8ec2;
+    --stage-kun: #4a9e72;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -131,7 +131,7 @@
   }
 
   .action-card {
-    background: white;
+    background: var(--paper-dark);
     border: 1.5px solid var(--paper-darker);
     border-radius: 12px;
     padding: 24px 20px;
@@ -188,7 +188,7 @@
 
   /* PROGRESS BAR */
   .progress-section {
-    background: white;
+    background: var(--paper-dark);
     border: 1.5px solid var(--paper-darker);
     border-radius: 12px;
     padding: 20px;
@@ -238,7 +238,7 @@
 
   /* LESSON SCREEN */
   .lesson-card {
-    background: white;
+    background: var(--paper-dark);
     border: 1.5px solid var(--paper-darker);
     border-radius: 16px;
     padding: 48px 40px;
@@ -358,7 +358,7 @@
     gap: 10px;
     margin-bottom: 8px;
     padding: 8px 12px;
-    background: var(--paper);
+    background: var(--paper-darker);
     border-radius: 8px;
   }
 
@@ -412,7 +412,7 @@
   }
 
   .quiz-card {
-    background: white;
+    background: var(--paper-dark);
     border: 1.5px solid var(--paper-darker);
     border-radius: 16px;
     padding: 40px;
@@ -486,7 +486,7 @@
     padding: 14px 16px;
     border: 1.5px solid var(--paper-darker);
     border-radius: 10px;
-    background: var(--paper);
+    background: var(--paper-dark);
     cursor: pointer;
     font-family: 'Noto Sans JP', sans-serif;
     font-size: 14px;
@@ -541,7 +541,7 @@
     padding: 14px 20px;
     border: 2px solid var(--paper-darker);
     border-radius: 10px;
-    background: var(--paper);
+    background: var(--paper-dark);
     font-family: 'DM Mono', monospace;
     font-size: 18px;
     color: var(--ink);
@@ -589,7 +589,7 @@
 
   /* REVIEW SCREEN */
   .review-screen {
-    background: white;
+    background: var(--paper-dark);
     border: 1.5px solid var(--paper-darker);
     border-radius: 16px;
     padding: 40px;
@@ -666,7 +666,7 @@
     gap: 16px;
     margin-bottom: 8px;
     padding: 12px 16px;
-    background: var(--paper);
+    background: var(--paper-darker);
     border-radius: 10px;
   }
 
@@ -705,9 +705,9 @@
   .next-btn {
     margin-top: auto;
     padding: 14px;
-    background: var(--ink);
-    color: var(--paper);
-    border: none;
+    background: var(--paper-darker);
+    color: var(--ink);
+    border: 1px solid var(--paper-darker);
     border-radius: 10px;
     font-family: 'Noto Sans JP', sans-serif;
     font-size: 15px;
@@ -718,7 +718,7 @@
   }
 
   .next-btn:hover {
-    background: var(--ink-light);
+    background: #3a3530;
     transform: translateY(-1px);
   }
 
@@ -731,7 +731,7 @@
   }
 
   .browse-kanji-card {
-    background: white;
+    background: var(--paper-dark);
     border: 1.5px solid var(--paper-darker);
     border-radius: 10px;
     padding: 12px 8px;
@@ -947,6 +947,11 @@
         <div class="card-desc">Practice due cards</div>
         <div class="card-count" id="home-review-count">0</div>
       </div>
+      <div class="action-card browse" onclick="startPretest()" style="--card-color: var(--red);">
+        <span class="card-icon">🎯</span>
+        <div class="card-title">Pretest</div>
+        <div class="card-desc">Already know some kanji? Fast-track them to Level 6</div>
+      </div>
       <div class="action-card browse" onclick="showBrowse()">
         <span class="card-icon">🗂</span>
         <div class="card-title">Browse Kanji</div>
@@ -1018,6 +1023,18 @@
       </div>
       <div class="complete-subtitle" id="complete-subtitle">Great work! Keep up the practice.</div>
       <button class="submit-btn" onclick="goHome()" style="margin-top:8px;">Return Home</button>
+    </div>
+  </div>
+  <!-- PRETEST SCREEN -->
+  <div class="screen" id="screen-pretest">
+    <div class="quiz-header">
+      <button class="back-btn" style="margin:0;" onclick="goHome()">← Quit</button>
+      <div class="quiz-progress-bar">
+        <div class="quiz-progress-fill" id="pretest-progress-fill" style="background:var(--red)"></div>
+      </div>
+      <div class="quiz-count" id="pretest-count">0/0</div>
+    </div>
+    <div class="quiz-card animate-in" id="pretest-card" style="--stage-color: var(--red)">
     </div>
   </div>
 
@@ -1855,18 +1872,2101 @@ const KANJI_DATA = [
     ],
     standalone: {on: false, kun: true}
   },
+  // ---- BATCH 2: N5/N4 continuation ----
+  {
+    kanji: '天',
+    meanings: ['heaven', 'sky', 'God'],
+    onYomi: [{kana:'テン',romaji:'ten'}],
+    kunYomi: [{kana:'あま',romaji:'ama'},{kana:'あめ',romaji:'ame'}],
+    onWords: [
+      {word:'天気',reading:'てんき',romajiTarget:'ten',meaning:'weather',targetIndex:0},
+      {word:'天国',reading:'てんごく',romajiTarget:'ten',meaning:'heaven',targetIndex:0},
+    ],
+    kunWords: [
+      {word:'天の川',reading:'あまのがわ',romajiTarget:'ama',meaning:'Milky Way',targetIndex:0},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '地',
+    meanings: ['ground', 'earth', 'land'],
+    onYomi: [{kana:'チ',romaji:'chi'},{kana:'ジ',romaji:'ji'}],
+    kunYomi: [],
+    onWords: [
+      {word:'地図',reading:'ちず',romajiTarget:'chi',meaning:'map',targetIndex:0},
+      {word:'地下',reading:'ちか',romajiTarget:'chi',meaning:'underground',targetIndex:0},
+      {word:'地球',reading:'ちきゅう',romajiTarget:'chi',meaning:'Earth (planet)',targetIndex:0},
+    ],
+    kunWords: [],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '空',
+    meanings: ['sky', 'empty', 'air'],
+    onYomi: [{kana:'クウ',romaji:'kuu'}],
+    kunYomi: [{kana:'そら',romaji:'sora'},{kana:'あ',romaji:'a'}],
+    onWords: [
+      {word:'空港',reading:'くうこう',romajiTarget:'kuu',meaning:'airport',targetIndex:0},
+      {word:'空気',reading:'くうき',romajiTarget:'kuu',meaning:'air / atmosphere',targetIndex:0},
+    ],
+    kunWords: [
+      {word:'空',reading:'そら',romajiTarget:'sora',meaning:'sky',targetIndex:0},
+      {word:'空く',reading:'あく',romajiTarget:'a',meaning:'to become empty',targetIndex:0},
+    ],
+    standalone:{on:false,kun:true}
+  },
+  {
+    kanji: '海',
+    meanings: ['sea', 'ocean'],
+    onYomi: [{kana:'カイ',romaji:'kai'}],
+    kunYomi: [{kana:'うみ',romaji:'umi'}],
+    onWords: [
+      {word:'海外',reading:'かいがい',romajiTarget:'kai',meaning:'overseas',targetIndex:0},
+      {word:'海岸',reading:'かいがん',romajiTarget:'kai',meaning:'coast / seashore',targetIndex:0},
+    ],
+    kunWords: [
+      {word:'海',reading:'うみ',romajiTarget:'umi',meaning:'sea',targetIndex:0},
+      {word:'海辺',reading:'うみべ',romajiTarget:'umi',meaning:'seaside',targetIndex:0},
+    ],
+    standalone:{on:false,kun:true}
+  },
+  {
+    kanji: '林',
+    meanings: ['forest', 'grove'],
+    onYomi: [{kana:'リン',romaji:'rin'}],
+    kunYomi: [{kana:'はやし',romaji:'hayashi'}],
+    onWords: [
+      {word:'森林',reading:'しんりん',romajiTarget:'rin',meaning:'forest',targetIndex:1},
+    ],
+    kunWords: [
+      {word:'林',reading:'はやし',romajiTarget:'hayashi',meaning:'grove / forest',targetIndex:0},
+    ],
+    standalone:{on:false,kun:true}
+  },
+  {
+    kanji: '森',
+    meanings: ['forest', 'woods'],
+    onYomi: [{kana:'シン',romaji:'shin'}],
+    kunYomi: [{kana:'もり',romaji:'mori'}],
+    onWords: [
+      {word:'森林',reading:'しんりん',romajiTarget:'shin',meaning:'forest',targetIndex:0},
+    ],
+    kunWords: [
+      {word:'森',reading:'もり',romajiTarget:'mori',meaning:'forest',targetIndex:0},
+    ],
+    standalone:{on:false,kun:true}
+  },
+  {
+    kanji: '花',
+    meanings: ['flower', 'blossom'],
+    onYomi: [{kana:'カ',romaji:'ka'}],
+    kunYomi: [{kana:'はな',romaji:'hana'}],
+    onWords: [
+      {word:'花火',reading:'はなび',romajiTarget:'ka',meaning:'fireworks',targetIndex:0},
+      {word:'花瓶',reading:'かびん',romajiTarget:'ka',meaning:'flower vase',targetIndex:0},
+    ],
+    kunWords: [
+      {word:'花',reading:'はな',romajiTarget:'hana',meaning:'flower',targetIndex:0},
+      {word:'花見',reading:'はなみ',romajiTarget:'hana',meaning:'cherry blossom viewing',targetIndex:0},
+    ],
+    standalone:{on:false,kun:true}
+  },
+  {
+    kanji: '草',
+    meanings: ['grass', 'plant'],
+    onYomi: [{kana:'ソウ',romaji:'sou'}],
+    kunYomi: [{kana:'くさ',romaji:'kusa'}],
+    onWords: [
+      {word:'草原',reading:'そうげん',romajiTarget:'sou',meaning:'grassland / meadow',targetIndex:0},
+    ],
+    kunWords: [
+      {word:'草',reading:'くさ',romajiTarget:'kusa',meaning:'grass',targetIndex:0},
+      {word:'草花',reading:'くさばな',romajiTarget:'kusa',meaning:'flowers and plants',targetIndex:0},
+    ],
+    standalone:{on:false,kun:true}
+  },
+  {
+    kanji: '石',
+    meanings: ['stone', 'rock'],
+    onYomi: [{kana:'セキ',romaji:'seki'},{kana:'シャク',romaji:'shaku'}],
+    kunYomi: [{kana:'いし',romaji:'ishi'}],
+    onWords: [
+      {word:'石油',reading:'せきゆ',romajiTarget:'seki',meaning:'petroleum / oil',targetIndex:0},
+      {word:'宝石',reading:'ほうせき',romajiTarget:'seki',meaning:'gem / jewel',targetIndex:1},
+    ],
+    kunWords: [
+      {word:'石',reading:'いし',romajiTarget:'ishi',meaning:'stone',targetIndex:0},
+      {word:'石橋',reading:'いしばし',romajiTarget:'ishi',meaning:'stone bridge',targetIndex:0},
+    ],
+    standalone:{on:false,kun:true}
+  },
+  {
+    kanji: '雨',
+    meanings: ['rain'],
+    onYomi: [{kana:'ウ',romaji:'u'}],
+    kunYomi: [{kana:'あめ',romaji:'ame'},{kana:'あま',romaji:'ama'}],
+    onWords: [
+      {word:'雨天',reading:'うてん',romajiTarget:'u',meaning:'rainy weather',targetIndex:0},
+    ],
+    kunWords: [
+      {word:'雨',reading:'あめ',romajiTarget:'ame',meaning:'rain',targetIndex:0},
+      {word:'雨具',reading:'あまぐ',romajiTarget:'ama',meaning:'rain gear',targetIndex:0},
+    ],
+    standalone:{on:false,kun:true}
+  },
+  {
+    kanji: '雪',
+    meanings: ['snow'],
+    onYomi: [{kana:'セツ',romaji:'setsu'}],
+    kunYomi: [{kana:'ゆき',romaji:'yuki'}],
+    onWords: [
+      {word:'雪山',reading:'せつざん',romajiTarget:'setsu',meaning:'snowy mountain',targetIndex:0},
+    ],
+    kunWords: [
+      {word:'雪',reading:'ゆき',romajiTarget:'yuki',meaning:'snow',targetIndex:0},
+      {word:'雪国',reading:'ゆきぐに',romajiTarget:'yuki',meaning:'snowy country',targetIndex:0},
+    ],
+    standalone:{on:false,kun:true}
+  },
+  {
+    kanji: '風',
+    meanings: ['wind', 'style', 'manner'],
+    onYomi: [{kana:'フウ',romaji:'fuu'},{kana:'フ',romaji:'fu'}],
+    kunYomi: [{kana:'かぜ',romaji:'kaze'},{kana:'かざ',romaji:'kaza'}],
+    onWords: [
+      {word:'台風',reading:'たいふう',romajiTarget:'fuu',meaning:'typhoon',targetIndex:1},
+      {word:'風景',reading:'ふうけい',romajiTarget:'fuu',meaning:'scenery / landscape',targetIndex:0},
+    ],
+    kunWords: [
+      {word:'風',reading:'かぜ',romajiTarget:'kaze',meaning:'wind',targetIndex:0},
+      {word:'風車',reading:'かざぐるま',romajiTarget:'kaza',meaning:'windmill / pinwheel',targetIndex:0},
+    ],
+    standalone:{on:false,kun:true}
+  },
+  {
+    kanji: '鳥',
+    meanings: ['bird'],
+    onYomi: [{kana:'チョウ',romaji:'chou'}],
+    kunYomi: [{kana:'とり',romaji:'tori'}],
+    onWords: [
+      {word:'鳥類',reading:'ちょうるい',romajiTarget:'chou',meaning:'birds (class)',targetIndex:0},
+    ],
+    kunWords: [
+      {word:'鳥',reading:'とり',romajiTarget:'tori',meaning:'bird',targetIndex:0},
+      {word:'小鳥',reading:'ことり',romajiTarget:'tori',meaning:'small bird',targetIndex:1},
+    ],
+    standalone:{on:false,kun:true}
+  },
+  {
+    kanji: '魚',
+    meanings: ['fish'],
+    onYomi: [{kana:'ギョ',romaji:'gyo'}],
+    kunYomi: [{kana:'さかな',romaji:'sakana'},{kana:'うお',romaji:'uo'}],
+    onWords: [
+      {word:'金魚',reading:'きんぎょ',romajiTarget:'gyo',meaning:'goldfish',targetIndex:1},
+      {word:'熱帯魚',reading:'ねったいぎょ',romajiTarget:'gyo',meaning:'tropical fish',targetIndex:2},
+    ],
+    kunWords: [
+      {word:'魚',reading:'さかな',romajiTarget:'sakana',meaning:'fish',targetIndex:0},
+      {word:'魚屋',reading:'さかなや',romajiTarget:'sakana',meaning:'fish shop',targetIndex:0},
+    ],
+    standalone:{on:false,kun:true}
+  },
+  {
+    kanji: '牛',
+    meanings: ['cow', 'bull', 'cattle'],
+    onYomi: [{kana:'ギュウ',romaji:'gyuu'}],
+    kunYomi: [{kana:'うし',romaji:'ushi'}],
+    onWords: [
+      {word:'牛乳',reading:'ぎゅうにゅう',romajiTarget:'gyuu',meaning:'milk',targetIndex:0},
+      {word:'牛肉',reading:'ぎゅうにく',romajiTarget:'gyuu',meaning:'beef',targetIndex:0},
+    ],
+    kunWords: [
+      {word:'牛',reading:'うし',romajiTarget:'ushi',meaning:'cow',targetIndex:0},
+    ],
+    standalone:{on:false,kun:true}
+  },
+  {
+    kanji: '犬',
+    meanings: ['dog'],
+    onYomi: [{kana:'ケン',romaji:'ken'}],
+    kunYomi: [{kana:'いぬ',romaji:'inu'}],
+    onWords: [
+      {word:'愛犬',reading:'あいけん',romajiTarget:'ken',meaning:'beloved dog',targetIndex:1},
+    ],
+    kunWords: [
+      {word:'犬',reading:'いぬ',romajiTarget:'inu',meaning:'dog',targetIndex:0},
+      {word:'子犬',reading:'こいぬ',romajiTarget:'inu',meaning:'puppy',targetIndex:1},
+    ],
+    standalone:{on:false,kun:true}
+  },
+  {
+    kanji: '馬',
+    meanings: ['horse'],
+    onYomi: [{kana:'バ',romaji:'ba'},{kana:'マ',romaji:'ma'}],
+    kunYomi: [{kana:'うま',romaji:'uma'}],
+    onWords: [
+      {word:'馬車',reading:'ばしゃ',romajiTarget:'ba',meaning:'horse carriage',targetIndex:0},
+      {word:'競馬',reading:'けいば',romajiTarget:'ba',meaning:'horse racing',targetIndex:1},
+    ],
+    kunWords: [
+      {word:'馬',reading:'うま',romajiTarget:'uma',meaning:'horse',targetIndex:0},
+    ],
+    standalone:{on:false,kun:true}
+  },
+  {
+    kanji: '耳',
+    meanings: ['ear'],
+    onYomi: [{kana:'ジ',romaji:'ji'}],
+    kunYomi: [{kana:'みみ',romaji:'mimi'}],
+    onWords: [
+      {word:'耳鼻科',reading:'じびか',romajiTarget:'ji',meaning:'ENT clinic',targetIndex:0},
+    ],
+    kunWords: [
+      {word:'耳',reading:'みみ',romajiTarget:'mimi',meaning:'ear',targetIndex:0},
+      {word:'耳元',reading:'みみもと',romajiTarget:'mimi',meaning:'near the ear',targetIndex:0},
+    ],
+    standalone:{on:false,kun:true}
+  },
+  {
+    kanji: '鼻',
+    meanings: ['nose'],
+    onYomi: [{kana:'ビ',romaji:'bi'}],
+    kunYomi: [{kana:'はな',romaji:'hana'}],
+    onWords: [
+      {word:'耳鼻科',reading:'じびか',romajiTarget:'bi',meaning:'ENT clinic',targetIndex:1},
+    ],
+    kunWords: [
+      {word:'鼻',reading:'はな',romajiTarget:'hana',meaning:'nose',targetIndex:0},
+      {word:'鼻水',reading:'はなみず',romajiTarget:'hana',meaning:'runny nose',targetIndex:0},
+    ],
+    standalone:{on:false,kun:true}
+  },
+  {
+    kanji: '頭',
+    meanings: ['head', 'top', 'leader'],
+    onYomi: [{kana:'トウ',romaji:'tou'},{kana:'ズ',romaji:'zu'}],
+    kunYomi: [{kana:'あたま',romaji:'atama'}],
+    onWords: [
+      {word:'頭痛',reading:'ずつう',romajiTarget:'zu',meaning:'headache',targetIndex:0},
+      {word:'先頭',reading:'せんとう',romajiTarget:'tou',meaning:'front / lead',targetIndex:1},
+    ],
+    kunWords: [
+      {word:'頭',reading:'あたま',romajiTarget:'atama',meaning:'head',targetIndex:0},
+      {word:'頭痛',reading:'あたまいた',romajiTarget:'atama',meaning:'headache (colloquial)',targetIndex:0},
+    ],
+    standalone:{on:false,kun:true}
+  },
+  {
+    kanji: '体',
+    meanings: ['body', 'substance'],
+    onYomi: [{kana:'タイ',romaji:'tai'},{kana:'テイ',romaji:'tei'}],
+    kunYomi: [{kana:'からだ',romaji:'karada'}],
+    onWords: [
+      {word:'体育',reading:'たいいく',romajiTarget:'tai',meaning:'physical education',targetIndex:0},
+      {word:'体重',reading:'たいじゅう',romajiTarget:'tai',meaning:'body weight',targetIndex:0},
+    ],
+    kunWords: [
+      {word:'体',reading:'からだ',romajiTarget:'karada',meaning:'body',targetIndex:0},
+    ],
+    standalone:{on:false,kun:true}
+  },
+  {
+    kanji: '心',
+    meanings: ['heart', 'mind', 'spirit'],
+    onYomi: [{kana:'シン',romaji:'shin'}],
+    kunYomi: [{kana:'こころ',romaji:'kokoro'}],
+    onWords: [
+      {word:'安心',reading:'あんしん',romajiTarget:'shin',meaning:'relief / peace of mind',targetIndex:1},
+      {word:'中心',reading:'ちゅうしん',romajiTarget:'shin',meaning:'center',targetIndex:1},
+    ],
+    kunWords: [
+      {word:'心',reading:'こころ',romajiTarget:'kokoro',meaning:'heart / mind',targetIndex:0},
+      {word:'心地',reading:'ここち',romajiTarget:'kokoro',meaning:'feeling / comfort',targetIndex:0},
+    ],
+    standalone:{on:false,kun:true}
+  },
+  {
+    kanji: '力',
+    meanings: ['power', 'strength', 'effort'],
+    onYomi: [{kana:'リョク',romaji:'ryoku'},{kana:'リキ',romaji:'riki'}],
+    kunYomi: [{kana:'ちから',romaji:'chikara'}],
+    onWords: [
+      {word:'電力',reading:'でんりょく',romajiTarget:'ryoku',meaning:'electric power',targetIndex:1},
+      {word:'努力',reading:'どりょく',romajiTarget:'ryoku',meaning:'effort',targetIndex:1},
+    ],
+    kunWords: [
+      {word:'力',reading:'ちから',romajiTarget:'chikara',meaning:'strength / power',targetIndex:0},
+      {word:'力持ち',reading:'ちからもち',romajiTarget:'chikara',meaning:'strong person',targetIndex:0},
+    ],
+    standalone:{on:false,kun:true}
+  },
+  {
+    kanji: '男',
+    meanings: ['man', 'male'],
+    onYomi: [{kana:'ダン',romaji:'dan'},{kana:'ナン',romaji:'nan'}],
+    kunYomi: [{kana:'おとこ',romaji:'otoko'}],
+    onWords: [
+      {word:'男性',reading:'だんせい',romajiTarget:'dan',meaning:'male / man',targetIndex:0},
+      {word:'長男',reading:'ちょうなん',romajiTarget:'nan',meaning:'eldest son',targetIndex:1},
+    ],
+    kunWords: [
+      {word:'男',reading:'おとこ',romajiTarget:'otoko',meaning:'man',targetIndex:0},
+      {word:'男の子',reading:'おとこのこ',romajiTarget:'otoko',meaning:'boy',targetIndex:0},
+    ],
+    standalone:{on:false,kun:true}
+  },
+  {
+    kanji: '女',
+    meanings: ['woman', 'female'],
+    onYomi: [{kana:'ジョ',romaji:'jo'},{kana:'ニョ',romaji:'nyo'}],
+    kunYomi: [{kana:'おんな',romaji:'onna'},{kana:'め',romaji:'me'}],
+    onWords: [
+      {word:'女性',reading:'じょせい',romajiTarget:'jo',meaning:'female / woman',targetIndex:0},
+      {word:'長女',reading:'ちょうじょ',romajiTarget:'jo',meaning:'eldest daughter',targetIndex:1},
+    ],
+    kunWords: [
+      {word:'女',reading:'おんな',romajiTarget:'onna',meaning:'woman',targetIndex:0},
+      {word:'女の子',reading:'おんなのこ',romajiTarget:'onna',meaning:'girl',targetIndex:0},
+    ],
+    standalone:{on:false,kun:true}
+  },
+  {
+    kanji: '子',
+    meanings: ['child', 'kid'],
+    onYomi: [{kana:'シ',romaji:'shi'},{kana:'ス',romaji:'su'}],
+    kunYomi: [{kana:'こ',romaji:'ko'}],
+    onWords: [
+      {word:'子供',reading:'こども',romajiTarget:'shi',meaning:'child',targetIndex:0},
+      {word:'女子',reading:'じょし',romajiTarget:'shi',meaning:'girl / female',targetIndex:1},
+    ],
+    kunWords: [
+      {word:'子',reading:'こ',romajiTarget:'ko',meaning:'child',targetIndex:0},
+      {word:'子犬',reading:'こいぬ',romajiTarget:'ko',meaning:'puppy',targetIndex:0},
+    ],
+    standalone:{on:false,kun:true}
+  },
+  {
+    kanji: '父',
+    meanings: ['father'],
+    onYomi: [{kana:'フ',romaji:'fu'}],
+    kunYomi: [{kana:'ちち',romaji:'chichi'}],
+    onWords: [
+      {word:'父親',reading:'ちちおや',romajiTarget:'fu',meaning:'father',targetIndex:0},
+      {word:'祖父',reading:'そふ',romajiTarget:'fu',meaning:'grandfather',targetIndex:1},
+    ],
+    kunWords: [
+      {word:'父',reading:'ちち',romajiTarget:'chichi',meaning:'(my) father',targetIndex:0},
+    ],
+    standalone:{on:false,kun:true}
+  },
+  {
+    kanji: '母',
+    meanings: ['mother'],
+    onYomi: [{kana:'ボ',romaji:'bo'}],
+    kunYomi: [{kana:'はは',romaji:'haha'}],
+    onWords: [
+      {word:'母親',reading:'ははおや',romajiTarget:'bo',meaning:'mother',targetIndex:0},
+      {word:'祖母',reading:'そぼ',romajiTarget:'bo',meaning:'grandmother',targetIndex:1},
+    ],
+    kunWords: [
+      {word:'母',reading:'はは',romajiTarget:'haha',meaning:'(my) mother',targetIndex:0},
+    ],
+    standalone:{on:false,kun:true}
+  },
+  {
+    kanji: '兄',
+    meanings: ['older brother'],
+    onYomi: [{kana:'ケイ',romaji:'kei'},{kana:'キョウ',romaji:'kyou'}],
+    kunYomi: [{kana:'あに',romaji:'ani'}],
+    onWords: [
+      {word:'兄弟',reading:'きょうだい',romajiTarget:'kyou',meaning:'siblings',targetIndex:0},
+    ],
+    kunWords: [
+      {word:'兄',reading:'あに',romajiTarget:'ani',meaning:'older brother',targetIndex:0},
+      {word:'お兄さん',reading:'おにいさん',romajiTarget:'ani',meaning:'older brother (polite)',targetIndex:0},
+    ],
+    standalone:{on:false,kun:true}
+  },
+  {
+    kanji: '姉',
+    meanings: ['older sister'],
+    onYomi: [{kana:'シ',romaji:'shi'}],
+    kunYomi: [{kana:'あね',romaji:'ane'}],
+    onWords: [
+      {word:'姉妹',reading:'しまい',romajiTarget:'shi',meaning:'sisters',targetIndex:0},
+    ],
+    kunWords: [
+      {word:'姉',reading:'あね',romajiTarget:'ane',meaning:'older sister',targetIndex:0},
+      {word:'お姉さん',reading:'おねえさん',romajiTarget:'ane',meaning:'older sister (polite)',targetIndex:0},
+    ],
+    standalone:{on:false,kun:true}
+  },
+  {
+    kanji: '弟',
+    meanings: ['younger brother'],
+    onYomi: [{kana:'テイ',romaji:'tei'},{kana:'ダイ',romaji:'dai'}],
+    kunYomi: [{kana:'おとうと',romaji:'otouto'}],
+    onWords: [
+      {word:'兄弟',reading:'きょうだい',romajiTarget:'dai',meaning:'siblings',targetIndex:1},
+    ],
+    kunWords: [
+      {word:'弟',reading:'おとうと',romajiTarget:'otouto',meaning:'younger brother',targetIndex:0},
+    ],
+    standalone:{on:false,kun:true}
+  },
+  {
+    kanji: '妹',
+    meanings: ['younger sister'],
+    onYomi: [{kana:'マイ',romaji:'mai'}],
+    kunYomi: [{kana:'いもうと',romaji:'imouto'}],
+    onWords: [
+      {word:'姉妹',reading:'しまい',romajiTarget:'mai',meaning:'sisters',targetIndex:1},
+    ],
+    kunWords: [
+      {word:'妹',reading:'いもうと',romajiTarget:'imouto',meaning:'younger sister',targetIndex:0},
+    ],
+    standalone:{on:false,kun:true}
+  },
+  {
+    kanji: '友',
+    meanings: ['friend'],
+    onYomi: [{kana:'ユウ',romaji:'yuu'}],
+    kunYomi: [{kana:'とも',romaji:'tomo'}],
+    onWords: [
+      {word:'友人',reading:'ゆうじん',romajiTarget:'yuu',meaning:'friend',targetIndex:0},
+      {word:'友好',reading:'ゆうこう',romajiTarget:'yuu',meaning:'friendship',targetIndex:0},
+    ],
+    kunWords: [
+      {word:'友達',reading:'ともだち',romajiTarget:'tomo',meaning:'friend',targetIndex:0},
+      {word:'友',reading:'とも',romajiTarget:'tomo',meaning:'friend',targetIndex:0},
+    ],
+    standalone:{on:false,kun:true}
+  },
+  {
+    kanji: '先',
+    meanings: ['previous', 'ahead', 'tip'],
+    onYomi: [{kana:'セン',romaji:'sen'}],
+    kunYomi: [{kana:'さき',romaji:'saki'}],
+    onWords: [
+      {word:'先生',reading:'せんせい',romajiTarget:'sen',meaning:'teacher',targetIndex:0},
+      {word:'先週',reading:'せんしゅう',romajiTarget:'sen',meaning:'last week',targetIndex:0},
+    ],
+    kunWords: [
+      {word:'先',reading:'さき',romajiTarget:'saki',meaning:'ahead / tip',targetIndex:0},
+      {word:'先ほど',reading:'さきほど',romajiTarget:'saki',meaning:'a short time ago',targetIndex:0},
+    ],
+    standalone:{on:false,kun:true}
+  },
+  {
+    kanji: '後',
+    meanings: ['after', 'later', 'behind'],
+    onYomi: [{kana:'ゴ',romaji:'go'},{kana:'コウ',romaji:'kou'}],
+    kunYomi: [{kana:'あと',romaji:'ato'},{kana:'うし',romaji:'ushi'},{kana:'のち',romaji:'nochi'}],
+    onWords: [
+      {word:'午後',reading:'ごご',romajiTarget:'go',meaning:'afternoon',targetIndex:1},
+      {word:'後半',reading:'こうはん',romajiTarget:'kou',meaning:'second half',targetIndex:0},
+    ],
+    kunWords: [
+      {word:'後',reading:'あと',romajiTarget:'ato',meaning:'after / later',targetIndex:0},
+      {word:'後ろ',reading:'うしろ',romajiTarget:'ushi',meaning:'behind / back',targetIndex:0},
+    ],
+    standalone:{on:false,kun:true}
+  },
+  {
+    kanji: '前',
+    meanings: ['before', 'front', 'previous'],
+    onYomi: [{kana:'ゼン',romaji:'zen'}],
+    kunYomi: [{kana:'まえ',romaji:'mae'}],
+    onWords: [
+      {word:'午前',reading:'ごぜん',romajiTarget:'zen',meaning:'morning / AM',targetIndex:1},
+      {word:'以前',reading:'いぜん',romajiTarget:'zen',meaning:'before / formerly',targetIndex:1},
+    ],
+    kunWords: [
+      {word:'前',reading:'まえ',romajiTarget:'mae',meaning:'front / before',targetIndex:0},
+      {word:'名前',reading:'なまえ',romajiTarget:'mae',meaning:'name',targetIndex:1},
+    ],
+    standalone:{on:false,kun:true}
+  },
+  {
+    kanji: '右',
+    meanings: ['right (direction)'],
+    onYomi: [{kana:'ウ',romaji:'u'},{kana:'ユウ',romaji:'yuu'}],
+    kunYomi: [{kana:'みぎ',romaji:'migi'}],
+    onWords: [
+      {word:'右折',reading:'うせつ',romajiTarget:'u',meaning:'right turn',targetIndex:0},
+      {word:'左右',reading:'さゆう',romajiTarget:'yuu',meaning:'left and right',targetIndex:1},
+    ],
+    kunWords: [
+      {word:'右',reading:'みぎ',romajiTarget:'migi',meaning:'right',targetIndex:0},
+      {word:'右手',reading:'みぎて',romajiTarget:'migi',meaning:'right hand',targetIndex:0},
+    ],
+    standalone:{on:false,kun:true}
+  },
+  {
+    kanji: '左',
+    meanings: ['left (direction)'],
+    onYomi: [{kana:'サ',romaji:'sa'}],
+    kunYomi: [{kana:'ひだり',romaji:'hidari'}],
+    onWords: [
+      {word:'左折',reading:'させつ',romajiTarget:'sa',meaning:'left turn',targetIndex:0},
+      {word:'左右',reading:'さゆう',romajiTarget:'sa',meaning:'left and right',targetIndex:0},
+    ],
+    kunWords: [
+      {word:'左',reading:'ひだり',romajiTarget:'hidari',meaning:'left',targetIndex:0},
+      {word:'左手',reading:'ひだりて',romajiTarget:'hidari',meaning:'left hand',targetIndex:0},
+    ],
+    standalone:{on:false,kun:true}
+  },
+  {
+    kanji: '外',
+    meanings: ['outside', 'foreign'],
+    onYomi: [{kana:'ガイ',romaji:'gai'},{kana:'ゲ',romaji:'ge'}],
+    kunYomi: [{kana:'そと',romaji:'soto'},{kana:'ほか',romaji:'hoka'}],
+    onWords: [
+      {word:'海外',reading:'かいがい',romajiTarget:'gai',meaning:'overseas',targetIndex:1},
+      {word:'外国',reading:'がいこく',romajiTarget:'gai',meaning:'foreign country',targetIndex:0},
+    ],
+    kunWords: [
+      {word:'外',reading:'そと',romajiTarget:'soto',meaning:'outside',targetIndex:0},
+      {word:'外れ',reading:'はずれ',romajiTarget:'hoka',meaning:'outskirts / miss',targetIndex:0},
+    ],
+    standalone:{on:false,kun:true}
+  },
+  {
+    kanji: '内',
+    meanings: ['inside', 'within', 'home'],
+    onYomi: [{kana:'ナイ',romaji:'nai'},{kana:'ダイ',romaji:'dai'}],
+    kunYomi: [{kana:'うち',romaji:'uchi'}],
+    onWords: [
+      {word:'国内',reading:'こくない',romajiTarget:'nai',meaning:'domestic / within the country',targetIndex:1},
+      {word:'内容',reading:'ないよう',romajiTarget:'nai',meaning:'contents',targetIndex:0},
+    ],
+    kunWords: [
+      {word:'内',reading:'うち',romajiTarget:'uchi',meaning:'inside / home',targetIndex:0},
+    ],
+    standalone:{on:false,kun:true}
+  },
+  {
+    kanji: '本',
+    meanings: ['book', 'origin', 'main'],
+    onYomi: [{kana:'ホン',romaji:'hon'}],
+    kunYomi: [{kana:'もと',romaji:'moto'}],
+    onWords: [
+      {word:'日本',reading:'にほん',romajiTarget:'hon',meaning:'Japan',targetIndex:1},
+      {word:'本屋',reading:'ほんや',romajiTarget:'hon',meaning:'bookstore',targetIndex:0},
+      {word:'本当',reading:'ほんとう',romajiTarget:'hon',meaning:'really / truth',targetIndex:0},
+    ],
+    kunWords: [
+      {word:'本',reading:'もと',romajiTarget:'moto',meaning:'origin / base',targetIndex:0},
+    ],
+    standalone:{on:true,kun:false}
+  },
+  {
+    kanji: '何',
+    meanings: ['what', 'how many'],
+    onYomi: [{kana:'カ',romaji:'ka'}],
+    kunYomi: [{kana:'なに',romaji:'nani'},{kana:'なん',romaji:'nan'}],
+    onWords: [
+      {word:'何者',reading:'なにもの',romajiTarget:'ka',meaning:'who / what kind of person',targetIndex:0},
+    ],
+    kunWords: [
+      {word:'何',reading:'なに',romajiTarget:'nani',meaning:'what',targetIndex:0},
+      {word:'何時',reading:'なんじ',romajiTarget:'nan',meaning:'what time',targetIndex:0},
+    ],
+    standalone:{on:false,kun:true}
+  },
+  {
+    kanji: '今',
+    meanings: ['now', 'the present'],
+    onYomi: [{kana:'コン',romaji:'kon'},{kana:'キン',romaji:'kin'}],
+    kunYomi: [{kana:'いま',romaji:'ima'}],
+    onWords: [
+      {word:'今日',reading:'こんにち',romajiTarget:'kon',meaning:'today / nowadays',targetIndex:0},
+      {word:'今週',reading:'こんしゅう',romajiTarget:'kon',meaning:'this week',targetIndex:0},
+    ],
+    kunWords: [
+      {word:'今',reading:'いま',romajiTarget:'ima',meaning:'now',targetIndex:0},
+      {word:'今ごろ',reading:'いまごろ',romajiTarget:'ima',meaning:'about now',targetIndex:0},
+    ],
+    standalone:{on:false,kun:true}
+  },
+  {
+    kanji: '半',
+    meanings: ['half'],
+    onYomi: [{kana:'ハン',romaji:'han'}],
+    kunYomi: [{kana:'なか',romaji:'naka'}],
+    onWords: [
+      {word:'半分',reading:'はんぶん',romajiTarget:'han',meaning:'half',targetIndex:0},
+      {word:'一時半',reading:'いちじはん',romajiTarget:'han',meaning:'1:30',targetIndex:2},
+    ],
+    kunWords: [
+      {word:'半ば',reading:'なかば',romajiTarget:'naka',meaning:'middle / halfway',targetIndex:0},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '毎',
+    meanings: ['every', 'each'],
+    onYomi: [{kana:'マイ',romaji:'mai'}],
+    kunYomi: [],
+    onWords: [
+      {word:'毎日',reading:'まいにち',romajiTarget:'mai',meaning:'every day',targetIndex:0},
+      {word:'毎週',reading:'まいしゅう',romajiTarget:'mai',meaning:'every week',targetIndex:0},
+      {word:'毎月',reading:'まいつき',romajiTarget:'mai',meaning:'every month',targetIndex:0},
+    ],
+    kunWords: [],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '週',
+    meanings: ['week'],
+    onYomi: [{kana:'シュウ',romaji:'shuu'}],
+    kunYomi: [],
+    onWords: [
+      {word:'今週',reading:'こんしゅう',romajiTarget:'shuu',meaning:'this week',targetIndex:1},
+      {word:'先週',reading:'せんしゅう',romajiTarget:'shuu',meaning:'last week',targetIndex:1},
+      {word:'毎週',reading:'まいしゅう',romajiTarget:'shuu',meaning:'every week',targetIndex:1},
+    ],
+    kunWords: [],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '曜',
+    meanings: ['day of the week'],
+    onYomi: [{kana:'ヨウ',romaji:'you'}],
+    kunYomi: [],
+    onWords: [
+      {word:'月曜日',reading:'げつようび',romajiTarget:'you',meaning:'Monday',targetIndex:1},
+      {word:'何曜日',reading:'なにようび',romajiTarget:'you',meaning:'what day of the week',targetIndex:1},
+    ],
+    kunWords: [],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '朝',
+    meanings: ['morning', 'dynasty'],
+    onYomi: [{kana:'チョウ',romaji:'chou'}],
+    kunYomi: [{kana:'あさ',romaji:'asa'}],
+    onWords: [
+      {word:'朝食',reading:'ちょうしょく',romajiTarget:'chou',meaning:'breakfast',targetIndex:0},
+      {word:'毎朝',reading:'まいあさ',romajiTarget:'chou',meaning:'every morning',targetIndex:1},
+    ],
+    kunWords: [
+      {word:'朝',reading:'あさ',romajiTarget:'asa',meaning:'morning',targetIndex:0},
+      {word:'朝ご飯',reading:'あさごはん',romajiTarget:'asa',meaning:'breakfast',targetIndex:0},
+    ],
+    standalone:{on:false,kun:true}
+  },
+  {
+    kanji: '昼',
+    meanings: ['daytime', 'noon'],
+    onYomi: [{kana:'チュウ',romaji:'chuu'}],
+    kunYomi: [{kana:'ひる',romaji:'hiru'}],
+    onWords: [
+      {word:'昼食',reading:'ちゅうしょく',romajiTarget:'chuu',meaning:'lunch',targetIndex:0},
+    ],
+    kunWords: [
+      {word:'昼',reading:'ひる',romajiTarget:'hiru',meaning:'noon / daytime',targetIndex:0},
+      {word:'昼ご飯',reading:'ひるごはん',romajiTarget:'hiru',meaning:'lunch',targetIndex:0},
+    ],
+    standalone:{on:false,kun:true}
+  },
+  {
+    kanji: '夜',
+    meanings: ['night', 'evening'],
+    onYomi: [{kana:'ヤ',romaji:'ya'}],
+    kunYomi: [{kana:'よる',romaji:'yoru'},{kana:'よ',romaji:'yo'}],
+    onWords: [
+      {word:'夜間',reading:'やかん',romajiTarget:'ya',meaning:'nighttime',targetIndex:0},
+      {word:'深夜',reading:'しんや',romajiTarget:'ya',meaning:'late night',targetIndex:1},
+    ],
+    kunWords: [
+      {word:'夜',reading:'よる',romajiTarget:'yoru',meaning:'night',targetIndex:0},
+      {word:'夜中',reading:'よなか',romajiTarget:'yo',meaning:'midnight',targetIndex:0},
+    ],
+    standalone:{on:false,kun:true}
+  },
+  {
+    kanji: '春',
+    meanings: ['spring (season)'],
+    onYomi: [{kana:'シュン',romaji:'shun'}],
+    kunYomi: [{kana:'はる',romaji:'haru'}],
+    onWords: [
+      {word:'春分',reading:'しゅんぶん',romajiTarget:'shun',meaning:'vernal equinox',targetIndex:0},
+    ],
+    kunWords: [
+      {word:'春',reading:'はる',romajiTarget:'haru',meaning:'spring',targetIndex:0},
+      {word:'春休み',reading:'はるやすみ',romajiTarget:'haru',meaning:'spring break',targetIndex:0},
+    ],
+    standalone:{on:false,kun:true}
+  },
+  {
+    kanji: '夏',
+    meanings: ['summer'],
+    onYomi: [{kana:'カ',romaji:'ka'},{kana:'ゲ',romaji:'ge'}],
+    kunYomi: [{kana:'なつ',romaji:'natsu'}],
+    onWords: [
+      {word:'夏至',reading:'げし',romajiTarget:'ge',meaning:'summer solstice',targetIndex:0},
+    ],
+    kunWords: [
+      {word:'夏',reading:'なつ',romajiTarget:'natsu',meaning:'summer',targetIndex:0},
+      {word:'夏休み',reading:'なつやすみ',romajiTarget:'natsu',meaning:'summer vacation',targetIndex:0},
+    ],
+    standalone:{on:false,kun:true}
+  },
+  {
+    kanji: '秋',
+    meanings: ['autumn', 'fall'],
+    onYomi: [{kana:'シュウ',romaji:'shuu'}],
+    kunYomi: [{kana:'あき',romaji:'aki'}],
+    onWords: [
+      {word:'秋分',reading:'しゅうぶん',romajiTarget:'shuu',meaning:'autumnal equinox',targetIndex:0},
+    ],
+    kunWords: [
+      {word:'秋',reading:'あき',romajiTarget:'aki',meaning:'autumn',targetIndex:0},
+      {word:'秋空',reading:'あきぞら',romajiTarget:'aki',meaning:'autumn sky',targetIndex:0},
+    ],
+    standalone:{on:false,kun:true}
+  },
+  {
+    kanji: '冬',
+    meanings: ['winter'],
+    onYomi: [{kana:'トウ',romaji:'tou'}],
+    kunYomi: [{kana:'ふゆ',romaji:'fuyu'}],
+    onWords: [
+      {word:'冬至',reading:'とうじ',romajiTarget:'tou',meaning:'winter solstice',targetIndex:0},
+    ],
+    kunWords: [
+      {word:'冬',reading:'ふゆ',romajiTarget:'fuyu',meaning:'winter',targetIndex:0},
+      {word:'冬休み',reading:'ふゆやすみ',romajiTarget:'fuyu',meaning:'winter vacation',targetIndex:0},
+    ],
+    standalone:{on:false,kun:true}
+  },
+  {
+    kanji: '町',
+    meanings: ['town', 'city block'],
+    onYomi: [{kana:'チョウ',romaji:'chou'}],
+    kunYomi: [{kana:'まち',romaji:'machi'}],
+    onWords: [
+      {word:'町長',reading:'ちょうちょう',romajiTarget:'chou',meaning:'town mayor',targetIndex:0},
+    ],
+    kunWords: [
+      {word:'町',reading:'まち',romajiTarget:'machi',meaning:'town',targetIndex:0},
+      {word:'下町',reading:'したまち',romajiTarget:'machi',meaning:'downtown / old town',targetIndex:1},
+    ],
+    standalone:{on:false,kun:true}
+  },
+  {
+    kanji: '村',
+    meanings: ['village'],
+    onYomi: [{kana:'ソン',romaji:'son'}],
+    kunYomi: [{kana:'むら',romaji:'mura'}],
+    onWords: [
+      {word:'村長',reading:'そんちょう',romajiTarget:'son',meaning:'village mayor',targetIndex:0},
+      {word:'農村',reading:'のうそん',romajiTarget:'son',meaning:'farming village',targetIndex:1},
+    ],
+    kunWords: [
+      {word:'村',reading:'むら',romajiTarget:'mura',meaning:'village',targetIndex:0},
+    ],
+    standalone:{on:false,kun:true}
+  },
+  {
+    kanji: '市',
+    meanings: ['city', 'market'],
+    onYomi: [{kana:'シ',romaji:'shi'}],
+    kunYomi: [{kana:'いち',romaji:'ichi'}],
+    onWords: [
+      {word:'市場',reading:'しじょう',romajiTarget:'shi',meaning:'market',targetIndex:0},
+      {word:'都市',reading:'とし',romajiTarget:'shi',meaning:'city',targetIndex:1},
+    ],
+    kunWords: [
+      {word:'市',reading:'いち',romajiTarget:'ichi',meaning:'market',targetIndex:0},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '都',
+    meanings: ['capital', 'metropolis'],
+    onYomi: [{kana:'ト',romaji:'to'},{kana:'ツ',romaji:'tsu'}],
+    kunYomi: [{kana:'みやこ',romaji:'miyako'}],
+    onWords: [
+      {word:'東京都',reading:'とうきょうと',romajiTarget:'to',meaning:'Tokyo Metropolis',targetIndex:2},
+      {word:'都市',reading:'とし',romajiTarget:'to',meaning:'city',targetIndex:0},
+    ],
+    kunWords: [
+      {word:'都',reading:'みやこ',romajiTarget:'miyako',meaning:'capital / metropolis',targetIndex:0},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '県',
+    meanings: ['prefecture'],
+    onYomi: [{kana:'ケン',romaji:'ken'}],
+    kunYomi: [],
+    onWords: [
+      {word:'県庁',reading:'けんちょう',romajiTarget:'ken',meaning:'prefectural office',targetIndex:0},
+      {word:'神奈川県',reading:'かながわけん',romajiTarget:'ken',meaning:'Kanagawa Prefecture',targetIndex:2},
+    ],
+    kunWords: [],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '家',
+    meanings: ['house', 'home', 'family'],
+    onYomi: [{kana:'カ',romaji:'ka'},{kana:'ケ',romaji:'ke'}],
+    kunYomi: [{kana:'いえ',romaji:'ie'},{kana:'うち',romaji:'uchi'}],
+    onWords: [
+      {word:'家族',reading:'かぞく',romajiTarget:'ka',meaning:'family',targetIndex:0},
+      {word:'家庭',reading:'かてい',romajiTarget:'ka',meaning:'home / household',targetIndex:0},
+    ],
+    kunWords: [
+      {word:'家',reading:'いえ',romajiTarget:'ie',meaning:'house / home',targetIndex:0},
+      {word:'家出',reading:'いえで',romajiTarget:'ie',meaning:'running away from home',targetIndex:0},
+    ],
+    standalone:{on:false,kun:true}
+  },
+  {
+    kanji: '部',
+    meanings: ['section', 'part', 'department', 'club'],
+    onYomi: [{kana:'ブ',romaji:'bu'}],
+    kunYomi: [],
+    onWords: [
+      {word:'部屋',reading:'へや',romajiTarget:'bu',meaning:'room',targetIndex:0},
+      {word:'部分',reading:'ぶぶん',romajiTarget:'bu',meaning:'part / section',targetIndex:0},
+    ],
+    kunWords: [],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '屋',
+    meanings: ['shop', 'roof', 'person'],
+    onYomi: [{kana:'オク',romaji:'oku'}],
+    kunYomi: [{kana:'や',romaji:'ya'}],
+    onWords: [
+      {word:'屋上',reading:'おくじょう',romajiTarget:'oku',meaning:'rooftop',targetIndex:0},
+      {word:'屋内',reading:'おくない',romajiTarget:'oku',meaning:'indoors',targetIndex:0},
+    ],
+    kunWords: [
+      {word:'本屋',reading:'ほんや',romajiTarget:'ya',meaning:'bookstore',targetIndex:1},
+      {word:'肉屋',reading:'にくや',romajiTarget:'ya',meaning:'butcher shop',targetIndex:1},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '店',
+    meanings: ['store', 'shop'],
+    onYomi: [{kana:'テン',romaji:'ten'}],
+    kunYomi: [{kana:'みせ',romaji:'mise'}],
+    onWords: [
+      {word:'店員',reading:'てんいん',romajiTarget:'ten',meaning:'shop clerk',targetIndex:0},
+      {word:'書店',reading:'しょてん',romajiTarget:'ten',meaning:'bookshop',targetIndex:1},
+    ],
+    kunWords: [
+      {word:'店',reading:'みせ',romajiTarget:'mise',meaning:'store / shop',targetIndex:0},
+    ],
+    standalone:{on:false,kun:true}
+  },
+  {
+    kanji: '駅',
+    meanings: ['station (train)'],
+    onYomi: [{kana:'エキ',romaji:'eki'}],
+    kunYomi: [],
+    onWords: [
+      {word:'駅前',reading:'えきまえ',romajiTarget:'eki',meaning:'in front of the station',targetIndex:0},
+      {word:'駅員',reading:'えきいん',romajiTarget:'eki',meaning:'station staff',targetIndex:0},
+    ],
+    kunWords: [],
+    standalone:{on:true,kun:false}
+  },
+  {
+    kanji: '橋',
+    meanings: ['bridge'],
+    onYomi: [{kana:'キョウ',romaji:'kyou'}],
+    kunYomi: [{kana:'はし',romaji:'hashi'}],
+    onWords: [
+      {word:'鉄橋',reading:'てっきょう',romajiTarget:'kyou',meaning:'railway bridge',targetIndex:1},
+    ],
+    kunWords: [
+      {word:'橋',reading:'はし',romajiTarget:'hashi',meaning:'bridge',targetIndex:0},
+      {word:'橋渡し',reading:'はしわたし',romajiTarget:'hashi',meaning:'mediation / bridge-building',targetIndex:0},
+    ],
+    standalone:{on:false,kun:true}
+  },
+  {
+    kanji: '門',
+    meanings: ['gate', 'school of thought'],
+    onYomi: [{kana:'モン',romaji:'mon'}],
+    kunYomi: [{kana:'かど',romaji:'kado'}],
+    onWords: [
+      {word:'正門',reading:'せいもん',romajiTarget:'mon',meaning:'main gate',targetIndex:1},
+      {word:'専門',reading:'せんもん',romajiTarget:'mon',meaning:'specialty / expert',targetIndex:1},
+    ],
+    kunWords: [
+      {word:'門',reading:'かど',romajiTarget:'kado',meaning:'gate',targetIndex:0},
+    ],
+    standalone:{on:true,kun:false}
+  },
+  {
+    kanji: '池',
+    meanings: ['pond', 'lake'],
+    onYomi: [{kana:'チ',romaji:'chi'}],
+    kunYomi: [{kana:'いけ',romaji:'ike'}],
+    onWords: [
+      {word:'電池',reading:'でんち',romajiTarget:'chi',meaning:'battery',targetIndex:1},
+    ],
+    kunWords: [
+      {word:'池',reading:'いけ',romajiTarget:'ike',meaning:'pond',targetIndex:0},
+      {word:'池袋',reading:'いけぶくろ',romajiTarget:'ike',meaning:'Ikebukuro (place)',targetIndex:0},
+    ],
+    standalone:{on:false,kun:true}
+  },
+  {
+    kanji: '山',
+    meanings: ['mountain'],
+    onYomi: [{kana:'サン',romaji:'san'},{kana:'セン',romaji:'sen'}],
+    kunYomi: [{kana:'やま',romaji:'yama'}],
+    onWords: [
+      {word:'富士山',reading:'ふじさん',romajiTarget:'san',meaning:'Mt. Fuji',targetIndex:2},
+      {word:'火山',reading:'かざん',romajiTarget:'san',meaning:'volcano',targetIndex:1},
+    ],
+    kunWords: [
+      {word:'山',reading:'やま',romajiTarget:'yama',meaning:'mountain',targetIndex:0},
+      {word:'山道',reading:'やまみち',romajiTarget:'yama',meaning:'mountain path',targetIndex:0},
+    ],
+    standalone:{on:false,kun:true}
+  },
+  {
+    kanji: '医',
+    meanings: ['doctor', 'medicine'],
+    onYomi: [{kana:'イ',romaji:'i'}],
+    kunYomi: [],
+    onWords: [
+      {word:'医者',reading:'いしゃ',romajiTarget:'i',meaning:'doctor',targetIndex:0},
+      {word:'医学',reading:'いがく',romajiTarget:'i',meaning:'medical science',targetIndex:0},
+    ],
+    kunWords: [],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '病',
+    meanings: ['illness', 'disease'],
+    onYomi: [{kana:'ビョウ',romaji:'byou'},{kana:'ヘイ',romaji:'hei'}],
+    kunYomi: [{kana:'やま',romaji:'yama'}],
+    onWords: [
+      {word:'病院',reading:'びょういん',romajiTarget:'byou',meaning:'hospital',targetIndex:0},
+      {word:'病気',reading:'びょうき',romajiTarget:'byou',meaning:'illness',targetIndex:0},
+    ],
+    kunWords: [
+      {word:'病む',reading:'やむ',romajiTarget:'yama',meaning:'to be ill',targetIndex:0},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '薬',
+    meanings: ['medicine', 'drug'],
+    onYomi: [{kana:'ヤク',romaji:'yaku'}],
+    kunYomi: [{kana:'くすり',romaji:'kusuri'}],
+    onWords: [
+      {word:'薬局',reading:'やっきょく',romajiTarget:'yaku',meaning:'pharmacy',targetIndex:0},
+      {word:'薬剤師',reading:'やくざいし',romajiTarget:'yaku',meaning:'pharmacist',targetIndex:0},
+    ],
+    kunWords: [
+      {word:'薬',reading:'くすり',romajiTarget:'kusuri',meaning:'medicine',targetIndex:0},
+    ],
+    standalone:{on:false,kun:true}
+  },
+  {
+    kanji: '肉',
+    meanings: ['meat', 'flesh'],
+    onYomi: [{kana:'ニク',romaji:'niku'}],
+    kunYomi: [],
+    onWords: [
+      {word:'牛肉',reading:'ぎゅうにく',romajiTarget:'niku',meaning:'beef',targetIndex:1},
+      {word:'肉屋',reading:'にくや',romajiTarget:'niku',meaning:'butcher shop',targetIndex:0},
+    ],
+    kunWords: [],
+    standalone:{on:true,kun:false}
+  },
+  {
+    kanji: '米',
+    meanings: ['rice', 'America'],
+    onYomi: [{kana:'ベイ',romaji:'bei'},{kana:'マイ',romaji:'mai'}],
+    kunYomi: [{kana:'こめ',romaji:'kome'}],
+    onWords: [
+      {word:'米国',reading:'べいこく',romajiTarget:'bei',meaning:'United States',targetIndex:0},
+      {word:'白米',reading:'はくまい',romajiTarget:'mai',meaning:'white rice',targetIndex:1},
+    ],
+    kunWords: [
+      {word:'米',reading:'こめ',romajiTarget:'kome',meaning:'rice (uncooked)',targetIndex:0},
+    ],
+    standalone:{on:false,kun:true}
+  },
+  {
+    kanji: '茶',
+    meanings: ['tea', 'brown'],
+    onYomi: [{kana:'チャ',romaji:'cha'},{kana:'サ',romaji:'sa'}],
+    kunYomi: [],
+    onWords: [
+      {word:'お茶',reading:'おちゃ',romajiTarget:'cha',meaning:'tea',targetIndex:1},
+      {word:'茶色',reading:'ちゃいろ',romajiTarget:'cha',meaning:'brown color',targetIndex:0},
+    ],
+    kunWords: [],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '音',
+    meanings: ['sound', 'noise'],
+    onYomi: [{kana:'オン',romaji:'on'},{kana:'イン',romaji:'in'}],
+    kunYomi: [{kana:'おと',romaji:'oto'},{kana:'ね',romaji:'ne'}],
+    onWords: [
+      {word:'音楽',reading:'おんがく',romajiTarget:'on',meaning:'music',targetIndex:0},
+      {word:'発音',reading:'はつおん',romajiTarget:'on',meaning:'pronunciation',targetIndex:1},
+    ],
+    kunWords: [
+      {word:'音',reading:'おと',romajiTarget:'oto',meaning:'sound / noise',targetIndex:0},
+      {word:'足音',reading:'あしおと',romajiTarget:'oto',meaning:'footsteps',targetIndex:1},
+    ],
+    standalone:{on:false,kun:true}
+  },
+  {
+    kanji: '楽',
+    meanings: ['music', 'comfort', 'ease', 'fun'],
+    onYomi: [{kana:'ガク',romaji:'gaku'},{kana:'ラク',romaji:'raku'}],
+    kunYomi: [{kana:'たの',romaji:'tano'}],
+    onWords: [
+      {word:'音楽',reading:'おんがく',romajiTarget:'gaku',meaning:'music',targetIndex:1},
+      {word:'楽器',reading:'がっき',romajiTarget:'gaku',meaning:'musical instrument',targetIndex:0},
+    ],
+    kunWords: [
+      {word:'楽しい',reading:'たのしい',romajiTarget:'tano',meaning:'fun / enjoyable',targetIndex:0},
+      {word:'楽しむ',reading:'たのしむ',romajiTarget:'tano',meaning:'to enjoy',targetIndex:0},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '歌',
+    meanings: ['song', 'sing'],
+    onYomi: [{kana:'カ',romaji:'ka'}],
+    kunYomi: [{kana:'うた',romaji:'uta'},{kana:'うた',romaji:'uta'}],
+    onWords: [
+      {word:'歌手',reading:'かしゅ',romajiTarget:'ka',meaning:'singer',targetIndex:0},
+      {word:'国歌',reading:'こっか',romajiTarget:'ka',meaning:'national anthem',targetIndex:1},
+    ],
+    kunWords: [
+      {word:'歌',reading:'うた',romajiTarget:'uta',meaning:'song',targetIndex:0},
+      {word:'歌う',reading:'うたう',romajiTarget:'uta',meaning:'to sing',targetIndex:0},
+    ],
+    standalone:{on:false,kun:true}
+  },
+  {
+    kanji: '絵',
+    meanings: ['picture', 'painting', 'drawing'],
+    onYomi: [{kana:'カイ',romaji:'kai'},{kana:'エ',romaji:'e'}],
+    kunYomi: [],
+    onWords: [
+      {word:'絵画',reading:'かいが',romajiTarget:'kai',meaning:'painting',targetIndex:0},
+      {word:'絵本',reading:'えほん',romajiTarget:'e',meaning:'picture book',targetIndex:0},
+    ],
+    kunWords: [],
+    standalone:{on:true,kun:false}
+  },
+  {
+    kanji: '色',
+    meanings: ['color', 'type'],
+    onYomi: [{kana:'ショク',romaji:'shoku'},{kana:'シキ',romaji:'shiki'}],
+    kunYomi: [{kana:'いろ',romaji:'iro'}],
+    onWords: [
+      {word:'茶色',reading:'ちゃいろ',romajiTarget:'shoku',meaning:'brown',targetIndex:1},
+      {word:'景色',reading:'けしき',romajiTarget:'shiki',meaning:'scenery',targetIndex:1},
+    ],
+    kunWords: [
+      {word:'色',reading:'いろ',romajiTarget:'iro',meaning:'color',targetIndex:0},
+      {word:'色々',reading:'いろいろ',romajiTarget:'iro',meaning:'various',targetIndex:0},
+    ],
+    standalone:{on:false,kun:true}
+  },
+  {
+    kanji: '形',
+    meanings: ['shape', 'form'],
+    onYomi: [{kana:'ケイ',romaji:'kei'},{kana:'ギョウ',romaji:'gyou'}],
+    kunYomi: [{kana:'かたち',romaji:'katachi'},{kana:'かた',romaji:'kata'}],
+    onWords: [
+      {word:'形式',reading:'けいしき',romajiTarget:'kei',meaning:'format / style',targetIndex:0},
+      {word:'人形',reading:'にんぎょう',romajiTarget:'gyou',meaning:'doll',targetIndex:1},
+    ],
+    kunWords: [
+      {word:'形',reading:'かたち',romajiTarget:'katachi',meaning:'shape',targetIndex:0},
+    ],
+    standalone:{on:false,kun:true}
+  },
+  {
+    kanji: '新',
+    meanings: ['new', 'fresh'],
+    onYomi: [{kana:'シン',romaji:'shin'}],
+    kunYomi: [{kana:'あたら',romaji:'atara'},{kana:'あら',romaji:'ara'},{kana:'にい',romaji:'nii'}],
+    onWords: [
+      {word:'新聞',reading:'しんぶん',romajiTarget:'shin',meaning:'newspaper',targetIndex:0},
+      {word:'新幹線',reading:'しんかんせん',romajiTarget:'shin',meaning:'bullet train',targetIndex:0},
+    ],
+    kunWords: [
+      {word:'新しい',reading:'あたらしい',romajiTarget:'atara',meaning:'new',targetIndex:0},
+      {word:'新た',reading:'あらた',romajiTarget:'ara',meaning:'new / fresh',targetIndex:0},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '古',
+    meanings: ['old', 'ancient'],
+    onYomi: [{kana:'コ',romaji:'ko'}],
+    kunYomi: [{kana:'ふる',romaji:'furu'}],
+    onWords: [
+      {word:'古代',reading:'こだい',romajiTarget:'ko',meaning:'ancient times',targetIndex:0},
+      {word:'古典',reading:'こてん',romajiTarget:'ko',meaning:'classics',targetIndex:0},
+    ],
+    kunWords: [
+      {word:'古い',reading:'ふるい',romajiTarget:'furu',meaning:'old',targetIndex:0},
+      {word:'古本',reading:'ふるほん',romajiTarget:'furu',meaning:'used book',targetIndex:0},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '高',
+    meanings: ['tall', 'high', 'expensive'],
+    onYomi: [{kana:'コウ',romaji:'kou'}],
+    kunYomi: [{kana:'たか',romaji:'taka'}],
+    onWords: [
+      {word:'高校',reading:'こうこう',romajiTarget:'kou',meaning:'high school',targetIndex:0},
+      {word:'高速',reading:'こうそく',romajiTarget:'kou',meaning:'high speed',targetIndex:0},
+    ],
+    kunWords: [
+      {word:'高い',reading:'たかい',romajiTarget:'taka',meaning:'tall / expensive',targetIndex:0},
+      {word:'高さ',reading:'たかさ',romajiTarget:'taka',meaning:'height',targetIndex:0},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '低',
+    meanings: ['low', 'short'],
+    onYomi: [{kana:'テイ',romaji:'tei'}],
+    kunYomi: [{kana:'ひく',romaji:'hiku'}],
+    onWords: [
+      {word:'低下',reading:'ていか',romajiTarget:'tei',meaning:'decline / drop',targetIndex:0},
+      {word:'最低',reading:'さいてい',romajiTarget:'tei',meaning:'minimum / worst',targetIndex:1},
+    ],
+    kunWords: [
+      {word:'低い',reading:'ひくい',romajiTarget:'hiku',meaning:'low / short',targetIndex:0},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '長',
+    meanings: ['long', 'chief', 'leader'],
+    onYomi: [{kana:'チョウ',romaji:'chou'}],
+    kunYomi: [{kana:'なが',romaji:'naga'}],
+    onWords: [
+      {word:'校長',reading:'こうちょう',romajiTarget:'chou',meaning:'school principal',targetIndex:1},
+      {word:'長所',reading:'ちょうしょ',romajiTarget:'chou',meaning:'strong point',targetIndex:0},
+    ],
+    kunWords: [
+      {word:'長い',reading:'ながい',romajiTarget:'naga',meaning:'long',targetIndex:0},
+      {word:'長さ',reading:'ながさ',romajiTarget:'naga',meaning:'length',targetIndex:0},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '短',
+    meanings: ['short', 'brief'],
+    onYomi: [{kana:'タン',romaji:'tan'}],
+    kunYomi: [{kana:'みじか',romaji:'mijika'}],
+    onWords: [
+      {word:'短所',reading:'たんしょ',romajiTarget:'tan',meaning:'weak point / flaw',targetIndex:0},
+      {word:'短期',reading:'たんき',romajiTarget:'tan',meaning:'short term',targetIndex:0},
+    ],
+    kunWords: [
+      {word:'短い',reading:'みじかい',romajiTarget:'mijika',meaning:'short',targetIndex:0},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '多',
+    meanings: ['many', 'much', 'frequent'],
+    onYomi: [{kana:'タ',romaji:'ta'}],
+    kunYomi: [{kana:'おお',romaji:'oo'}],
+    onWords: [
+      {word:'多数',reading:'たすう',romajiTarget:'ta',meaning:'large number',targetIndex:0},
+      {word:'多様',reading:'たよう',romajiTarget:'ta',meaning:'diverse',targetIndex:0},
+    ],
+    kunWords: [
+      {word:'多い',reading:'おおい',romajiTarget:'oo',meaning:'many / much',targetIndex:0},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '少',
+    meanings: ['few', 'little', 'small amount'],
+    onYomi: [{kana:'ショウ',romaji:'shou'}],
+    kunYomi: [{kana:'すく',romaji:'suku'},{kana:'すこ',romaji:'suko'}],
+    onWords: [
+      {word:'少数',reading:'しょうすう',romajiTarget:'shou',meaning:'small number',targetIndex:0},
+      {word:'少年',reading:'しょうねん',romajiTarget:'shou',meaning:'boy / youth',targetIndex:0},
+    ],
+    kunWords: [
+      {word:'少ない',reading:'すくない',romajiTarget:'suku',meaning:'few / scarce',targetIndex:0},
+      {word:'少し',reading:'すこし',romajiTarget:'suko',meaning:'a little',targetIndex:0},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '広',
+    meanings: ['wide', 'broad', 'spacious'],
+    onYomi: [{kana:'コウ',romaji:'kou'}],
+    kunYomi: [{kana:'ひろ',romaji:'hiro'}],
+    onWords: [
+      {word:'広場',reading:'ひろば',romajiTarget:'kou',meaning:'plaza / square',targetIndex:0},
+      {word:'広告',reading:'こうこく',romajiTarget:'kou',meaning:'advertisement',targetIndex:0},
+    ],
+    kunWords: [
+      {word:'広い',reading:'ひろい',romajiTarget:'hiro',meaning:'wide / spacious',targetIndex:0},
+      {word:'広まる',reading:'ひろまる',romajiTarget:'hiro',meaning:'to spread',targetIndex:0},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '細',
+    meanings: ['thin', 'fine', 'detailed'],
+    onYomi: [{kana:'サイ',romaji:'sai'}],
+    kunYomi: [{kana:'ほそ',romaji:'hoso'},{kana:'こま',romaji:'koma'}],
+    onWords: [
+      {word:'細心',reading:'さいしん',romajiTarget:'sai',meaning:'meticulous',targetIndex:0},
+      {word:'詳細',reading:'しょうさい',romajiTarget:'sai',meaning:'details',targetIndex:1},
+    ],
+    kunWords: [
+      {word:'細い',reading:'ほそい',romajiTarget:'hoso',meaning:'thin / slender',targetIndex:0},
+      {word:'細かい',reading:'こまかい',romajiTarget:'koma',meaning:'detailed / fine',targetIndex:0},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '重',
+    meanings: ['heavy', 'important', 'overlap'],
+    onYomi: [{kana:'ジュウ',romaji:'juu'},{kana:'チョウ',romaji:'chou'}],
+    kunYomi: [{kana:'おも',romaji:'omo'},{kana:'かさ',romaji:'kasa'}],
+    onWords: [
+      {word:'重要',reading:'じゅうよう',romajiTarget:'juu',meaning:'important',targetIndex:0},
+      {word:'体重',reading:'たいじゅう',romajiTarget:'juu',meaning:'body weight',targetIndex:1},
+    ],
+    kunWords: [
+      {word:'重い',reading:'おもい',romajiTarget:'omo',meaning:'heavy',targetIndex:0},
+      {word:'重なる',reading:'かさなる',romajiTarget:'kasa',meaning:'to overlap',targetIndex:0},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '軽',
+    meanings: ['light (weight)', 'easy', 'casual'],
+    onYomi: [{kana:'ケイ',romaji:'kei'}],
+    kunYomi: [{kana:'かる',romaji:'karu'}],
+    onWords: [
+      {word:'軽食',reading:'けいしょく',romajiTarget:'kei',meaning:'light meal / snack',targetIndex:0},
+      {word:'軽減',reading:'けいげん',romajiTarget:'kei',meaning:'reduction / mitigation',targetIndex:0},
+    ],
+    kunWords: [
+      {word:'軽い',reading:'かるい',romajiTarget:'karu',meaning:'light (weight)',targetIndex:0},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '早',
+    meanings: ['early', 'fast', 'quick'],
+    onYomi: [{kana:'ソウ',romaji:'sou'},{kana:'サッ',romaji:'sa'}],
+    kunYomi: [{kana:'はや',romaji:'haya'}],
+    onWords: [
+      {word:'早朝',reading:'そうちょう',romajiTarget:'sou',meaning:'early morning',targetIndex:0},
+      {word:'早速',reading:'さっそく',romajiTarget:'sa',meaning:'at once / immediately',targetIndex:0},
+    ],
+    kunWords: [
+      {word:'早い',reading:'はやい',romajiTarget:'haya',meaning:'early / fast',targetIndex:0},
+      {word:'早起き',reading:'はやおき',romajiTarget:'haya',meaning:'early rising',targetIndex:0},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '遅',
+    meanings: ['late', 'slow'],
+    onYomi: [{kana:'チ',romaji:'chi'}],
+    kunYomi: [{kana:'おそ',romaji:'oso'},{kana:'おく',romaji:'oku'}],
+    onWords: [
+      {word:'遅延',reading:'ちえん',romajiTarget:'chi',meaning:'delay',targetIndex:0},
+    ],
+    kunWords: [
+      {word:'遅い',reading:'おそい',romajiTarget:'oso',meaning:'late / slow',targetIndex:0},
+      {word:'遅れる',reading:'おくれる',romajiTarget:'oku',meaning:'to be late',targetIndex:0},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '来',
+    meanings: ['come', 'next', 'future'],
+    onYomi: [{kana:'ライ',romaji:'rai'}],
+    kunYomi: [{kana:'く',romaji:'ku'},{kana:'き',romaji:'ki'}],
+    onWords: [
+      {word:'来年',reading:'らいねん',romajiTarget:'rai',meaning:'next year',targetIndex:0},
+      {word:'来週',reading:'らいしゅう',romajiTarget:'rai',meaning:'next week',targetIndex:0},
+    ],
+    kunWords: [
+      {word:'来る',reading:'くる',romajiTarget:'ku',meaning:'to come',targetIndex:0},
+      {word:'出来る',reading:'できる',romajiTarget:'ki',meaning:'can do / be able to',targetIndex:1},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '行',
+    meanings: ['go', 'conduct', 'line (of text)'],
+    onYomi: [{kana:'コウ',romaji:'kou'},{kana:'ギョウ',romaji:'gyou'},{kana:'アン',romaji:'an'}],
+    kunYomi: [{kana:'い',romaji:'i'},{kana:'ゆ',romaji:'yu'},{kana:'おこな',romaji:'okona'}],
+    onWords: [
+      {word:'銀行',reading:'ぎんこう',romajiTarget:'kou',meaning:'bank',targetIndex:1},
+      {word:'行動',reading:'こうどう',romajiTarget:'kou',meaning:'action / behavior',targetIndex:0},
+    ],
+    kunWords: [
+      {word:'行く',reading:'いく',romajiTarget:'i',meaning:'to go',targetIndex:0},
+      {word:'行う',reading:'おこなう',romajiTarget:'okona',meaning:'to perform / carry out',targetIndex:0},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '帰',
+    meanings: ['return', 'go home'],
+    onYomi: [{kana:'キ',romaji:'ki'}],
+    kunYomi: [{kana:'かえ',romaji:'kae'}],
+    onWords: [
+      {word:'帰国',reading:'きこく',romajiTarget:'ki',meaning:'return to home country',targetIndex:0},
+      {word:'帰宅',reading:'きたく',romajiTarget:'ki',meaning:'returning home',targetIndex:0},
+    ],
+    kunWords: [
+      {word:'帰る',reading:'かえる',romajiTarget:'kae',meaning:'to return home',targetIndex:0},
+      {word:'帰り',reading:'かえり',romajiTarget:'kae',meaning:'return trip',targetIndex:0},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '出',
+    meanings: ['exit', 'go out', 'put out'],
+    onYomi: [{kana:'シュツ',romaji:'shutsu'},{kana:'スイ',romaji:'sui'}],
+    kunYomi: [{kana:'で',romaji:'de'},{kana:'だ',romaji:'da'}],
+    onWords: [
+      {word:'出発',reading:'しゅっぱつ',romajiTarget:'shutsu',meaning:'departure',targetIndex:0},
+      {word:'出口',reading:'でぐち',romajiTarget:'shutsu',meaning:'exit',targetIndex:0},
+    ],
+    kunWords: [
+      {word:'出る',reading:'でる',romajiTarget:'de',meaning:'to exit / come out',targetIndex:0},
+      {word:'出す',reading:'だす',romajiTarget:'da',meaning:'to put out / submit',targetIndex:0},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '入',
+    meanings: ['enter', 'put in'],
+    onYomi: [{kana:'ニュウ',romaji:'nyuu'}],
+    kunYomi: [{kana:'い',romaji:'i'},{kana:'はい',romaji:'hai'}],
+    onWords: [
+      {word:'入学',reading:'にゅうがく',romajiTarget:'nyuu',meaning:'school enrollment',targetIndex:0},
+      {word:'収入',reading:'しゅうにゅう',romajiTarget:'nyuu',meaning:'income',targetIndex:1},
+    ],
+    kunWords: [
+      {word:'入れる',reading:'いれる',romajiTarget:'i',meaning:'to put in',targetIndex:0},
+      {word:'入る',reading:'はいる',romajiTarget:'hai',meaning:'to enter',targetIndex:0},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '立',
+    meanings: ['stand', 'rise', 'establish'],
+    onYomi: [{kana:'リツ',romaji:'ritsu'},{kana:'リュウ',romaji:'ryuu'}],
+    kunYomi: [{kana:'た',romaji:'ta'}],
+    onWords: [
+      {word:'立場',reading:'たちば',romajiTarget:'ritsu',meaning:'standpoint / position',targetIndex:0},
+      {word:'独立',reading:'どくりつ',romajiTarget:'ritsu',meaning:'independence',targetIndex:1},
+    ],
+    kunWords: [
+      {word:'立つ',reading:'たつ',romajiTarget:'ta',meaning:'to stand',targetIndex:0},
+      {word:'立てる',reading:'たてる',romajiTarget:'ta',meaning:'to stand up / establish',targetIndex:0},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '座',
+    meanings: ['sit', 'seat', 'constellation'],
+    onYomi: [{kana:'ザ',romaji:'za'}],
+    kunYomi: [{kana:'すわ',romaji:'suwa'}],
+    onWords: [
+      {word:'座席',reading:'ざせき',romajiTarget:'za',meaning:'seat',targetIndex:0},
+      {word:'銀座',reading:'ぎんざ',romajiTarget:'za',meaning:'Ginza (district)',targetIndex:1},
+    ],
+    kunWords: [
+      {word:'座る',reading:'すわる',romajiTarget:'suwa',meaning:'to sit',targetIndex:0},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '起',
+    meanings: ['wake up', 'rise', 'occur'],
+    onYomi: [{kana:'キ',romaji:'ki'}],
+    kunYomi: [{kana:'お',romaji:'o'}],
+    onWords: [
+      {word:'起動',reading:'きどう',romajiTarget:'ki',meaning:'startup / boot',targetIndex:0},
+      {word:'早起き',reading:'はやおき',romajiTarget:'ki',meaning:'early rising',targetIndex:1},
+    ],
+    kunWords: [
+      {word:'起きる',reading:'おきる',romajiTarget:'o',meaning:'to wake up / occur',targetIndex:0},
+      {word:'起こす',reading:'おこす',romajiTarget:'o',meaning:'to wake someone up',targetIndex:0},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '寝',
+    meanings: ['sleep', 'lie down'],
+    onYomi: [{kana:'シン',romaji:'shin'}],
+    kunYomi: [{kana:'ね',romaji:'ne'}],
+    onWords: [
+      {word:'就寝',reading:'しゅうしん',romajiTarget:'shin',meaning:'going to bed',targetIndex:1},
+    ],
+    kunWords: [
+      {word:'寝る',reading:'ねる',romajiTarget:'ne',meaning:'to sleep / lie down',targetIndex:0},
+      {word:'寝坊',reading:'ねぼう',romajiTarget:'ne',meaning:'oversleeping',targetIndex:0},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '使',
+    meanings: ['use', 'employ'],
+    onYomi: [{kana:'シ',romaji:'shi'}],
+    kunYomi: [{kana:'つか',romaji:'tsuka'}],
+    onWords: [
+      {word:'使用',reading:'しよう',romajiTarget:'shi',meaning:'use / usage',targetIndex:0},
+      {word:'大使',reading:'たいし',romajiTarget:'shi',meaning:'ambassador',targetIndex:1},
+    ],
+    kunWords: [
+      {word:'使う',reading:'つかう',romajiTarget:'tsuka',meaning:'to use',targetIndex:0},
+      {word:'使い方',reading:'つかいかた',romajiTarget:'tsuka',meaning:'how to use',targetIndex:0},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '作',
+    meanings: ['make', 'create', 'produce'],
+    onYomi: [{kana:'サク',romaji:'saku'},{kana:'サ',romaji:'sa'}],
+    kunYomi: [{kana:'つく',romaji:'tsuku'}],
+    onWords: [
+      {word:'作品',reading:'さくひん',romajiTarget:'saku',meaning:'work (of art)',targetIndex:0},
+      {word:'作家',reading:'さっか',romajiTarget:'saku',meaning:'author / writer',targetIndex:0},
+    ],
+    kunWords: [
+      {word:'作る',reading:'つくる',romajiTarget:'tsuku',meaning:'to make / create',targetIndex:0},
+      {word:'作り方',reading:'つくりかた',romajiTarget:'tsuku',meaning:'how to make',targetIndex:0},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '持',
+    meanings: ['hold', 'have', 'carry'],
+    onYomi: [{kana:'ジ',romaji:'ji'}],
+    kunYomi: [{kana:'も',romaji:'mo'}],
+    onWords: [
+      {word:'持続',reading:'じぞく',romajiTarget:'ji',meaning:'continuation / sustainability',targetIndex:0},
+      {word:'気持ち',reading:'きもち',romajiTarget:'ji',meaning:'feeling',targetIndex:1},
+    ],
+    kunWords: [
+      {word:'持つ',reading:'もつ',romajiTarget:'mo',meaning:'to hold / have',targetIndex:0},
+      {word:'持ち物',reading:'もちもの',romajiTarget:'mo',meaning:'belongings',targetIndex:0},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '買',
+    meanings: ['buy', 'purchase'],
+    onYomi: [{kana:'バイ',romaji:'bai'}],
+    kunYomi: [{kana:'か',romaji:'ka'}],
+    onWords: [
+      {word:'売買',reading:'ばいばい',romajiTarget:'bai',meaning:'buying and selling',targetIndex:1},
+    ],
+    kunWords: [
+      {word:'買う',reading:'かう',romajiTarget:'ka',meaning:'to buy',targetIndex:0},
+      {word:'買い物',reading:'かいもの',romajiTarget:'ka',meaning:'shopping',targetIndex:0},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '売',
+    meanings: ['sell'],
+    onYomi: [{kana:'バイ',romaji:'bai'}],
+    kunYomi: [{kana:'う',romaji:'u'}],
+    onWords: [
+      {word:'売買',reading:'ばいばい',romajiTarget:'bai',meaning:'buying and selling',targetIndex:0},
+      {word:'販売',reading:'はんばい',romajiTarget:'bai',meaning:'sales',targetIndex:1},
+    ],
+    kunWords: [
+      {word:'売る',reading:'うる',romajiTarget:'u',meaning:'to sell',targetIndex:0},
+      {word:'売り場',reading:'うりば',romajiTarget:'u',meaning:'sales floor',targetIndex:0},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '切',
+    meanings: ['cut', 'sever'],
+    onYomi: [{kana:'セツ',romaji:'setsu'},{kana:'サイ',romaji:'sai'}],
+    kunYomi: [{kana:'き',romaji:'ki'}],
+    onWords: [
+      {word:'大切',reading:'たいせつ',romajiTarget:'setsu',meaning:'important / precious',targetIndex:1},
+      {word:'切手',reading:'きって',romajiTarget:'setsu',meaning:'postage stamp',targetIndex:0},
+    ],
+    kunWords: [
+      {word:'切る',reading:'きる',romajiTarget:'ki',meaning:'to cut',targetIndex:0},
+      {word:'切れる',reading:'きれる',romajiTarget:'ki',meaning:'to be cut / to run out',targetIndex:0},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '知',
+    meanings: ['know', 'wisdom'],
+    onYomi: [{kana:'チ',romaji:'chi'}],
+    kunYomi: [{kana:'し',romaji:'shi'}],
+    onWords: [
+      {word:'知識',reading:'ちしき',romajiTarget:'chi',meaning:'knowledge',targetIndex:0},
+      {word:'通知',reading:'つうち',romajiTarget:'chi',meaning:'notification',targetIndex:1},
+    ],
+    kunWords: [
+      {word:'知る',reading:'しる',romajiTarget:'shi',meaning:'to know',targetIndex:0},
+      {word:'知り合い',reading:'しりあい',romajiTarget:'shi',meaning:'acquaintance',targetIndex:0},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '思',
+    meanings: ['think', 'thought', 'feel'],
+    onYomi: [{kana:'シ',romaji:'shi'}],
+    kunYomi: [{kana:'おも',romaji:'omo'}],
+    onWords: [
+      {word:'思想',reading:'しそう',romajiTarget:'shi',meaning:'thought / ideology',targetIndex:0},
+    ],
+    kunWords: [
+      {word:'思う',reading:'おもう',romajiTarget:'omo',meaning:'to think / feel',targetIndex:0},
+      {word:'思い出',reading:'おもいで',romajiTarget:'omo',meaning:'memory / recollection',targetIndex:0},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '話',
+    meanings: ['talk', 'story', 'speak'],
+    onYomi: [{kana:'ワ',romaji:'wa'}],
+    kunYomi: [{kana:'はな',romaji:'hana'},{kana:'はなし',romaji:'hanashi'}],
+    onWords: [
+      {word:'電話',reading:'でんわ',romajiTarget:'wa',meaning:'telephone',targetIndex:1},
+      {word:'会話',reading:'かいわ',romajiTarget:'wa',meaning:'conversation',targetIndex:1},
+    ],
+    kunWords: [
+      {word:'話す',reading:'はなす',romajiTarget:'hana',meaning:'to speak',targetIndex:0},
+      {word:'話',reading:'はなし',romajiTarget:'hanashi',meaning:'story / talk',targetIndex:0},
+    ],
+    standalone:{on:false,kun:true}
+  },
+  {
+    kanji: '答',
+    meanings: ['answer', 'reply'],
+    onYomi: [{kana:'トウ',romaji:'tou'}],
+    kunYomi: [{kana:'こた',romaji:'kota'}],
+    onWords: [
+      {word:'回答',reading:'かいとう',romajiTarget:'tou',meaning:'answer / reply',targetIndex:1},
+      {word:'答案',reading:'とうあん',romajiTarget:'tou',meaning:'answer sheet',targetIndex:0},
+    ],
+    kunWords: [
+      {word:'答える',reading:'こたえる',romajiTarget:'kota',meaning:'to answer',targetIndex:0},
+      {word:'答え',reading:'こたえ',romajiTarget:'kota',meaning:'answer',targetIndex:0},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '問',
+    meanings: ['question', 'problem', 'ask'],
+    onYomi: [{kana:'モン',romaji:'mon'}],
+    kunYomi: [{kana:'と',romaji:'to'}],
+    onWords: [
+      {word:'問題',reading:'もんだい',romajiTarget:'mon',meaning:'problem / question',targetIndex:0},
+      {word:'質問',reading:'しつもん',romajiTarget:'mon',meaning:'question',targetIndex:1},
+    ],
+    kunWords: [
+      {word:'問う',reading:'とう',romajiTarget:'to',meaning:'to ask / question',targetIndex:0},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '教',
+    meanings: ['teach', 'education', 'religion'],
+    onYomi: [{kana:'キョウ',romaji:'kyou'}],
+    kunYomi: [{kana:'おし',romaji:'oshi'},{kana:'おそ',romaji:'oso'}],
+    onWords: [
+      {word:'教室',reading:'きょうしつ',romajiTarget:'kyou',meaning:'classroom',targetIndex:0},
+      {word:'教育',reading:'きょういく',romajiTarget:'kyou',meaning:'education',targetIndex:0},
+    ],
+    kunWords: [
+      {word:'教える',reading:'おしえる',romajiTarget:'oshi',meaning:'to teach',targetIndex:0},
+      {word:'教わる',reading:'おそわる',romajiTarget:'oso',meaning:'to be taught',targetIndex:0},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '習',
+    meanings: ['practice', 'learn', 'study'],
+    onYomi: [{kana:'シュウ',romaji:'shuu'}],
+    kunYomi: [{kana:'なら',romaji:'nara'}],
+    onWords: [
+      {word:'練習',reading:'れんしゅう',romajiTarget:'shuu',meaning:'practice',targetIndex:1},
+      {word:'習慣',reading:'しゅうかん',romajiTarget:'shuu',meaning:'habit / custom',targetIndex:0},
+    ],
+    kunWords: [
+      {word:'習う',reading:'ならう',romajiTarget:'nara',meaning:'to learn (from someone)',targetIndex:0},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '勉',
+    meanings: ['study hard', 'diligence'],
+    onYomi: [{kana:'ベン',romaji:'ben'}],
+    kunYomi: [],
+    onWords: [
+      {word:'勉強',reading:'べんきょう',romajiTarget:'ben',meaning:'study',targetIndex:0},
+      {word:'勤勉',reading:'きんべん',romajiTarget:'ben',meaning:'diligence',targetIndex:1},
+    ],
+    kunWords: [],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '強',
+    meanings: ['strong', 'powerful', 'force'],
+    onYomi: [{kana:'キョウ',romaji:'kyou'},{kana:'ゴウ',romaji:'gou'}],
+    kunYomi: [{kana:'つよ',romaji:'tsuyo'},{kana:'し',romaji:'shi'}],
+    onWords: [
+      {word:'勉強',reading:'べんきょう',romajiTarget:'kyou',meaning:'study',targetIndex:1},
+      {word:'強力',reading:'きょうりょく',romajiTarget:'kyou',meaning:'powerful',targetIndex:0},
+    ],
+    kunWords: [
+      {word:'強い',reading:'つよい',romajiTarget:'tsuyo',meaning:'strong',targetIndex:0},
+      {word:'強める',reading:'つよめる',romajiTarget:'tsuyo',meaning:'to strengthen',targetIndex:0},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '弱',
+    meanings: ['weak', 'feeble'],
+    onYomi: [{kana:'ジャク',romaji:'jaku'}],
+    kunYomi: [{kana:'よわ',romaji:'yowa'}],
+    onWords: [
+      {word:'弱点',reading:'じゃくてん',romajiTarget:'jaku',meaning:'weak point',targetIndex:0},
+      {word:'強弱',reading:'きょうじゃく',romajiTarget:'jaku',meaning:'strength and weakness',targetIndex:1},
+    ],
+    kunWords: [
+      {word:'弱い',reading:'よわい',romajiTarget:'yowa',meaning:'weak',targetIndex:0},
+      {word:'弱める',reading:'よわめる',romajiTarget:'yowa',meaning:'to weaken',targetIndex:0},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '好',
+    meanings: ['like', 'fond', 'good'],
+    onYomi: [{kana:'コウ',romaji:'kou'}],
+    kunYomi: [{kana:'す',romaji:'su'},{kana:'この',romaji:'kono'}],
+    onWords: [
+      {word:'好意',reading:'こうい',romajiTarget:'kou',meaning:'goodwill / favor',targetIndex:0},
+      {word:'好き嫌い',reading:'すききらい',romajiTarget:'kou',meaning:'likes and dislikes',targetIndex:0},
+    ],
+    kunWords: [
+      {word:'好き',reading:'すき',romajiTarget:'su',meaning:'like / favorite',targetIndex:0},
+      {word:'好む',reading:'このむ',romajiTarget:'kono',meaning:'to prefer / like',targetIndex:0},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '嫌',
+    meanings: ['dislike', 'hate', 'unpleasant'],
+    onYomi: [{kana:'ケン',romaji:'ken'},{kana:'ゲン',romaji:'gen'}],
+    kunYomi: [{kana:'きら',romaji:'kira'},{kana:'いや',romaji:'iya'}],
+    onWords: [
+      {word:'嫌悪',reading:'けんお',romajiTarget:'ken',meaning:'disgust / hatred',targetIndex:0},
+    ],
+    kunWords: [
+      {word:'嫌い',reading:'きらい',romajiTarget:'kira',meaning:'dislike',targetIndex:0},
+      {word:'嫌',reading:'いや',romajiTarget:'iya',meaning:'unpleasant / no',targetIndex:0},
+    ],
+    standalone:{on:false,kun:true}
+  },
+  {
+    kanji: '急',
+    meanings: ['sudden', 'hurry', 'urgent'],
+    onYomi: [{kana:'キュウ',romaji:'kyuu'}],
+    kunYomi: [{kana:'いそ',romaji:'iso'}],
+    onWords: [
+      {word:'急行',reading:'きゅうこう',romajiTarget:'kyuu',meaning:'express (train)',targetIndex:0},
+      {word:'急速',reading:'きゅうそく',romajiTarget:'kyuu',meaning:'rapid',targetIndex:0},
+    ],
+    kunWords: [
+      {word:'急ぐ',reading:'いそぐ',romajiTarget:'iso',meaning:'to hurry',targetIndex:0},
+      {word:'急き',reading:'いそき',romajiTarget:'iso',meaning:'in a hurry',targetIndex:0},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '待',
+    meanings: ['wait', 'expect'],
+    onYomi: [{kana:'タイ',romaji:'tai'}],
+    kunYomi: [{kana:'ま',romaji:'ma'}],
+    onWords: [
+      {word:'待機',reading:'たいき',romajiTarget:'tai',meaning:'standby / waiting',targetIndex:0},
+      {word:'期待',reading:'きたい',romajiTarget:'tai',meaning:'expectation',targetIndex:1},
+    ],
+    kunWords: [
+      {word:'待つ',reading:'まつ',romajiTarget:'ma',meaning:'to wait',targetIndex:0},
+      {word:'待ち合わせ',reading:'まちあわせ',romajiTarget:'ma',meaning:'meeting up',targetIndex:0},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '始',
+    meanings: ['begin', 'start'],
+    onYomi: [{kana:'シ',romaji:'shi'}],
+    kunYomi: [{kana:'はじ',romaji:'haji'}],
+    onWords: [
+      {word:'開始',reading:'かいし',romajiTarget:'shi',meaning:'start / commencement',targetIndex:1},
+    ],
+    kunWords: [
+      {word:'始まる',reading:'はじまる',romajiTarget:'haji',meaning:'to begin',targetIndex:0},
+      {word:'始める',reading:'はじめる',romajiTarget:'haji',meaning:'to start',targetIndex:0},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '終',
+    meanings: ['end', 'finish'],
+    onYomi: [{kana:'シュウ',romaji:'shuu'}],
+    kunYomi: [{kana:'お',romaji:'o'}],
+    onWords: [
+      {word:'終了',reading:'しゅうりょう',romajiTarget:'shuu',meaning:'completion / end',targetIndex:0},
+      {word:'最終',reading:'さいしゅう',romajiTarget:'shuu',meaning:'last / final',targetIndex:1},
+    ],
+    kunWords: [
+      {word:'終わる',reading:'おわる',romajiTarget:'o',meaning:'to end / finish',targetIndex:0},
+      {word:'終わり',reading:'おわり',romajiTarget:'o',meaning:'end / conclusion',targetIndex:0},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '会',
+    meanings: ['meet', 'assembly', 'society'],
+    onYomi: [{kana:'カイ',romaji:'kai'},{kana:'エ',romaji:'e'}],
+    kunYomi: [{kana:'あ',romaji:'a'}],
+    onWords: [
+      {word:'会社',reading:'かいしゃ',romajiTarget:'kai',meaning:'company',targetIndex:0},
+      {word:'会議',reading:'かいぎ',romajiTarget:'kai',meaning:'meeting',targetIndex:0},
+    ],
+    kunWords: [
+      {word:'会う',reading:'あう',romajiTarget:'a',meaning:'to meet',targetIndex:0},
+      {word:'出会い',reading:'であい',romajiTarget:'a',meaning:'encounter / meeting',targetIndex:1},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '社',
+    meanings: ['company', 'shrine', 'society'],
+    onYomi: [{kana:'シャ',romaji:'sha'}],
+    kunYomi: [{kana:'やしろ',romaji:'yashiro'}],
+    onWords: [
+      {word:'会社',reading:'かいしゃ',romajiTarget:'sha',meaning:'company',targetIndex:1},
+      {word:'神社',reading:'じんじゃ',romajiTarget:'sha',meaning:'Shinto shrine',targetIndex:1},
+    ],
+    kunWords: [
+      {word:'社',reading:'やしろ',romajiTarget:'yashiro',meaning:'shrine',targetIndex:0},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '仕',
+    meanings: ['serve', 'work', 'do'],
+    onYomi: [{kana:'シ',romaji:'shi'},{kana:'ジ',romaji:'ji'}],
+    kunYomi: [],
+    onWords: [
+      {word:'仕事',reading:'しごと',romajiTarget:'shi',meaning:'work / job',targetIndex:0},
+      {word:'仕方',reading:'しかた',romajiTarget:'shi',meaning:'way / method',targetIndex:0},
+    ],
+    kunWords: [],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '働',
+    meanings: ['work', 'labor'],
+    onYomi: [{kana:'ドウ',romaji:'dou'}],
+    kunYomi: [{kana:'はたら',romaji:'hatara'}],
+    onWords: [
+      {word:'労働',reading:'ろうどう',romajiTarget:'dou',meaning:'labor / work',targetIndex:1},
+      {word:'働き',reading:'はたらき',romajiTarget:'dou',meaning:'work / function',targetIndex:0},
+    ],
+    kunWords: [
+      {word:'働く',reading:'はたらく',romajiTarget:'hatara',meaning:'to work',targetIndex:0},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '休',
+    meanings: ['rest', 'vacation', 'absence'],
+    onYomi: [{kana:'キュウ',romaji:'kyuu'}],
+    kunYomi: [{kana:'やす',romaji:'yasu'}],
+    onWords: [
+      {word:'休日',reading:'きゅうじつ',romajiTarget:'kyuu',meaning:'holiday',targetIndex:0},
+      {word:'休憩',reading:'きゅうけい',romajiTarget:'kyuu',meaning:'break / rest',targetIndex:0},
+    ],
+    kunWords: [
+      {word:'休む',reading:'やすむ',romajiTarget:'yasu',meaning:'to rest / take a break',targetIndex:0},
+      {word:'夏休み',reading:'なつやすみ',romajiTarget:'yasu',meaning:'summer vacation',targetIndex:1},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '転',
+    meanings: ['roll', 'turn', 'change'],
+    onYomi: [{kana:'テン',romaji:'ten'}],
+    kunYomi: [{kana:'ころ',romaji:'koro'},{kana:'うた',romaji:'uta'}],
+    onWords: [
+      {word:'運転',reading:'うんてん',romajiTarget:'ten',meaning:'driving',targetIndex:1},
+      {word:'転換',reading:'てんかん',romajiTarget:'ten',meaning:'conversion / shift',targetIndex:0},
+    ],
+    kunWords: [
+      {word:'転ぶ',reading:'ころぶ',romajiTarget:'koro',meaning:'to fall / tumble',targetIndex:0},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '運',
+    meanings: ['carry', 'luck', 'fate'],
+    onYomi: [{kana:'ウン',romaji:'un'}],
+    kunYomi: [{kana:'はこ',romaji:'hako'}],
+    onWords: [
+      {word:'運転',reading:'うんてん',romajiTarget:'un',meaning:'driving',targetIndex:0},
+      {word:'運動',reading:'うんどう',romajiTarget:'un',meaning:'exercise / movement',targetIndex:0},
+    ],
+    kunWords: [
+      {word:'運ぶ',reading:'はこぶ',romajiTarget:'hako',meaning:'to carry / transport',targetIndex:0},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '動',
+    meanings: ['move', 'motion', 'stir'],
+    onYomi: [{kana:'ドウ',romaji:'dou'}],
+    kunYomi: [{kana:'うご',romaji:'ugo'}],
+    onWords: [
+      {word:'運動',reading:'うんどう',romajiTarget:'dou',meaning:'exercise',targetIndex:1},
+      {word:'自動',reading:'じどう',romajiTarget:'dou',meaning:'automatic',targetIndex:1},
+    ],
+    kunWords: [
+      {word:'動く',reading:'うごく',romajiTarget:'ugo',meaning:'to move',targetIndex:0},
+      {word:'動かす',reading:'うごかす',romajiTarget:'ugo',meaning:'to move something',targetIndex:0},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '止',
+    meanings: ['stop', 'halt'],
+    onYomi: [{kana:'シ',romaji:'shi'}],
+    kunYomi: [{kana:'と',romaji:'to'},{kana:'や',romaji:'ya'}],
+    onWords: [
+      {word:'停止',reading:'ていし',romajiTarget:'shi',meaning:'stop / suspension',targetIndex:1},
+      {word:'禁止',reading:'きんし',romajiTarget:'shi',meaning:'prohibition',targetIndex:1},
+    ],
+    kunWords: [
+      {word:'止まる',reading:'とまる',romajiTarget:'to',meaning:'to stop',targetIndex:0},
+      {word:'止める',reading:'やめる',romajiTarget:'ya',meaning:'to stop / quit',targetIndex:0},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '考',
+    meanings: ['think', 'consider'],
+    onYomi: [{kana:'コウ',romaji:'kou'}],
+    kunYomi: [{kana:'かんが',romaji:'kanga'}],
+    onWords: [
+      {word:'考慮',reading:'こうりょ',romajiTarget:'kou',meaning:'consideration',targetIndex:0},
+      {word:'参考',reading:'さんこう',romajiTarget:'kou',meaning:'reference',targetIndex:1},
+    ],
+    kunWords: [
+      {word:'考える',reading:'かんがえる',romajiTarget:'kanga',meaning:'to think / consider',targetIndex:0},
+      {word:'考え方',reading:'かんがえかた',romajiTarget:'kanga',meaning:'way of thinking',targetIndex:0},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '近',
+    meanings: ['near', 'close', 'recent'],
+    onYomi: [{kana:'キン',romaji:'kin'}],
+    kunYomi: [{kana:'ちか',romaji:'chika'}],
+    onWords: [
+      {word:'近代',reading:'きんだい',romajiTarget:'kin',meaning:'modern times',targetIndex:0},
+      {word:'最近',reading:'さいきん',romajiTarget:'kin',meaning:'recently',targetIndex:1},
+    ],
+    kunWords: [
+      {word:'近い',reading:'ちかい',romajiTarget:'chika',meaning:'near / close',targetIndex:0},
+      {word:'近く',reading:'ちかく',romajiTarget:'chika',meaning:'nearby',targetIndex:0},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '遠',
+    meanings: ['far', 'distant'],
+    onYomi: [{kana:'エン',romaji:'en'},{kana:'オン',romaji:'on'}],
+    kunYomi: [{kana:'とお',romaji:'too'}],
+    onWords: [
+      {word:'遠距離',reading:'えんきょり',romajiTarget:'en',meaning:'long distance',targetIndex:0},
+      {word:'永遠',reading:'えいえん',romajiTarget:'en',meaning:'eternity',targetIndex:1},
+    ],
+    kunWords: [
+      {word:'遠い',reading:'とおい',romajiTarget:'too',meaning:'far / distant',targetIndex:0},
+      {word:'遠く',reading:'とおく',romajiTarget:'too',meaning:'far away',targetIndex:0},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '明',
+    meanings: ['bright', 'clear', 'tomorrow'],
+    onYomi: [{kana:'メイ',romaji:'mei'},{kana:'ミョウ',romaji:'myou'}],
+    kunYomi: [{kana:'あか',romaji:'aka'},{kana:'あ',romaji:'a'}],
+    onWords: [
+      {word:'明日',reading:'あした',romajiTarget:'myou',meaning:'tomorrow',targetIndex:0},
+      {word:'説明',reading:'せつめい',romajiTarget:'mei',meaning:'explanation',targetIndex:1},
+    ],
+    kunWords: [
+      {word:'明るい',reading:'あかるい',romajiTarget:'aka',meaning:'bright / cheerful',targetIndex:0},
+      {word:'明ける',reading:'あける',romajiTarget:'a',meaning:'to dawn / to end',targetIndex:0},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '暗',
+    meanings: ['dark', 'gloomy', 'dim'],
+    onYomi: [{kana:'アン',romaji:'an'}],
+    kunYomi: [{kana:'くら',romaji:'kura'}],
+    onWords: [
+      {word:'暗示',reading:'あんじ',romajiTarget:'an',meaning:'hint / suggestion',targetIndex:0},
+      {word:'暗記',reading:'あんき',romajiTarget:'an',meaning:'memorization',targetIndex:0},
+    ],
+    kunWords: [
+      {word:'暗い',reading:'くらい',romajiTarget:'kura',meaning:'dark / gloomy',targetIndex:0},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '白',
+    meanings: ['white'],
+    onYomi: [{kana:'ハク',romaji:'haku'},{kana:'ビャク',romaji:'byaku'}],
+    kunYomi: [{kana:'しろ',romaji:'shiro'},{kana:'しら',romaji:'shira'}],
+    onWords: [
+      {word:'白米',reading:'はくまい',romajiTarget:'haku',meaning:'white rice',targetIndex:0},
+      {word:'告白',reading:'こくはく',romajiTarget:'haku',meaning:'confession',targetIndex:1},
+    ],
+    kunWords: [
+      {word:'白い',reading:'しろい',romajiTarget:'shiro',meaning:'white',targetIndex:0},
+      {word:'白髪',reading:'しらが',romajiTarget:'shira',meaning:'white/grey hair',targetIndex:0},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '黒',
+    meanings: ['black'],
+    onYomi: [{kana:'コク',romaji:'koku'}],
+    kunYomi: [{kana:'くろ',romaji:'kuro'}],
+    onWords: [
+      {word:'黒板',reading:'こくばん',romajiTarget:'koku',meaning:'blackboard',targetIndex:0},
+      {word:'暗黒',reading:'あんこく',romajiTarget:'koku',meaning:'darkness',targetIndex:1},
+    ],
+    kunWords: [
+      {word:'黒い',reading:'くろい',romajiTarget:'kuro',meaning:'black',targetIndex:0},
+      {word:'黒猫',reading:'くろねこ',romajiTarget:'kuro',meaning:'black cat',targetIndex:0},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '赤',
+    meanings: ['red'],
+    onYomi: [{kana:'セキ',romaji:'seki'},{kana:'シャク',romaji:'shaku'}],
+    kunYomi: [{kana:'あか',romaji:'aka'}],
+    onWords: [
+      {word:'赤道',reading:'せきどう',romajiTarget:'seki',meaning:'equator',targetIndex:0},
+      {word:'赤字',reading:'あかじ',romajiTarget:'seki',meaning:'deficit / red letters',targetIndex:0},
+    ],
+    kunWords: [
+      {word:'赤い',reading:'あかい',romajiTarget:'aka',meaning:'red',targetIndex:0},
+      {word:'赤ちゃん',reading:'あかちゃん',romajiTarget:'aka',meaning:'baby',targetIndex:0},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '青',
+    meanings: ['blue', 'green', 'young'],
+    onYomi: [{kana:'セイ',romaji:'sei'},{kana:'ショウ',romaji:'shou'}],
+    kunYomi: [{kana:'あお',romaji:'ao'}],
+    onWords: [
+      {word:'青春',reading:'せいしゅん',romajiTarget:'sei',meaning:'youth / springtime of life',targetIndex:0},
+      {word:'青年',reading:'せいねん',romajiTarget:'sei',meaning:'young person',targetIndex:0},
+    ],
+    kunWords: [
+      {word:'青い',reading:'あおい',romajiTarget:'ao',meaning:'blue / green',targetIndex:0},
+      {word:'青空',reading:'あおぞら',romajiTarget:'ao',meaning:'blue sky',targetIndex:0},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '黄',
+    meanings: ['yellow'],
+    onYomi: [{kana:'コウ',romaji:'kou'},{kana:'オウ',romaji:'ou'}],
+    kunYomi: [{kana:'き',romaji:'ki'}],
+    onWords: [
+      {word:'黄色',reading:'きいろ',romajiTarget:'ou',meaning:'yellow',targetIndex:0},
+      {word:'黄金',reading:'おうごん',romajiTarget:'ou',meaning:'gold',targetIndex:0},
+    ],
+    kunWords: [
+      {word:'黄色い',reading:'きいろい',romajiTarget:'ki',meaning:'yellow',targetIndex:0},
+    ],
+    standalone:{on:false,kun:false}
+  },
+
 ];
 
 // ===================================================
-// SRS ENGINE (SM-2)
+// SRS ENGINE
 // ===================================================
-const SRS_INTERVALS = [0, 1, 3, 7, 14, 30, 60, 120]; // days
-const MAX_SRS_LEVEL = 7;
-const MASTER_THRESHOLD = 4; // level needed to consider stage "mastered"
+// Intervals in MINUTES
+const SRS_INTERVALS_MINS = [1, 30, 90, 720, 1440, 2880, 5760, 10080, 15120, 30240, 43200];
+// Level:                   0   1   2    3     4     5     6      7      8      9     10
+// Human:                 1m  30m 90m  12h    1d    2d    4d     1w   1.5w    3w    1mo
+
+const MAX_SRS_LEVEL = 10;
+const UNLOCK_THRESHOLD = 5;   // all 3 stages must reach this to unlock next kanji
+const MASTER_THRESHOLD = 10;  // shown as "mastered" in stats
+const PRETEST_LEVEL = 6;      // fast-track level for passed pretest cards
 const MAX_IN_PROGRESS = 15;
 
+function formatNextReview(ms) {
+  const diff = ms - Date.now();
+  if (diff <= 0) return 'due now';
+  const mins = Math.round(diff / 60000);
+  if (mins < 60) return `${mins}m`;
+  const hrs = Math.round(diff / 3600000);
+  if (hrs < 24) return `${hrs}h`;
+  const days = Math.round(diff / 86400000);
+  if (days < 14) return `${days}d`;
+  const weeks = Math.round(diff / 604800000);
+  return `${weeks}w`;
+}
+
 function createCardState() {
-  return { level: 0, nextReview: 0, learning: false }; // nextReview = timestamp ms
+  return { level: 0, nextReview: 0, learning: false };
 }
 
 function isDue(card) {
@@ -1879,15 +3979,24 @@ function gradeCard(card, correct) {
   if (correct) {
     newCard.level = Math.min(newCard.level + 1, MAX_SRS_LEVEL);
   } else {
-    newCard.level = Math.max(0, newCard.level - 2);
+    // Level 5+ → drop to level 3. Level 4 and below → subtract 2, min 0
+    if (newCard.level >= 5) {
+      newCard.level = 3;
+    } else {
+      newCard.level = Math.max(0, newCard.level - 2);
+    }
   }
-  const daysUntil = SRS_INTERVALS[newCard.level] || 1;
-  newCard.nextReview = Date.now() + daysUntil * 86400000;
+  const minsUntil = SRS_INTERVALS_MINS[newCard.level] || 1;
+  newCard.nextReview = Date.now() + minsUntil * 60000;
   return newCard;
 }
 
 function isMastered(card) {
   return card.learning && card.level >= MASTER_THRESHOLD;
+}
+
+function isUnlockReady(card) {
+  return card.learning && card.level >= UNLOCK_THRESHOLD;
 }
 
 // ===================================================
@@ -1940,9 +4049,19 @@ function getInProgressCount() {
   let count = 0;
   for (let i = 0; i < state.unlockedCount; i++) {
     const c = state.cards[i];
-    if (c && (!isKanjiMastered(i))) count++;
+    if (c && !isKanjiUnlockReady(i)) count++;
   }
   return count;
+}
+
+function isKanjiUnlockReady(idx) {
+  const c = state.cards[idx];
+  if (!c) return false;
+  const kd = KANJI_DATA[idx];
+  const meaningReady = isUnlockReady(c.meaning);
+  const onReady = kd.onYomi.length === 0 || isUnlockReady(c.on);
+  const kunReady = kd.kunYomi.length === 0 || isUnlockReady(c.kun);
+  return meaningReady && onReady && kunReady;
 }
 
 function isKanjiMastered(idx) {
@@ -1978,11 +4097,14 @@ function getLessonQueue() {
     const kd = KANJI_DATA[i];
     if (!c.meaning.learning) {
       queue.push({idx: i, stage: 'meaning'});
-    } else if (isMastered(c.meaning)) {
-      if (kd.onYomi.length > 0 && !c.on.learning) {
+    } else {
+      // On unlocks when meaning >= level 2
+      if (kd.onYomi.length > 0 && !c.on.learning && c.meaning.level >= 2) {
         queue.push({idx: i, stage: 'on'});
       }
-      if (kd.kunYomi.length > 0 && !c.kun.learning) {
+      // Kun unlocks when on >= level 2 (or no on yomi, then when meaning >= 2)
+      const onReady = kd.onYomi.length === 0 ? c.meaning.level >= 2 : c.on.level >= 2;
+      if (kd.kunYomi.length > 0 && !c.kun.learning && onReady) {
         queue.push({idx: i, stage: 'kun'});
       }
     }
@@ -2515,6 +4637,10 @@ function showReviewScreen() {
   const kd = KANJI_DATA[item.idx];
   const wasCorrect = session.wasCorrect;
   const word = session.selectedWord;
+  const card = state.cards[item.idx][item.stage];
+
+  const levelLabel = card.level >= MAX_SRS_LEVEL ? '⭐ Mastered' : `Level ${card.level} / ${MAX_SRS_LEVEL}`;
+  const nextReviewLabel = formatNextReview(card.nextReview);
 
   let html = `
     <div class="review-result-banner ${wasCorrect ? 'correct-banner' : 'wrong-banner'}"></div>
@@ -2525,7 +4651,6 @@ function showReviewScreen() {
     <div class="review-meaning">${kd.meanings[0]}</div>
   `;
 
-  // Show the reading for the stage
   if (item.stage === 'on' && kd.onYomi.length > 0) {
     html += `<div class="review-stage-reading">On'yomi: ${kd.onYomi.map(r => r.kana + ' ('+r.romaji+')').join('・')}</div>`;
   } else if (item.stage === 'kun' && kd.kunYomi.length > 0) {
@@ -2533,6 +4658,18 @@ function showReviewScreen() {
   } else if (item.stage === 'meaning') {
     html += `<div class="review-stage-reading">Readings: ${kd.onYomi.map(r=>r.kana).concat(kd.kunYomi.map(r=>r.kana)).join('・')}</div>`;
   }
+
+  // Level and next review info
+  html += `
+    <div style="display:flex; gap:16px; justify-content:center; margin:12px 0; flex-wrap:wrap;">
+      <div style="font-size:12px; color:var(--ink-light); background:var(--paper); padding:6px 14px; border-radius:20px; border:1px solid var(--paper-darker);">
+        ${levelLabel}
+      </div>
+      <div style="font-size:12px; color:var(--ink-light); background:var(--paper); padding:6px 14px; border-radius:20px; border:1px solid var(--paper-darker);">
+        Next review: <strong style="color:var(--gold)">${nextReviewLabel}</strong>
+      </div>
+    </div>
+  `;
 
   if (word) {
     html += `<hr class="review-divider">`;
@@ -2546,7 +4683,7 @@ function showReviewScreen() {
   }
 
   if (!wasCorrect && item.stage !== 'meaning') {
-    const correctAnswers = item.stage === 'on' 
+    const correctAnswers = item.stage === 'on'
       ? (word ? [word.romajiTarget] : kd.onYomi.map(r=>r.romaji))
       : (word ? [word.romajiTarget] : kd.kunYomi.map(r=>r.romaji));
     html += `
@@ -2558,6 +4695,10 @@ function showReviewScreen() {
   }
 
   html += `<button class="next-btn" onclick="nextQuizItem()">Continue →</button>`;
+
+  document.getElementById('review-content').innerHTML = html;
+  showScreen('review');
+}
 
   document.getElementById('review-content').innerHTML = html;
   showScreen('review');
@@ -2615,6 +4756,197 @@ function showBrowse() {
     `;
   }).join('');
   showScreen('browse');
+}
+
+// ===================================================
+// PRETEST
+// ===================================================
+let pretest = {
+  queue: [],       // all kanji indices to test
+  pos: 0,
+  stage: 'meaning', // cycles: meaning → on → kun
+  // per-kanji tracking
+  results: {},     // idx -> { meaning: bool, on: bool, kun: bool }
+  choices: null,
+  correct: null,
+  answered: false,
+  fastTracked: 0,
+};
+
+function startPretest() {
+  // Build queue: all kanji that haven't been started yet (not learning)
+  pretest.queue = [];
+  for (let i = 0; i < KANJI_DATA.length; i++) {
+    const c = state.cards[i];
+    // Include if not yet in lessons at all, or unlocked but not learning
+    if (!c || (!c.meaning.learning && !c.on.learning && !c.kun.learning)) {
+      pretest.queue.push(i);
+    }
+  }
+  if (pretest.queue.length === 0) {
+    alert('All kanji are already in progress or mastered. Nothing to pretest!');
+    return;
+  }
+  pretest.pos = 0;
+  pretest.stage = 'meaning';
+  pretest.results = {};
+  pretest.fastTracked = 0;
+  showScreen('pretest');
+  renderPretestCard();
+}
+
+function renderPretestCard() {
+  const idx = pretest.queue[pretest.pos];
+  const kd = KANJI_DATA[idx];
+  const total = pretest.queue.length * 3; // meaning + on + kun per kanji (approx)
+  const done = pretest.pos * 3 + (['meaning','on','kun'].indexOf(pretest.stage));
+  pretest.answered = false;
+
+  document.getElementById('pretest-progress-fill').style.width = (done / total * 100) + '%';
+  document.getElementById('pretest-count').textContent = `${pretest.pos + 1}/${pretest.queue.length}`;
+
+  const card = document.getElementById('pretest-card');
+  const stageLabel = getStageLabel(pretest.stage);
+  const color = getStageColor(pretest.stage);
+  card.style.setProperty('--stage-color', color);
+
+  let html = `<div class="stage-badge" style="--stage-color:${color}">${stageLabel}</div>`;
+
+  if (pretest.stage === 'meaning') {
+    const {choices, correct} = getMeaningChoices(idx);
+    pretest.correct = correct;
+    html += `<div class="quiz-kanji">${kd.kanji}</div>`;
+    html += `<div class="quiz-prompt">What does this kanji mean?</div>`;
+    html += `<div class="choices">`;
+    choices.forEach(c => {
+      html += `<button class="choice-btn" onclick="pretestSelectMeaning(this,'${c}','${correct}')">${c}</button>`;
+    });
+    html += `</div>`;
+  } else {
+    // Reading stage
+    const words = pretest.stage === 'on' ? kd.onWords : kd.kunWords;
+    const word = words.length > 0 ? words[0] : null;
+    pretest.word = word;
+
+    if (word) {
+      const wordChars = word.word;
+      const targetKanji = kd.kanji;
+      let wordHTML = wordChars.includes(targetKanji)
+        ? wordChars.split(targetKanji)[0] + `<span class="target-kanji">${targetKanji}</span>` + wordChars.split(targetKanji).slice(1).join(targetKanji)
+        : `<span class="target-kanji">${wordChars}</span>`;
+      html += `<div class="quiz-word-context">${wordHTML}</div>`;
+      html += `<div class="quiz-prompt">Type the reading of <strong>${targetKanji}</strong> in this word</div>`;
+    } else {
+      html += `<div class="quiz-kanji">${kd.kanji}</div>`;
+      html += `<div class="quiz-prompt">Type the ${pretest.stage === 'on' ? "on'yomi" : "kun'yomi"}</div>`;
+    }
+    html += `
+      <div class="input-area">
+        <div class="kana-preview placeholder" id="pretest-kana-preview">type romaji below...</div>
+        <input type="text" class="romaji-input" id="pretest-romaji-input"
+          placeholder="romaji..."
+          oninput="onPretestRomajiInput(this)"
+          onkeydown="if(event.key==='Enter'&&!pretest.answered) submitPretestReading()"
+          autocomplete="off" autocorrect="off" spellcheck="false">
+        <button class="submit-btn" style="background:var(--red)" onclick="submitPretestReading()">Check</button>
+      </div>
+    `;
+  }
+
+  card.innerHTML = html;
+  card.className = 'quiz-card animate-in';
+  if (pretest.stage !== 'meaning') {
+    setTimeout(() => { const i = document.getElementById('pretest-romaji-input'); if(i) i.focus(); }, 100);
+  }
+}
+
+function onPretestRomajiInput(input) {
+  const preview = document.getElementById('pretest-kana-preview');
+  if (!input.value) { preview.textContent = 'type romaji below...'; preview.className = 'kana-preview placeholder'; }
+  else { preview.textContent = toHiragana(input.value); preview.className = 'kana-preview'; }
+}
+
+function pretestSelectMeaning(btn, selected, correct) {
+  if (pretest.answered) return;
+  pretest.answered = true;
+  const wasCorrect = selected === correct;
+  document.querySelectorAll('#pretest-card .choice-btn').forEach(b => {
+    b.disabled = true;
+    if (b.textContent === correct) b.classList.add('correct');
+    else if (b === btn && !wasCorrect) b.classList.add('wrong');
+  });
+  const idx = pretest.queue[pretest.pos];
+  if (!pretest.results[idx]) pretest.results[idx] = {};
+  pretest.results[idx].meaning = wasCorrect;
+  setTimeout(() => advancePretestStage(), 700);
+}
+
+function submitPretestReading() {
+  if (pretest.answered) return;
+  const input = document.getElementById('pretest-romaji-input');
+  if (!input || !input.value.trim()) return;
+  pretest.answered = true;
+  const idx = pretest.queue[pretest.pos];
+  const kd = KANJI_DATA[idx];
+  const word = pretest.word;
+  let correctAnswers = [];
+  if (pretest.stage === 'on') {
+    correctAnswers = word ? [word.romajiTarget] : kd.onYomi.map(r=>r.romaji);
+  } else {
+    correctAnswers = word ? [word.romajiTarget] : kd.kunYomi.map(r=>r.romaji);
+  }
+  const wasCorrect = correctAnswers.some(a => checkRomajiAnswer(input.value, a));
+  input.classList.add(wasCorrect ? 'correct' : 'wrong');
+  input.disabled = true;
+  if (!pretest.results[idx]) pretest.results[idx] = {};
+  pretest.results[idx][pretest.stage] = wasCorrect;
+  setTimeout(() => advancePretestStage(), 600);
+}
+
+function advancePretestStage() {
+  const idx = pretest.queue[pretest.pos];
+  const kd = KANJI_DATA[idx];
+
+  if (pretest.stage === 'meaning') {
+    // Move to on if has on, else kun, else next kanji
+    if (kd.onYomi.length > 0) { pretest.stage = 'on'; renderPretestCard(); return; }
+    if (kd.kunYomi.length > 0) { pretest.stage = 'kun'; renderPretestCard(); return; }
+  } else if (pretest.stage === 'on') {
+    if (kd.kunYomi.length > 0) { pretest.stage = 'kun'; renderPretestCard(); return; }
+  }
+
+  // Done with this kanji — check if all 3 (applicable) stages passed
+  const r = pretest.results[idx] || {};
+  const meaningPassed = r.meaning !== false; // true or undefined (no test needed)
+  const onPassed = kd.onYomi.length === 0 || r.on === true;
+  const kunPassed = kd.kunYomi.length === 0 || r.kun === true;
+
+  if (meaningPassed && onPassed && kunPassed) {
+    // Fast-track this kanji to level 6
+    if (!state.cards[idx]) {
+      state.cards[idx] = { meaning: createCardState(), on: createCardState(), kun: createCardState() };
+      if (idx >= state.unlockedCount) state.unlockedCount = idx + 1;
+    }
+    const nextReview = Date.now() + SRS_INTERVALS_MINS[PRETEST_LEVEL] * 60000;
+    state.cards[idx].meaning = { level: PRETEST_LEVEL, nextReview, learning: true };
+    if (kd.onYomi.length > 0) state.cards[idx].on = { level: PRETEST_LEVEL, nextReview, learning: true };
+    if (kd.kunYomi.length > 0) state.cards[idx].kun = { level: PRETEST_LEVEL, nextReview, learning: true };
+    pretest.fastTracked++;
+  }
+
+  // Next kanji
+  pretest.pos++;
+  if (pretest.pos >= pretest.queue.length) {
+    // Done with pretest
+    tryUnlockNext();
+    saveState();
+    updateHomeStats();
+    alert(`Pretest complete! ${pretest.fastTracked} kanji fast-tracked to Level 6.`);
+    goHome();
+    return;
+  }
+  pretest.stage = 'meaning';
+  renderPretestCard();
 }
 
 // ===================================================
