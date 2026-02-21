@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content">
 <title>墨 Sumi — Kanji Study</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&family=Noto+Sans+JP:wght@300;400;500&family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -22,10 +22,15 @@
     --green-light: #60c090;
     --stage-meaning: #c07a50;
     --stage-on: #4a8ec2;
-    --stage-kun: #4a9e72;
+    --stage-kun: #3a7ab5;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  /* Prevent layout jump when virtual keyboard opens on mobile */
+  html {
+    height: -webkit-fill-available;
+  }
 
   body {
     font-family: 'Noto Sans JP', sans-serif;
@@ -184,7 +189,7 @@
 
   .action-card.lessons { --card-color: var(--gold); }
   .action-card.reviews { --card-color: var(--blue); }
-  .action-card.browse { --card-color: var(--stage-kun); grid-column: span 2; }
+  .action-card.browse { --card-color: var(--blue); grid-column: span 2; }
 
   /* PROGRESS BAR */
   .progress-section {
@@ -311,15 +316,15 @@
   }
 
   .reading-chip.on {
-    background: color-mix(in srgb, var(--stage-on) 10%, white);
-    border: 1px solid color-mix(in srgb, var(--stage-on) 25%, transparent);
-    color: var(--stage-on);
+    background: color-mix(in srgb, var(--stage-on) 12%, transparent);
+    border: 1px solid color-mix(in srgb, var(--stage-on) 30%, transparent);
+    color: var(--blue-light);
   }
 
   .reading-chip.kun {
-    background: color-mix(in srgb, var(--stage-kun) 10%, white);
-    border: 1px solid color-mix(in srgb, var(--stage-kun) 25%, transparent);
-    color: var(--stage-kun);
+    background: color-mix(in srgb, var(--stage-kun) 12%, transparent);
+    border: 1px solid color-mix(in srgb, var(--stage-kun) 30%, transparent);
+    color: var(--blue-light);
   }
 
   .reading-chip-label {
@@ -763,6 +768,21 @@
     white-space: nowrap;
   }
 
+  .browse-level {
+    font-size: 10px;
+    font-weight: 600;
+    margin-top: 3px;
+    font-family: 'DM Mono', monospace;
+    text-align: center;
+  }
+
+  .browse-level-locked {
+    font-size: 10px;
+    color: var(--paper-darker);
+    margin-top: 3px;
+    text-align: center;
+  }
+
   .browse-stage-dots {
     display: flex;
     gap: 3px;
@@ -940,7 +960,7 @@
     <div id="pretest-banner" style="display:none; margin-bottom:16px;">
       <div class="action-card" onclick="startPretest()" style="--card-color: var(--red); grid-column: span 2; background: color-mix(in srgb, var(--red) 10%, var(--paper-dark));">
         <span class="card-icon">🎯</span>
-        <div class="card-title">Pretest — Already know some kanji?</div>
+        <div class="card-title" id="pretest-banner-title">Pretest — Already know some kanji?</div>
         <div class="card-desc">Test yourself to skip ahead. Fast-tracks passed kanji to Level 6, freeing lesson slots for new ones.</div>
       </div>
     </div>
@@ -1040,7 +1060,7 @@
   <!-- PRETEST SCREEN -->
   <div class="screen" id="screen-pretest">
     <div class="quiz-header">
-      <button class="back-btn" style="margin:0;" onclick="goHome()">← Quit</button>
+      <button class="back-btn" style="margin:0;" onclick="pretestGoHome()">← Back</button>
       <div class="quiz-progress-bar">
         <div class="quiz-progress-fill" id="pretest-progress-fill" style="background:var(--red)"></div>
       </div>
@@ -1048,9 +1068,14 @@
     </div>
     <div class="quiz-card animate-in" id="pretest-card" style="--stage-color: var(--red)">
     </div>
-    <button onclick="skipPretestKanji()" style="margin-top:12px; background:none; border:none; color:var(--ink-light); font-size:13px; cursor:pointer; font-family:'Noto Sans JP',sans-serif; text-decoration:underline; opacity:0.6;">
-      Skip this kanji →
-    </button>
+    <div style="display:flex; justify-content:space-between; align-items:center; width:100%; max-width:480px; margin-top:12px; padding:0 4px;">
+      <button onclick="skipPretestKanji()" style="background:none; border:none; color:var(--ink-light); font-size:13px; cursor:pointer; font-family:'Noto Sans JP',sans-serif; text-decoration:underline; opacity:0.6; -webkit-tap-highlight-color:transparent;">
+        Skip →
+      </button>
+      <button onclick="pretestGiveUp()" style="background:none; border:none; color:var(--red); font-size:13px; cursor:pointer; font-family:'Noto Sans JP',sans-serif; text-decoration:underline; opacity:0.7; -webkit-tap-highlight-color:transparent;">
+        Give Up (end pretest)
+      </button>
+    </div>
   </div>
 
 </div>
@@ -1070,13 +1095,13 @@ const KANJI_DATA = [
     onYomi: [{kana:'ニチ',romaji:'nichi'},{kana:'ジツ',romaji:'jitsu'}],
     kunYomi: [{kana:'ひ',romaji:'hi'},{kana:'か',romaji:'ka'}],
     onWords: [
-      {word:'日本', reading:'にほん', romajiTarget:'nichi', meaning:'Japan', targetIndex:0},
+      {word:'日本', reading:'にほん', romajiTarget:'ni', meaning:'Japan', targetIndex:0},
       {word:'日曜日', reading:'にちようび', romajiTarget:'nichi', meaning:'Sunday', targetIndex:0},
       {word:'毎日', reading:'まいにち', romajiTarget:'nichi', meaning:'every day', targetIndex:1},
     ],
     kunWords: [
       {word:'日', reading:'ひ', romajiTarget:'hi', meaning:'sun / day', targetIndex:0},
-      {word:'今日', reading:'きょう', romajiTarget:'hi', meaning:'today', targetIndex:0},
+      {word:'今日', reading:'きょう', romajiTarget:'kyou', meaning:'today', targetIndex:0},
       {word:'日々', reading:'ひびく', romajiTarget:'hi', meaning:'day by day', targetIndex:0},
     ],
     standalone: {on: false, kun: true}
@@ -1089,11 +1114,11 @@ const KANJI_DATA = [
     onWords: [
       {word:'月曜日', reading:'げつようび', romajiTarget:'getsu', meaning:'Monday', targetIndex:0},
       {word:'一月', reading:'いちがつ', romajiTarget:'gatsu', meaning:'January', targetIndex:1},
-      {word:'毎月', reading:'まいつき', romajiTarget:'getsu', meaning:'every month', targetIndex:1},
+      {word:'毎月', reading:'まいつき', romajiTarget:'tsuki', meaning:'every month', targetIndex:1},
     ],
     kunWords: [
       {word:'月', reading:'つき', romajiTarget:'tsuki', meaning:'moon / month', targetIndex:0},
-      {word:'三日月', reading:'みかづき', romajiTarget:'tsuki', meaning:'crescent moon', targetIndex:1},
+      {word:'三日月', reading:'みかづき', romajiTarget:'zuki', meaning:'crescent moon', targetIndex:1},
     ],
     standalone: {on: false, kun: true}
   },
@@ -1108,7 +1133,7 @@ const KANJI_DATA = [
     ],
     kunWords: [
       {word:'火', reading:'ひ', romajiTarget:'hi', meaning:'fire', targetIndex:0},
-      {word:'花火', reading:'はなび', romajiTarget:'hi', meaning:'fireworks', targetIndex:1},
+      {word:'花火', reading:'はなび', romajiTarget:'bi', meaning:'fireworks', targetIndex:1},
     ],
     standalone: {on: false, kun: true}
   },
@@ -1168,7 +1193,7 @@ const KANJI_DATA = [
     ],
     kunWords: [
       {word:'土', reading:'つち', romajiTarget:'tsuchi', meaning:'earth / soil', targetIndex:0},
-      {word:'土台', reading:'どだい', romajiTarget:'tsuchi', meaning:'foundation', targetIndex:0},
+      {word:'土台', reading:'どだい', romajiTarget:'do', meaning:'foundation', targetIndex:0},
     ],
     standalone: {on: false, kun: true}
   },
@@ -1390,7 +1415,7 @@ const KANJI_DATA = [
     kunYomi: [{kana:'なな',romaji:'nana'},{kana:'なの',romaji:'nano'}],
     onWords: [
       {word:'七月', reading:'しちがつ', romajiTarget:'shichi', meaning:'July', targetIndex:0},
-      {word:'七夕', reading:'たなばた', romajiTarget:'shichi', meaning:'Star Festival', targetIndex:0},
+      {word:'七時', reading:'しちじ', romajiTarget:'shichi', meaning:'seven o\'clock', targetIndex:0},
     ],
     kunWords: [
       {word:'七つ', reading:'ななつ', romajiTarget:'nana', meaning:'seven (things)', targetIndex:0},
@@ -1405,7 +1430,7 @@ const KANJI_DATA = [
     kunYomi: [{kana:'や',romaji:'ya'},{kana:'やっ',romaji:'ya'}],
     onWords: [
       {word:'八月', reading:'はちがつ', romajiTarget:'hachi', meaning:'August', targetIndex:0},
-      {word:'八百屋', reading:'やおや', romajiTarget:'hachi', meaning:'greengrocer', targetIndex:0},
+      {word:'八時', reading:'はちじ', romajiTarget:'hachi', meaning:'eight o\'clock', targetIndex:0},
     ],
     kunWords: [
       {word:'八つ', reading:'やっつ', romajiTarget:'ya', meaning:'eight (things)', targetIndex:0},
@@ -2252,7 +2277,7 @@ const KANJI_DATA = [
     onYomi: [{kana:'シ',romaji:'shi'},{kana:'ス',romaji:'su'}],
     kunYomi: [{kana:'こ',romaji:'ko'}],
     onWords: [
-      {word:'子供',reading:'こども',romajiTarget:'shi',meaning:'child',targetIndex:0},
+      {word:'子供',reading:'こども',romajiTarget:'ko',meaning:'child',targetIndex:0},
       {word:'女子',reading:'じょし',romajiTarget:'shi',meaning:'girl / female',targetIndex:1},
     ],
     kunWords: [
@@ -2444,7 +2469,7 @@ const KANJI_DATA = [
     ],
     kunWords: [
       {word:'外',reading:'そと',romajiTarget:'soto',meaning:'outside',targetIndex:0},
-      {word:'外れ',reading:'はずれ',romajiTarget:'hoka',meaning:'outskirts / miss',targetIndex:0},
+      {word:'外出',reading:'がいしゅつ',romajiTarget:'gai',meaning:'going out',targetIndex:0},
     ],
     standalone:{on:false,kun:true}
   },
@@ -2858,7 +2883,7 @@ const KANJI_DATA = [
       {word:'病気',reading:'びょうき',romajiTarget:'byou',meaning:'illness',targetIndex:0},
     ],
     kunWords: [
-      {word:'病む',reading:'やむ',romajiTarget:'yama',meaning:'to be ill',targetIndex:0},
+      {word:'病む',reading:'やむ',romajiTarget:'ya',meaning:'to be ill',targetIndex:0},
     ],
     standalone:{on:false,kun:false}
   },
@@ -3123,7 +3148,7 @@ const KANJI_DATA = [
     onYomi: [{kana:'コウ',romaji:'kou'}],
     kunYomi: [{kana:'ひろ',romaji:'hiro'}],
     onWords: [
-      {word:'広場',reading:'ひろば',romajiTarget:'kou',meaning:'plaza / square',targetIndex:0},
+      {word:'広場',reading:'ひろば',romajiTarget:'hiro',meaning:'plaza / square',targetIndex:0},
       {word:'広告',reading:'こうこく',romajiTarget:'kou',meaning:'advertisement',targetIndex:0},
     ],
     kunWords: [
@@ -3257,7 +3282,7 @@ const KANJI_DATA = [
     kunYomi: [{kana:'で',romaji:'de'},{kana:'だ',romaji:'da'}],
     onWords: [
       {word:'出発',reading:'しゅっぱつ',romajiTarget:'shutsu',meaning:'departure',targetIndex:0},
-      {word:'出口',reading:'でぐち',romajiTarget:'shutsu',meaning:'exit',targetIndex:0},
+      {word:'出口',reading:'でぐち',romajiTarget:'de',meaning:'exit',targetIndex:0},
     ],
     kunWords: [
       {word:'出る',reading:'でる',romajiTarget:'de',meaning:'to exit / come out',targetIndex:0},
@@ -3286,7 +3311,7 @@ const KANJI_DATA = [
     onYomi: [{kana:'リツ',romaji:'ritsu'},{kana:'リュウ',romaji:'ryuu'}],
     kunYomi: [{kana:'た',romaji:'ta'}],
     onWords: [
-      {word:'立場',reading:'たちば',romajiTarget:'ritsu',meaning:'standpoint / position',targetIndex:0},
+      {word:'立場',reading:'たちば',romajiTarget:'tachi',meaning:'standpoint / position',targetIndex:0},
       {word:'独立',reading:'どくりつ',romajiTarget:'ritsu',meaning:'independence',targetIndex:1},
     ],
     kunWords: [
@@ -3419,7 +3444,7 @@ const KANJI_DATA = [
     kunYomi: [{kana:'き',romaji:'ki'}],
     onWords: [
       {word:'大切',reading:'たいせつ',romajiTarget:'setsu',meaning:'important / precious',targetIndex:1},
-      {word:'切手',reading:'きって',romajiTarget:'setsu',meaning:'postage stamp',targetIndex:0},
+      {word:'切手',reading:'きって',romajiTarget:'ki',meaning:'postage stamp',targetIndex:0},
     ],
     kunWords: [
       {word:'切る',reading:'きる',romajiTarget:'ki',meaning:'to cut',targetIndex:0},
@@ -3578,7 +3603,7 @@ const KANJI_DATA = [
     kunYomi: [{kana:'す',romaji:'su'},{kana:'この',romaji:'kono'}],
     onWords: [
       {word:'好意',reading:'こうい',romajiTarget:'kou',meaning:'goodwill / favor',targetIndex:0},
-      {word:'好き嫌い',reading:'すききらい',romajiTarget:'kou',meaning:'likes and dislikes',targetIndex:0},
+      {word:'好き嫌い',reading:'すききらい',romajiTarget:'su',meaning:'likes and dislikes',targetIndex:0},
     ],
     kunWords: [
       {word:'好き',reading:'すき',romajiTarget:'su',meaning:'like / favorite',targetIndex:0},
@@ -4113,22 +4138,48 @@ function getLessonQueue() {
 }
 
 function getReviewQueue() {
-  const queue = [];
-  const now = Date.now();
+  const soloItems = [];   // kanji still in staged unlocking
+  const groupedKanji = []; // kanji with all stages learning — reviewed as a trio
+
   for (let i = 0; i < state.unlockedCount; i++) {
     const c = state.cards[i];
     if (!c) continue;
     const kd = KANJI_DATA[i];
-    if (isDue(c.meaning)) queue.push({idx: i, stage: 'meaning'});
-    if (kd.onYomi.length > 0 && isDue(c.on)) queue.push({idx: i, stage: 'on'});
-    if (kd.kunYomi.length > 0 && isDue(c.kun)) queue.push({idx: i, stage: 'kun'});
+
+    if (allStagesLearning(i)) {
+      // All stages learning: only add as a group if meaning is due
+      // (all share same nextReview, so checking meaning is enough)
+      if (isDue(c.meaning)) {
+        groupedKanji.push(i);
+      }
+    } else {
+      // Staged: add each due stage individually
+      if (isDue(c.meaning)) soloItems.push({idx: i, stage: 'meaning'});
+      if (kd.onYomi.length > 0 && isDue(c.on)) soloItems.push({idx: i, stage: 'on'});
+      if (kd.kunYomi.length > 0 && isDue(c.kun)) soloItems.push({idx: i, stage: 'kun'});
+    }
   }
-  // Shuffle
-  for (let i = queue.length - 1; i > 0; i--) {
+
+  // Shuffle solo items
+  for (let i = soloItems.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
-    [queue[i], queue[j]] = [queue[j], queue[i]];
+    [soloItems[i], soloItems[j]] = [soloItems[j], soloItems[i]];
   }
-  return queue;
+
+  // Shuffle grouped kanji order, then expand each into meaning→on→kun
+  for (let i = groupedKanji.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [groupedKanji[i], groupedKanji[j]] = [groupedKanji[j], groupedKanji[i]];
+  }
+  const groupItems = [];
+  for (const idx of groupedKanji) {
+    const kd = KANJI_DATA[idx];
+    groupItems.push({idx, stage: 'meaning'});
+    if (kd.onYomi.length > 0) groupItems.push({idx, stage: 'on'});
+    if (kd.kunYomi.length > 0) groupItems.push({idx, stage: 'kun'});
+  }
+
+  return [...soloItems, ...groupItems];
 }
 
 // ===================================================
@@ -4315,12 +4366,21 @@ function updateHomeStats() {
   document.getElementById('home-lesson-count').textContent = lessons;
   document.getElementById('home-review-count').textContent = reviews;
 
-  // Show pretest banner only if no card is learning yet
+  // Show pretest banner if: no lessons started yet OR pretest is in progress
   const anyLearning = Object.values(state.cards).some(c =>
     c && (c.meaning.learning || c.on.learning || c.kun.learning)
   );
   const banner = document.getElementById('pretest-banner');
-  if (banner) banner.style.display = anyLearning ? 'none' : 'block';
+  const pretestTitle = document.getElementById('pretest-banner-title');
+  if (banner) {
+    const showBanner = !anyLearning || pretestInProgress;
+    banner.style.display = showBanner ? 'block' : 'none';
+    if (pretestTitle) {
+      pretestTitle.textContent = pretestInProgress
+        ? 'Pretest in progress — Resume where you left off'
+        : 'Pretest — Already know some kanji?';
+    }
+  }
   const h = new Date().getHours();
   const greeting = h < 12 ? 'morning' : h < 17 ? 'afternoon' : 'evening';
   document.getElementById('time-greeting').textContent = greeting;
@@ -4331,9 +4391,15 @@ function updateHomeStats() {
     const c = state.cards[i];
     if (!c) continue;
     const kd = KANJI_DATA[i];
-    if (c.meaning.learning) levels[Math.min(c.meaning.level, MAX_SRS_LEVEL)]++;
-    if (kd.onYomi.length > 0 && c.on.learning) levels[Math.min(c.on.level, MAX_SRS_LEVEL)]++;
-    if (kd.kunYomi.length > 0 && c.kun.learning) levels[Math.min(c.kun.level, MAX_SRS_LEVEL)]++;
+    if (allStagesLearning(i)) {
+      // Count kanji once at its unified level
+      levels[Math.min(c.meaning.level, MAX_SRS_LEVEL)]++;
+    } else {
+      // Count each stage separately during staged unlocking
+      if (c.meaning.learning) levels[Math.min(c.meaning.level, MAX_SRS_LEVEL)]++;
+      if (kd.onYomi.length > 0 && c.on.learning) levels[Math.min(c.on.level, MAX_SRS_LEVEL)]++;
+      if (kd.kunYomi.length > 0 && c.kun.learning) levels[Math.min(c.kun.level, MAX_SRS_LEVEL)]++;
+    }
   }
   const total = levels.reduce((a,b) => a+b, 0) || 1;
   const colors = ['#555','#c0392b','#e07030','#e0a030','#c9a84c','#4a8ec2','#6aaee0','#4a9e72','#60c090','#a060c0','#cc88ee'];
@@ -4677,16 +4743,41 @@ function submitReading() {
   setTimeout(() => showReviewScreen(), 600);
 }
 
+function allStagesLearning(idx) {
+  const c = state.cards[idx];
+  if (!c) return false;
+  const kd = KANJI_DATA[idx];
+  const needsOn = kd.onYomi.length > 0;
+  const needsKun = kd.kunYomi.length > 0;
+  return c.meaning.learning &&
+    (!needsOn || c.on.learning) &&
+    (!needsKun || c.kun.learning);
+}
+
 function gradeCurrentCard(wasCorrect) {
   const item = session.item;
-  const card = state.cards[item.idx][item.stage];
-  const newCard = gradeCard(card, wasCorrect);
-  state.cards[item.idx][item.stage] = newCard;
+  const idx = item.idx;
+  const kd = KANJI_DATA[idx];
+  const c = state.cards[idx];
 
   if (wasCorrect) session.correct++;
   else session.wrong++;
 
-  // Check if we should unlock new kanji
+  if (allStagesLearning(idx)) {
+    // All stages unlocked — grade the one answered, then sync all to lowest result
+    const gradedCard = gradeCard(c[item.stage], wasCorrect);
+    const newLevel = gradedCard.level;
+    const nextReview = gradedCard.nextReview;
+
+    // Apply same new level & nextReview to ALL stages
+    c.meaning = { ...c.meaning, level: newLevel, nextReview };
+    if (kd.onYomi.length > 0) c.on = { ...c.on, level: newLevel, nextReview };
+    if (kd.kunYomi.length > 0) c.kun = { ...c.kun, level: newLevel, nextReview };
+  } else {
+    // Stages still unlocking individually — grade only this stage
+    state.cards[idx][item.stage] = gradeCard(c[item.stage], wasCorrect);
+  }
+
   tryUnlockNext();
   saveState();
 }
@@ -4697,9 +4788,10 @@ function showReviewScreen() {
   const wasCorrect = session.wasCorrect;
   const word = session.selectedWord;
   const card = state.cards[item.idx][item.stage];
-
-  const levelLabel = card.level >= MAX_SRS_LEVEL ? '⭐ Mastered' : `Level ${card.level} / ${MAX_SRS_LEVEL}`;
-  const nextReviewLabel = formatNextReview(card.nextReview);
+  // If all stages are unified, show the shared level; otherwise show this stage's level
+  const displayCard = allStagesLearning(item.idx) ? state.cards[item.idx].meaning : card;
+  const levelLabel = displayCard.level >= MAX_SRS_LEVEL ? '⭐ Mastered' : `Level ${displayCard.level} / ${MAX_SRS_LEVEL}`;
+  const nextReviewLabel = formatNextReview(displayCard.nextReview);
 
   let html = `
     <div class="review-result-banner ${wasCorrect ? 'correct-banner' : 'wrong-banner'}"></div>
@@ -4787,26 +4879,38 @@ function showBrowse() {
     const c = state.cards[i];
     const unlocked = i < state.unlockedCount;
 
-    let dots = '';
-    const stages = ['meaning', 'on', 'kun'];
-    const stageColors = ['var(--stage-meaning)', 'var(--stage-on)', 'var(--stage-kun)'];
-    stages.forEach((s, si) => {
-      if (s === 'on' && kd.onYomi.length === 0) return;
-      if (s === 'kun' && kd.kunYomi.length === 0) return;
-      let cls = 'stage-dot stage-locked';
-      let color = '';
-      if (unlocked && c) {
-        if (isMastered(c[s])) { cls = 'stage-dot'; color = stageColors[si]; }
-        else if (c[s].learning) { cls = 'stage-dot'; color = 'var(--gold)'; }
+    let levelDisplay = '';
+    if (!unlocked) {
+      levelDisplay = `<div class="browse-level-locked">—</div>`;
+    } else if (!c) {
+      levelDisplay = `<div class="browse-level-locked">—</div>`;
+    } else {
+      // Show the unified/lowest level, or per-stage if not all learning yet
+      const meaningLvl = c.meaning.learning ? c.meaning.level : null;
+      const onLvl = kd.onYomi.length > 0 ? (c.on.learning ? c.on.level : null) : undefined;
+      const kunLvl = kd.kunYomi.length > 0 ? (c.kun.learning ? c.kun.level : null) : undefined;
+
+      const allLevels = [meaningLvl, onLvl, kunLvl].filter(v => v !== undefined);
+      const allLearning = allLevels.every(v => v !== null);
+
+      if (!c.meaning.learning) {
+        levelDisplay = `<div class="browse-level" style="color:var(--ink-light)">new</div>`;
+      } else if (allLearning) {
+        const minLvl = Math.min(...allLevels);
+        const color = minLvl >= 10 ? 'var(--green-light)' : minLvl >= 5 ? 'var(--blue-light)' : 'var(--gold)';
+        levelDisplay = `<div class="browse-level" style="color:${color}">Lv ${minLvl}</div>`;
+      } else {
+        // Some stages not yet unlocked — show meaning level + indicators
+        const color = meaningLvl >= 5 ? 'var(--blue-light)' : 'var(--gold)';
+        levelDisplay = `<div class="browse-level" style="color:${color}">Lv ${meaningLvl}</div>`;
       }
-      dots += `<div class="${cls}" style="${color ? 'background:'+color : ''}"></div>`;
-    });
+    }
 
     return `
-      <div class="browse-kanji-card" style="${!unlocked ? 'opacity:0.4' : ''}">
+      <div class="browse-kanji-card" style="${!unlocked ? 'opacity:0.35' : ''}">
         <span class="browse-kanji-char" style="${!unlocked ? 'filter:blur(2px)' : ''}">${kd.kanji}</span>
         <div class="browse-kanji-meaning">${kd.meanings[0]}</div>
-        <div class="browse-stage-dots">${dots}</div>
+        ${levelDisplay}
       </div>
     `;
   }).join('');
@@ -4853,6 +4957,7 @@ function startPretest() {
   pretest.stage = 'meaning';
   pretest.results = {};
   pretest.fastTracked = 0;
+  pretestInProgress = true;
   showScreen('pretest');
   renderPretestCard();
 }
@@ -5019,6 +5124,7 @@ function advancePretestStage() {
   pretest.pos++;
   if (pretest.pos >= pretest.queue.length) {
     // Done with pretest
+    pretestInProgress = false;
     tryUnlockNext();
     saveState();
     updateHomeStats();
@@ -5030,10 +5136,30 @@ function advancePretestStage() {
   renderPretestCard();
 }
 
+let pretestInProgress = false;
+
+function pretestGoHome() {
+  // Leave pretest in progress so banner stays visible for resuming
+  tryUnlockNext();
+  saveState();
+  updateHomeStats();
+  showScreen('home');
+}
+
+function pretestGiveUp() {
+  // Permanently end the pretest — lock it, save fast-tracked progress, go home
+  if (!confirm('End the pretest? Any kanji you already passed are saved, but the pretest will be locked.')) return;
+  pretestInProgress = false;
+  tryUnlockNext();
+  saveState();
+  updateHomeStats();
+  showScreen('home');
+}
+
 function skipPretestKanji() {
-  // Mark this kanji as skipped (leave it at level 0, will appear in lessons normally)
   pretest.pos++;
   if (pretest.pos >= pretest.queue.length) {
+    pretestInProgress = false;
     tryUnlockNext();
     saveState();
     updateHomeStats();
@@ -5048,8 +5174,19 @@ function skipPretestKanji() {
 function confirmReset() {
   if (confirm('Reset ALL progress? This cannot be undone.')) {
     localStorage.removeItem('sumi_state');
+    // Reset all in-memory state
     state = { cards: {}, unlockedCount: 0 };
-    initState();
+    pretestInProgress = false;
+    pretest.queue = [];
+    pretest.pos = 0;
+    pretest.fastTracked = 0;
+    // Seed first 5 kanji fresh
+    const startBatch = Math.min(5, KANJI_DATA.length);
+    state.unlockedCount = startBatch;
+    for (let i = 0; i < startBatch; i++) {
+      state.cards[i] = { meaning: createCardState(), on: createCardState(), kun: createCardState() };
+    }
+    saveState();
     tryUnlockNext();
     updateHomeStats();
     showScreen('home');
