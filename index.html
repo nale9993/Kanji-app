@@ -491,26 +491,28 @@
     font-family: 'Noto Sans JP', sans-serif;
     font-size: 14px;
     color: var(--ink);
-    transition: all 0.15s;
+    transition: border-color 0.15s;
     text-align: center;
     font-weight: 400;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    -webkit-user-select: none;
   }
 
   .choice-btn:hover:not(:disabled) {
-    border-color: var(--stage-color, var(--gold));
-    background: color-mix(in srgb, var(--stage-color, var(--gold)) 8%, white);
+    border-color: var(--paper-darker);
   }
 
   .choice-btn.correct {
-    background: color-mix(in srgb, var(--green) 15%, white);
+    background: color-mix(in srgb, var(--green) 20%, var(--paper-dark));
     border-color: var(--green);
-    color: var(--green);
+    color: var(--green-light);
   }
 
   .choice-btn.wrong {
-    background: color-mix(in srgb, var(--red) 12%, white);
+    background: color-mix(in srgb, var(--red) 20%, var(--paper-dark));
     border-color: var(--red);
-    color: var(--red);
+    color: var(--red-light);
   }
 
   /* TEXT INPUT */
@@ -934,6 +936,15 @@
     <div class="home-greeting">Good <span id="time-greeting">day</span>.</div>
     <div class="home-subtitle">Continue your kanji journey.</div>
 
+    <!-- Pretest banner — only shown before any lessons started -->
+    <div id="pretest-banner" style="display:none; margin-bottom:16px;">
+      <div class="action-card" onclick="startPretest()" style="--card-color: var(--red); grid-column: span 2; background: color-mix(in srgb, var(--red) 10%, var(--paper-dark));">
+        <span class="card-icon">🎯</span>
+        <div class="card-title">Pretest — Already know some kanji?</div>
+        <div class="card-desc">Test yourself to skip ahead. Fast-tracks passed kanji to Level 6, freeing lesson slots for new ones.</div>
+      </div>
+    </div>
+
     <div class="action-cards">
       <div class="action-card lessons" onclick="startLessons()">
         <span class="card-icon">🌱</span>
@@ -947,26 +958,22 @@
         <div class="card-desc">Practice due cards</div>
         <div class="card-count" id="home-review-count">0</div>
       </div>
-      <div class="action-card browse" onclick="startPretest()" style="--card-color: var(--red);">
-        <span class="card-icon">🎯</span>
-        <div class="card-title">Pretest</div>
-        <div class="card-desc">Already know some kanji? Fast-track them to Level 6</div>
-      </div>
       <div class="action-card browse" onclick="showBrowse()">
         <span class="card-icon">🗂</span>
         <div class="card-title">Browse Kanji</div>
         <div class="card-desc">View all kanji and your progress</div>
-      </div>
-      <div class="action-card" onclick="confirmReset()" style="--card-color:#666; grid-column: span 2;">
-        <span class="card-icon">🔄</span>
-        <div class="card-title">Reset Progress</div>
-        <div class="card-desc">Wipe all progress and start fresh from the beginning</div>
       </div>
     </div>
 
     <div class="progress-section">
       <h3>SRS Progress</h3>
       <div class="srs-levels" id="srs-levels-display"></div>
+    </div>
+
+    <div style="text-align:center; margin-top:24px; padding-bottom:8px;">
+      <button onclick="confirmReset()" style="background:none; border:none; color:var(--ink-light); font-size:12px; cursor:pointer; opacity:0.5; font-family:'Noto Sans JP',sans-serif; text-decoration:underline;">
+        Reset all progress
+      </button>
     </div>
   </div>
 
@@ -1041,6 +1048,9 @@
     </div>
     <div class="quiz-card animate-in" id="pretest-card" style="--stage-color: var(--red)">
     </div>
+    <button onclick="skipPretestKanji()" style="margin-top:12px; background:none; border:none; color:var(--ink-light); font-size:13px; cursor:pointer; font-family:'Noto Sans JP',sans-serif; text-decoration:underline; opacity:0.6;">
+      Skip this kanji →
+    </button>
   </div>
 
 </div>
@@ -2827,21 +2837,6 @@ const KANJI_DATA = [
     standalone:{on:false,kun:true}
   },
   {
-    kanji: '山',
-    meanings: ['mountain'],
-    onYomi: [{kana:'サン',romaji:'san'},{kana:'セン',romaji:'sen'}],
-    kunYomi: [{kana:'やま',romaji:'yama'}],
-    onWords: [
-      {word:'富士山',reading:'ふじさん',romajiTarget:'san',meaning:'Mt. Fuji',targetIndex:2},
-      {word:'火山',reading:'かざん',romajiTarget:'san',meaning:'volcano',targetIndex:1},
-    ],
-    kunWords: [
-      {word:'山',reading:'やま',romajiTarget:'yama',meaning:'mountain',targetIndex:0},
-      {word:'山道',reading:'やまみち',romajiTarget:'yama',meaning:'mountain path',targetIndex:0},
-    ],
-    standalone:{on:false,kun:true}
-  },
-  {
     kanji: '医',
     meanings: ['doctor', 'medicine'],
     onYomi: [{kana:'イ',romaji:'i'}],
@@ -4140,23 +4135,32 @@ function getReviewQueue() {
 // ROMAJI → KANA CONVERSION
 // ===================================================
 function toHiragana(romaji) {
-  const r = romaji.toLowerCase();
+  // Map ordered longest-first so longer sequences match before shorter ones
   const map = [
-    ['chi','ち'],['shi','し'],['tsu','つ'],['tchi','っち'],['sshi','っし'],
+    // Double consonant patterns (っ)
+    ['tchi','っち'],['sshi','っし'],['ttsu','っつ'],
+    ['kka','っか'],['kki','っき'],['kku','っく'],['kke','っけ'],['kko','っこ'],
+    ['ssa','っさ'],['ssi','っし'],['ssu','っす'],['sse','っせ'],['sso','っそ'],
+    ['tta','った'],['tti','っち'],['tte','って'],['tto','っと'],
+    ['ppa','っぱ'],['ppi','っぴ'],['ppu','っぷ'],['ppe','っぺ'],['ppo','っぽ'],
+    ['hha','っは'],
+    // 3-char combos
+    ['chi','ち'],['shi','し'],['tsu','つ'],
     ['kya','きゃ'],['kyu','きゅ'],['kyo','きょ'],
-    ['sha','しゃ'],['shu','しゅ'],['she','しぇ'],['sho','しょ'],
-    ['cha','ちゃ'],['chu','ちゅ'],['cho','ちょ'],
+    ['sha','しゃ'],['shu','しゅ'],['sho','しょ'],['she','しぇ'],
+    ['cha','ちゃ'],['chu','ちゅ'],['cho','ちょ'],['che','ちぇ'],
     ['nya','にゃ'],['nyu','にゅ'],['nyo','にょ'],
     ['hya','ひゃ'],['hyu','ひゅ'],['hyo','ひょ'],
     ['mya','みゃ'],['myu','みゅ'],['myo','みょ'],
     ['rya','りゃ'],['ryu','りゅ'],['ryo','りょ'],
     ['gya','ぎゃ'],['gyu','ぎゅ'],['gyo','ぎょ'],
-    ['ja','じゃ'],['ju','じゅ'],['jo','じょ'],
     ['bya','びゃ'],['byu','びゅ'],['byo','びょ'],
     ['pya','ぴゃ'],['pyu','ぴゅ'],['pyo','ぴょ'],
     ['dya','ぢゃ'],['dyu','ぢゅ'],['dyo','ぢょ'],
     ['tya','ちゃ'],['tyu','ちゅ'],['tyo','ちょ'],
-    ['a','あ'],['i','い'],['u','う'],['e','え'],['o','お'],
+    ['dzu','づ'],
+    // 2-char combos
+    ['ja','じゃ'],['ju','じゅ'],['jo','じょ'],['ji','じ'],
     ['ka','か'],['ki','き'],['ku','く'],['ke','け'],['ko','こ'],
     ['sa','さ'],['si','し'],['su','す'],['se','せ'],['so','そ'],
     ['ta','た'],['ti','ち'],['te','て'],['to','と'],
@@ -4171,16 +4175,48 @@ function toHiragana(romaji) {
     ['da','だ'],['di','ぢ'],['du','づ'],['de','で'],['do','ど'],
     ['ba','ば'],['bi','び'],['bu','ぶ'],['be','べ'],['bo','ぼ'],
     ['pa','ぱ'],['pi','ぴ'],['pu','ぷ'],['pe','ぺ'],['po','ぽ'],
-    ['n','ん'],['m','ん'],
+    // vowels
+    ['a','あ'],['i','い'],['u','う'],['e','え'],['o','お'],
+    // n — only convert when followed by consonant or end of string, not before vowel
+    ['n','ん'],
   ];
 
-  let result = r;
-  // Handle double consonants (っ)
-  result = result.replace(/([kstpgzdbh])\1/g, 'っ$1');
-  result = result.replace(/tts/g, 'っts');
-
-  for (const [rom, kana] of map) {
-    result = result.split(rom).join(kana);
+  let result = '';
+  let s = romaji.toLowerCase();
+  outer: while (s.length > 0) {
+    // nn before a vowel: first n → ん, leave second n for next iteration
+    // nn before consonant or end: both → ん
+    if (s.startsWith('nn')) {
+      if (s.length === 2 || !'aiueo'.includes(s[2])) {
+        result += 'ん'; s = s.slice(2);
+      } else {
+        result += 'ん'; s = s.slice(1); // leave one n for the next syllable (e.g. nna → ん + な)
+      }
+      continue;
+    }
+    // n before a consonant (not vowel, n, or y) → ん
+    if (s[0] === 'n' && s.length >= 2 && !'aiueony'.includes(s[1])) {
+      result += 'ん';
+      s = s.slice(1);
+      continue;
+    }
+    // lone n at end → ん
+    if (s === 'n') {
+      result += 'ん';
+      s = '';
+      continue;
+    }
+    for (const [rom, kana] of map) {
+      if (rom === 'n') continue; // handled above
+      if (s.startsWith(rom)) {
+        result += kana;
+        s = s.slice(rom.length);
+        continue outer;
+      }
+    }
+    // No match — output the character as-is (still being typed)
+    result += s[0];
+    s = s.slice(1);
   }
   return result;
 }
@@ -4279,31 +4315,36 @@ function updateHomeStats() {
   document.getElementById('home-lesson-count').textContent = lessons;
   document.getElementById('home-review-count').textContent = reviews;
 
-  // Time greeting
+  // Show pretest banner only if no card is learning yet
+  const anyLearning = Object.values(state.cards).some(c =>
+    c && (c.meaning.learning || c.on.learning || c.kun.learning)
+  );
+  const banner = document.getElementById('pretest-banner');
+  if (banner) banner.style.display = anyLearning ? 'none' : 'block';
   const h = new Date().getHours();
   const greeting = h < 12 ? 'morning' : h < 17 ? 'afternoon' : 'evening';
   document.getElementById('time-greeting').textContent = greeting;
 
-  // SRS levels
-  const levels = [0,0,0,0,0,0,0,0];
+  // SRS levels — 11 buckets: level 0 through 10
+  const levels = Array(MAX_SRS_LEVEL + 1).fill(0);
   for (let i = 0; i < state.unlockedCount; i++) {
     const c = state.cards[i];
     if (!c) continue;
     const kd = KANJI_DATA[i];
-    if (c.meaning.learning) levels[c.meaning.level]++;
-    if (kd.onYomi.length > 0 && c.on.learning) levels[c.on.level]++;
-    if (kd.kunYomi.length > 0 && c.kun.learning) levels[c.kun.level]++;
+    if (c.meaning.learning) levels[Math.min(c.meaning.level, MAX_SRS_LEVEL)]++;
+    if (kd.onYomi.length > 0 && c.on.learning) levels[Math.min(c.on.level, MAX_SRS_LEVEL)]++;
+    if (kd.kunYomi.length > 0 && c.kun.learning) levels[Math.min(c.kun.level, MAX_SRS_LEVEL)]++;
   }
   const total = levels.reduce((a,b) => a+b, 0) || 1;
-  const colors = ['#e0d0b0','#f0c040','#c9a84c','#8b5e3c','#2c5f8a','#3a7ab5','#2d6a4f','#40916c'];
-  const labels = ['N','1','2','3','4','5','6','M'];
+  const colors = ['#555','#c0392b','#e07030','#e0a030','#c9a84c','#4a8ec2','#6aaee0','#4a9e72','#60c090','#a060c0','#cc88ee'];
+  const labels = ['0','1','2','3','4','5','6','7','8','9','10'];
   const container = document.getElementById('srs-levels-display');
   container.innerHTML = levels.map((count, i) => `
     <div class="srs-level">
       <div class="srs-level-bar">
         <div class="srs-level-fill" style="width:${(count/total)*100}%;background:${colors[i]}"></div>
       </div>
-      <div class="srs-level-label">${labels[i]}<br>${count}</div>
+      <div class="srs-level-label">${labels[i]}<br><span style="font-size:10px">${count}</span></div>
     </div>
   `).join('');
 }
@@ -4483,9 +4524,11 @@ function renderQuizCard() {
     html += `<div class="quiz-kanji">${kd.kanji}</div>`;
     html += `<div class="quiz-prompt">What does this kanji mean?</div>`;
     const {choices, correct} = getMeaningChoices(item.idx);
-    html += `<div class="choices">`;
-    choices.forEach(c => {
-      html += `<button class="choice-btn" onclick="selectMeaning(this,'${c}','${correct}')">${c}</button>`;
+    // Store correct answer in session to avoid inline string issues
+    session.meaningCorrect = correct;
+    html += `<div class="choices" id="meaning-choices">`;
+    choices.forEach((c, i) => {
+      html += `<button class="choice-btn" data-choice="${i}" data-meaning="${c.replace(/"/g,'&quot;')}">${c}</button>`;
     });
     html += `</div>`;
   } else {
@@ -4527,6 +4570,17 @@ function renderQuizCard() {
 
   card.innerHTML = html;
 
+  // Attach meaning choice listeners via event delegation (avoids inline onclick string issues)
+  if (item.stage === 'meaning') {
+    const choicesDiv = document.getElementById('meaning-choices');
+    if (choicesDiv) {
+      choicesDiv.addEventListener('click', function(e) {
+        const btn = e.target.closest('.choice-btn');
+        if (btn) selectMeaning(btn, btn.dataset.meaning, session.meaningCorrect);
+      });
+    }
+  }
+
   if (item.stage !== 'meaning') {
     setTimeout(() => {
       const inp = document.getElementById('romaji-input');
@@ -4563,7 +4617,7 @@ function selectMeaning(btn, selected, correct) {
 
   document.querySelectorAll('.choice-btn').forEach(b => {
     b.disabled = true;
-    if (b.textContent === correct) b.classList.add('correct');
+    if (b.dataset.meaning === correct) b.classList.add('correct');
     else if (b === btn && !wasCorrect) b.classList.add('wrong');
   });
 
@@ -4822,12 +4876,12 @@ function renderPretestCard() {
 
   if (pretest.stage === 'meaning') {
     const {choices, correct} = getMeaningChoices(idx);
-    pretest.correct = correct;
+    pretest.meaningCorrect = correct;
     html += `<div class="quiz-kanji">${kd.kanji}</div>`;
     html += `<div class="quiz-prompt">What does this kanji mean?</div>`;
-    html += `<div class="choices">`;
+    html += `<div class="choices" id="pretest-choices">`;
     choices.forEach(c => {
-      html += `<button class="choice-btn" onclick="pretestSelectMeaning(this,'${c}','${correct}')">${c}</button>`;
+      html += `<button class="choice-btn" data-meaning="${c.replace(/"/g,'&quot;')}">${c}</button>`;
     });
     html += `</div>`;
   } else {
@@ -4863,6 +4917,17 @@ function renderPretestCard() {
 
   card.innerHTML = html;
   card.className = 'quiz-card animate-in';
+
+  if (pretest.stage === 'meaning') {
+    const choicesDiv = document.getElementById('pretest-choices');
+    if (choicesDiv) {
+      choicesDiv.addEventListener('click', function(e) {
+        const btn = e.target.closest('.choice-btn');
+        if (btn) pretestSelectMeaning(btn, btn.dataset.meaning, pretest.meaningCorrect);
+      });
+    }
+  }
+
   if (pretest.stage !== 'meaning') {
     setTimeout(() => { const i = document.getElementById('pretest-romaji-input'); if(i) i.focus(); }, 100);
   }
@@ -4880,7 +4945,7 @@ function pretestSelectMeaning(btn, selected, correct) {
   const wasCorrect = selected === correct;
   document.querySelectorAll('#pretest-card .choice-btn').forEach(b => {
     b.disabled = true;
-    if (b.textContent === correct) b.classList.add('correct');
+    if (b.dataset.meaning === correct) b.classList.add('correct');
     else if (b === btn && !wasCorrect) b.classList.add('wrong');
   });
   const idx = pretest.queue[pretest.pos];
@@ -4947,12 +5012,28 @@ function advancePretestStage() {
     if (kd.onYomi.length > 0) state.cards[idx].on = { level: PRETEST_LEVEL, nextReview, learning: true };
     if (kd.kunYomi.length > 0) state.cards[idx].kun = { level: PRETEST_LEVEL, nextReview, learning: true };
     pretest.fastTracked++;
+    tryUnlockNext(); // immediately open new lesson slots freed by this fast-track
   }
 
   // Next kanji
   pretest.pos++;
   if (pretest.pos >= pretest.queue.length) {
     // Done with pretest
+    tryUnlockNext();
+    saveState();
+    updateHomeStats();
+    alert(`Pretest complete! ${pretest.fastTracked} kanji fast-tracked to Level 6.`);
+    goHome();
+    return;
+  }
+  pretest.stage = 'meaning';
+  renderPretestCard();
+}
+
+function skipPretestKanji() {
+  // Mark this kanji as skipped (leave it at level 0, will appear in lessons normally)
+  pretest.pos++;
+  if (pretest.pos >= pretest.queue.length) {
     tryUnlockNext();
     saveState();
     updateHomeStats();
