@@ -560,35 +560,42 @@
     letter-spacing: 0.05em;
   }
 
+  /* Strip turns green/red and stays there until next screen */
   .quiz-card.flash-correct::before {
-    animation: flashStripCorrect 0.6s ease forwards;
+    background: var(--green) !important;
+    height: 6px;
+    transition: background 0.15s, height 0.15s;
   }
   .quiz-card.flash-wrong::before {
-    animation: flashStripWrong 0.6s ease forwards;
+    background: var(--red) !important;
+    height: 6px;
+    transition: background 0.15s, height 0.15s;
   }
-  .quiz-card.flash-correct .quiz-kanji,
-  .quiz-card.flash-correct .quiz-word-context {
-    animation: flashTextCorrect 0.6s ease forwards;
+
+  /* Meaning screen: the big standalone kanji flashes and stays */
+  .quiz-card.flash-correct .quiz-kanji {
+    color: var(--green) !important;
+    transition: color 0.15s;
   }
-  .quiz-card.flash-wrong .quiz-kanji,
-  .quiz-card.flash-wrong .quiz-word-context {
-    animation: flashTextWrong 0.6s ease forwards;
+  .quiz-card.flash-wrong .quiz-kanji {
+    color: var(--red) !important;
+    transition: color 0.15s;
   }
-  @keyframes flashStripCorrect {
-    0%   { background: var(--green); height: 8px; }
-    100% { background: var(--stage-color, var(--gold)); height: 4px; }
+
+  /* On/kun screens: only the highlighted target kanji changes, not the whole word */
+  .quiz-card.flash-correct .target-kanji {
+    color: var(--green) !important;
+    transition: color 0.15s;
   }
-  @keyframes flashStripWrong {
-    0%   { background: var(--red); height: 8px; }
-    100% { background: var(--stage-color, var(--gold)); height: 4px; }
+  .quiz-card.flash-correct .target-kanji::after {
+    background: var(--green) !important;
   }
-  @keyframes flashTextCorrect {
-    0%   { color: var(--green); }
-    100% { color: var(--ink); }
+  .quiz-card.flash-wrong .target-kanji {
+    color: var(--red) !important;
+    transition: color 0.15s;
   }
-  @keyframes flashTextWrong {
-    0%   { color: var(--red); }
-    100% { color: var(--ink); }
+  .quiz-card.flash-wrong .target-kanji::after {
+    background: var(--red) !important;
   }
 
   .romaji-input.correct {
