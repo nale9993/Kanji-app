@@ -432,18 +432,6 @@
     justify-content: center;
     /* Prevent content from pushing layout when keyboard opens */
     min-height: 0;
-    transition: box-shadow 0.4s, border-color 0.4s;
-  }
-
-  .quiz-card.flash-correct {
-    border-color: var(--green) !important;
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--green) 35%, transparent);
-    transition: box-shadow 0.4s, border-color 0.4s;
-  }
-  .quiz-card.flash-wrong {
-    border-color: var(--red) !important;
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--red) 35%, transparent);
-    transition: box-shadow 0.4s, border-color 0.4s;
   }
 
   .quiz-card::before {
@@ -568,46 +556,8 @@
     color: var(--ink);
     text-align: center;
     outline: none;
-    transition: border-color 0.2s;
+    transition: border-color 0.4s, background 0.4s;
     letter-spacing: 0.05em;
-  }
-
-  /* Strip turns green/red and stays there until next screen */
-  .quiz-card.flash-correct::before {
-    background: var(--green) !important;
-    height: 6px;
-    transition: background 0.4s, height 0.4s;
-  }
-  .quiz-card.flash-wrong::before {
-    background: var(--red) !important;
-    height: 6px;
-    transition: background 0.4s, height 0.4s;
-  }
-
-  /* Meaning screen: the big standalone kanji flashes and stays */
-  .quiz-card.flash-correct .quiz-kanji {
-    color: var(--green) !important;
-    transition: color 0.4s;
-  }
-  .quiz-card.flash-wrong .quiz-kanji {
-    color: var(--red) !important;
-    transition: color 0.4s;
-  }
-
-  /* On/kun screens: only the highlighted target kanji changes, not the whole word */
-  .quiz-card.flash-correct .target-kanji {
-    color: var(--green) !important;
-    transition: color 0.4s;
-  }
-  .quiz-card.flash-correct .target-kanji::after {
-    background: var(--green) !important;
-  }
-  .quiz-card.flash-wrong .target-kanji {
-    color: var(--red) !important;
-    transition: color 0.4s;
-  }
-  .quiz-card.flash-wrong .target-kanji::after {
-    background: var(--red) !important;
   }
 
   .romaji-input.correct {
@@ -4524,11 +4474,9 @@ function toHiragana(romaji) {
   return result;
 }
 
-// Normalize for comparison: accept both romaji and hiragana/katakana loosely
+// Normalize for comparison: accept romaji loosely (case, whitespace only)
 function normalizeAnswer(s) {
   return s.toLowerCase().trim()
-    .replace(/oo/g, 'ou') // common alternates
-    .replace(/[ー]/g, '')
     .replace(/\s+/g, '');
 }
 
@@ -4620,15 +4568,10 @@ function updateHomeStats() {
   document.getElementById('home-lesson-count').textContent = lessons;
   document.getElementById('home-review-count').textContent = reviews;
 
-  // Show pretest banner if: no lessons started yet OR pretest is in progress
-  // Once any kanji is learning, the banner is gone (unless pretest is in progress)
-  const anyLearning = Object.values(state.cards).some(c =>
-    c && (c.meaning.learning || c.on.learning || c.kun.learning)
-  );
   const banner = document.getElementById('pretest-banner');
   const pretestTitle = document.getElementById('pretest-banner-title');
   if (banner) {
-    const showBanner = (!anyLearning && !state.pretestDismissed) || pretestInProgress;
+    const showBanner = !state.pretestDismissed || pretestInProgress;
     banner.style.display = showBanner ? 'block' : 'none';
     if (pretestTitle) {
       pretestTitle.textContent = pretestInProgress
@@ -4679,13 +4622,10 @@ function startLessons() {
     alert('No new lessons right now! Come back after reviewing.');
     return;
   }
-  // Lock the pretest when user starts lessons — same as giving up
-  if (!pretestInProgress) {
-    pretestInProgress = false;
-    state.pretestDismissed = true;
-    saveState();
-    updateHomeStats();
-  }
+  // Always lock the pretest when user starts lessons
+  state.pretestDismissed = true;
+  pretestInProgress = false;
+  saveState();
   lessonPos = 0;
   showScreen('lesson');
   renderLesson();
