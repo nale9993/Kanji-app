@@ -564,35 +564,35 @@
   .quiz-card.flash-correct::before {
     background: var(--green) !important;
     height: 6px;
-    transition: background 0.15s, height 0.15s;
+    transition: background 0.7s, height 0.7s;
   }
   .quiz-card.flash-wrong::before {
     background: var(--red) !important;
     height: 6px;
-    transition: background 0.15s, height 0.15s;
+    transition: background 0.7s, height 0.7s;
   }
 
   /* Meaning screen: the big standalone kanji flashes and stays */
   .quiz-card.flash-correct .quiz-kanji {
     color: var(--green) !important;
-    transition: color 0.15s;
+    transition: color 0.7s;
   }
   .quiz-card.flash-wrong .quiz-kanji {
     color: var(--red) !important;
-    transition: color 0.15s;
+    transition: color 0.7s;
   }
 
   /* On/kun screens: only the highlighted target kanji changes, not the whole word */
   .quiz-card.flash-correct .target-kanji {
     color: var(--green) !important;
-    transition: color 0.15s;
+    transition: color 0.7s;
   }
   .quiz-card.flash-correct .target-kanji::after {
     background: var(--green) !important;
   }
   .quiz-card.flash-wrong .target-kanji {
     color: var(--red) !important;
-    transition: color 0.15s;
+    transition: color 0.7s;
   }
   .quiz-card.flash-wrong .target-kanji::after {
     background: var(--red) !important;
@@ -767,10 +767,28 @@
 
   /* BROWSE SCREEN */
   .browse-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-    gap: 10px;
     margin-top: 16px;
+  }
+
+  .browse-group {
+    margin-bottom: 28px;
+  }
+
+  .browse-group-title {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-light);
+    font-weight: 600;
+    margin-bottom: 10px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--paper-darker);
+  }
+
+  .browse-group-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+    gap: 8px;
   }
 
   /* KANJI DETAIL MODAL */
@@ -1275,7 +1293,7 @@ const KANJI_DATA = [
     kunWords: [
       {word:'日', reading:'ひ', romajiTarget:'hi', meaning:'sun / day', targetIndex:0},
       {word:'今日', reading:'きょう', romajiTarget:'kyou', meaning:'today', targetIndex:0},
-      {word:'日々', reading:'ひびく', romajiTarget:'hi', meaning:'day by day', targetIndex:0},
+      {word:'日々', reading:'ひび', romajiTarget:'hi', meaning:'day by day', targetIndex:0},
     ],
     standalone: {on: false, kun: true}
   },
@@ -1287,7 +1305,7 @@ const KANJI_DATA = [
     onWords: [
       {word:'月曜日', reading:'げつようび', romajiTarget:'getsu', meaning:'Monday', targetIndex:0},
       {word:'一月', reading:'いちがつ', romajiTarget:'gatsu', meaning:'January', targetIndex:1},
-      {word:'毎月', reading:'まいつき', romajiTarget:'tsuki', meaning:'every month', targetIndex:1},
+      {word:'月給', reading:'げっきゅう', romajiTarget:'getsu', meaning:'monthly salary', targetIndex:0},
     ],
     kunWords: [
       {word:'月', reading:'つき', romajiTarget:'tsuki', meaning:'moon / month', targetIndex:0},
@@ -1426,7 +1444,7 @@ const KANJI_DATA = [
     ],
     kunWords: [
       {word:'田んぼ', reading:'たんぼ', romajiTarget:'ta', meaning:'rice field', targetIndex:0},
-      {word:'田舎', reading:'いなか', romajiTarget:'ta', meaning:'countryside', targetIndex:0},
+      {word:'田植え', reading:'たうえ', romajiTarget:'ta', meaning:'rice planting', targetIndex:0},
     ],
     standalone: {on: false, kun: true}
   },
@@ -1452,11 +1470,12 @@ const KANJI_DATA = [
     kunYomi: [{kana:'くち',romaji:'kuchi'}],
     onWords: [
       {word:'人口', reading:'じんこう', romajiTarget:'kou', meaning:'population', targetIndex:1},
-      {word:'出口', reading:'でぐち', romajiTarget:'kuchi', meaning:'exit', targetIndex:1},
+      {word:'開口', reading:'かいこう', romajiTarget:'kou', meaning:'opening / beginning to speak', targetIndex:1},
     ],
     kunWords: [
       {word:'口', reading:'くち', romajiTarget:'kuchi', meaning:'mouth', targetIndex:0},
       {word:'入り口', reading:'いりぐち', romajiTarget:'kuchi', meaning:'entrance', targetIndex:1},
+      {word:'出口', reading:'でぐち', romajiTarget:'kuchi', meaning:'exit', targetIndex:1},
     ],
     standalone: {on: false, kun: true}
   },
@@ -1659,7 +1678,7 @@ const KANJI_DATA = [
     kunYomi: [{kana:'ち',romaji:'chi'}],
     onWords: [
       {word:'千円', reading:'せんえん', romajiTarget:'sen', meaning:'1000 yen', targetIndex:0},
-      {word:'千葉', reading:'ちば', romajiTarget:'sen', meaning:'Chiba (place)', targetIndex:0},
+      {word:'千年', reading:'せんねん', romajiTarget:'sen', meaning:'a thousand years', targetIndex:0},
     ],
     kunWords: [
       {word:'千代', reading:'ちよ', romajiTarget:'chi', meaning:'thousand generations', targetIndex:0},
@@ -1673,7 +1692,7 @@ const KANJI_DATA = [
     kunYomi: [],
     onWords: [
       {word:'万円', reading:'まんえん', romajiTarget:'man', meaning:'10,000 yen', targetIndex:0},
-      {word:'万能', reading:'ばんのう', romajiTarget:'ban', meaning:'all-purpose', targetIndex:0},
+      {word:'一万', reading:'いちまん', romajiTarget:'man', meaning:'ten thousand', targetIndex:1},
     ],
     kunWords: [],
     standalone: {on: false, kun: false}
@@ -2150,6 +2169,7 @@ const KANJI_DATA = [
     kunYomi: [{kana:'はやし',romaji:'hayashi'}],
     onWords: [
       {word:'森林',reading:'しんりん',romajiTarget:'rin',meaning:'forest',targetIndex:1},
+      {word:'林業',reading:'りんぎょう',romajiTarget:'rin',meaning:'forestry',targetIndex:0},
     ],
     kunWords: [
       {word:'林',reading:'はやし',romajiTarget:'hayashi',meaning:'grove / forest',targetIndex:0},
@@ -2191,6 +2211,7 @@ const KANJI_DATA = [
     kunYomi: [{kana:'くさ',romaji:'kusa'}],
     onWords: [
       {word:'草原',reading:'そうげん',romajiTarget:'sou',meaning:'grassland / meadow',targetIndex:0},
+      {word:'雑草',reading:'ざっそう',romajiTarget:'sou',meaning:'weeds',targetIndex:1},
     ],
     kunWords: [
       {word:'草',reading:'くさ',romajiTarget:'kusa',meaning:'grass',targetIndex:0},
@@ -2262,7 +2283,7 @@ const KANJI_DATA = [
     onYomi: [{kana:'チョウ',romaji:'chou'}],
     kunYomi: [{kana:'とり',romaji:'tori'}],
     onWords: [
-      {word:'鳥類',reading:'ちょうるい',romajiTarget:'chou',meaning:'birds (class)',targetIndex:0},
+      {word:'野鳥',reading:'やちょう',romajiTarget:'chou',meaning:'wild bird',targetIndex:1},
     ],
     kunWords: [
       {word:'鳥',reading:'とり',romajiTarget:'tori',meaning:'bird',targetIndex:0},
@@ -2319,7 +2340,7 @@ const KANJI_DATA = [
     onYomi: [{kana:'バ',romaji:'ba'},{kana:'マ',romaji:'ma'}],
     kunYomi: [{kana:'うま',romaji:'uma'}],
     onWords: [
-      {word:'馬車',reading:'ばしゃ',romajiTarget:'ba',meaning:'horse carriage',targetIndex:0},
+      {word:'馬力',reading:'ばりき',romajiTarget:'ba',meaning:'horsepower',targetIndex:0},
       {word:'競馬',reading:'けいば',romajiTarget:'ba',meaning:'horse racing',targetIndex:1},
     ],
     kunWords: [
@@ -2348,6 +2369,7 @@ const KANJI_DATA = [
     kunYomi: [{kana:'はな',romaji:'hana'}],
     onWords: [
       {word:'耳鼻科',reading:'じびか',romajiTarget:'bi',meaning:'ENT clinic',targetIndex:1},
+      {word:'鼻炎',reading:'びえん',romajiTarget:'bi',meaning:'rhinitis / nasal inflammation',targetIndex:0},
     ],
     kunWords: [
       {word:'鼻',reading:'はな',romajiTarget:'hana',meaning:'nose',targetIndex:0},
@@ -2363,10 +2385,10 @@ const KANJI_DATA = [
     onWords: [
       {word:'頭痛',reading:'ずつう',romajiTarget:'zu',meaning:'headache',targetIndex:0},
       {word:'先頭',reading:'せんとう',romajiTarget:'tou',meaning:'front / lead',targetIndex:1},
+      {word:'頭巾',reading:'ずきん',romajiTarget:'zu',meaning:'hood / headscarf',targetIndex:0},
     ],
     kunWords: [
       {word:'頭',reading:'あたま',romajiTarget:'atama',meaning:'head',targetIndex:0},
-      {word:'頭痛',reading:'あたまいた',romajiTarget:'atama',meaning:'headache (colloquial)',targetIndex:0},
     ],
     standalone:{on:false,kun:true}
   },
@@ -2450,11 +2472,12 @@ const KANJI_DATA = [
     onYomi: [{kana:'シ',romaji:'shi'},{kana:'ス',romaji:'su'}],
     kunYomi: [{kana:'こ',romaji:'ko'}],
     onWords: [
-      {word:'子供',reading:'こども',romajiTarget:'ko',meaning:'child',targetIndex:0},
+      {word:'様子',reading:'ようす',romajiTarget:'su',meaning:'situation / appearance',targetIndex:1},
       {word:'女子',reading:'じょし',romajiTarget:'shi',meaning:'girl / female',targetIndex:1},
     ],
     kunWords: [
       {word:'子',reading:'こ',romajiTarget:'ko',meaning:'child',targetIndex:0},
+      {word:'子供',reading:'こども',romajiTarget:'ko',meaning:'child',targetIndex:0},
       {word:'子犬',reading:'こいぬ',romajiTarget:'ko',meaning:'puppy',targetIndex:0},
     ],
     standalone:{on:false,kun:true}
@@ -2642,7 +2665,7 @@ const KANJI_DATA = [
     ],
     kunWords: [
       {word:'外',reading:'そと',romajiTarget:'soto',meaning:'outside',targetIndex:0},
-      {word:'外出',reading:'がいしゅつ',romajiTarget:'gai',meaning:'going out',targetIndex:0},
+      {word:'外側',reading:'そとがわ',romajiTarget:'soto',meaning:'outside / exterior',targetIndex:0},
     ],
     standalone:{on:false,kun:true}
   },
@@ -2806,7 +2829,9 @@ const KANJI_DATA = [
     onYomi: [{kana:'シュン',romaji:'shun'}],
     kunYomi: [{kana:'はる',romaji:'haru'}],
     onWords: [
+      {word:'青春',reading:'せいしゅん',romajiTarget:'shun',meaning:'youth / springtime of life',targetIndex:1},
       {word:'春分',reading:'しゅんぶん',romajiTarget:'shun',meaning:'vernal equinox',targetIndex:0},
+      {word:'青春',reading:'せいしゅん',romajiTarget:'shun',meaning:'youth / springtime of life',targetIndex:1},
     ],
     kunWords: [
       {word:'春',reading:'はる',romajiTarget:'haru',meaning:'spring',targetIndex:0},
@@ -2820,7 +2845,7 @@ const KANJI_DATA = [
     onYomi: [{kana:'カ',romaji:'ka'},{kana:'ゲ',romaji:'ge'}],
     kunYomi: [{kana:'なつ',romaji:'natsu'}],
     onWords: [
-      {word:'夏至',reading:'げし',romajiTarget:'ge',meaning:'summer solstice',targetIndex:0},
+      {word:'夏期',reading:'かき',romajiTarget:'ka',meaning:'summer period',targetIndex:0},
     ],
     kunWords: [
       {word:'夏',reading:'なつ',romajiTarget:'natsu',meaning:'summer',targetIndex:0},
@@ -2835,6 +2860,7 @@ const KANJI_DATA = [
     kunYomi: [{kana:'あき',romaji:'aki'}],
     onWords: [
       {word:'秋分',reading:'しゅうぶん',romajiTarget:'shuu',meaning:'autumnal equinox',targetIndex:0},
+      {word:'秋季',reading:'しゅうき',romajiTarget:'shuu',meaning:'autumn season',targetIndex:0},
     ],
     kunWords: [
       {word:'秋',reading:'あき',romajiTarget:'aki',meaning:'autumn',targetIndex:0},
@@ -2849,6 +2875,7 @@ const KANJI_DATA = [
     kunYomi: [{kana:'ふゆ',romaji:'fuyu'}],
     onWords: [
       {word:'冬至',reading:'とうじ',romajiTarget:'tou',meaning:'winter solstice',targetIndex:0},
+      {word:'冬季',reading:'とうき',romajiTarget:'tou',meaning:'winter season',targetIndex:0},
     ],
     kunWords: [
       {word:'冬',reading:'ふゆ',romajiTarget:'fuyu',meaning:'winter',targetIndex:0},
@@ -2862,7 +2889,7 @@ const KANJI_DATA = [
     onYomi: [{kana:'チョウ',romaji:'chou'}],
     kunYomi: [{kana:'まち',romaji:'machi'}],
     onWords: [
-      {word:'町長',reading:'ちょうちょう',romajiTarget:'chou',meaning:'town mayor',targetIndex:0},
+      {word:'町内',reading:'ちょうない',romajiTarget:'chou',meaning:'neighborhood / within the town',targetIndex:0},
     ],
     kunWords: [
       {word:'町',reading:'まち',romajiTarget:'machi',meaning:'town',targetIndex:0},
@@ -3030,7 +3057,7 @@ const KANJI_DATA = [
     ],
     kunWords: [
       {word:'池',reading:'いけ',romajiTarget:'ike',meaning:'pond',targetIndex:0},
-      {word:'池袋',reading:'いけぶくろ',romajiTarget:'ike',meaning:'Ikebukuro (place)',targetIndex:0},
+      {word:'小池',reading:'こいけ',romajiTarget:'ike',meaning:'small pond',targetIndex:1},
     ],
     standalone:{on:false,kun:true}
   },
@@ -3071,6 +3098,7 @@ const KANJI_DATA = [
     ],
     kunWords: [
       {word:'薬',reading:'くすり',romajiTarget:'kusuri',meaning:'medicine',targetIndex:0},
+      {word:'薬指',reading:'くすりゆび',romajiTarget:'kusuri',meaning:'ring finger',targetIndex:0},
     ],
     standalone:{on:false,kun:true}
   },
@@ -3146,7 +3174,7 @@ const KANJI_DATA = [
     kanji: '歌',
     meanings: ['song', 'sing'],
     onYomi: [{kana:'カ',romaji:'ka'}],
-    kunYomi: [{kana:'うた',romaji:'uta'},{kana:'うた',romaji:'uta'}],
+    kunYomi: [{kana:'うた',romaji:'uta'},{kana:'ころ',romaji:'koro'}],
     onWords: [
       {word:'歌手',reading:'かしゅ',romajiTarget:'ka',meaning:'singer',targetIndex:0},
       {word:'国歌',reading:'こっか',romajiTarget:'ka',meaning:'national anthem',targetIndex:1},
@@ -3175,12 +3203,13 @@ const KANJI_DATA = [
     onYomi: [{kana:'ショク',romaji:'shoku'},{kana:'シキ',romaji:'shiki'}],
     kunYomi: [{kana:'いろ',romaji:'iro'}],
     onWords: [
-      {word:'茶色',reading:'ちゃいろ',romajiTarget:'shoku',meaning:'brown',targetIndex:1},
+      {word:'色彩',reading:'しきさい',romajiTarget:'shiki',meaning:'color / coloring',targetIndex:0},
       {word:'景色',reading:'けしき',romajiTarget:'shiki',meaning:'scenery',targetIndex:1},
     ],
     kunWords: [
       {word:'色',reading:'いろ',romajiTarget:'iro',meaning:'color',targetIndex:0},
       {word:'色々',reading:'いろいろ',romajiTarget:'iro',meaning:'various',targetIndex:0},
+      {word:'茶色',reading:'ちゃいろ',romajiTarget:'iro',meaning:'brown',targetIndex:1},
     ],
     standalone:{on:false,kun:true}
   },
@@ -3321,12 +3350,13 @@ const KANJI_DATA = [
     onYomi: [{kana:'コウ',romaji:'kou'}],
     kunYomi: [{kana:'ひろ',romaji:'hiro'}],
     onWords: [
-      {word:'広場',reading:'ひろば',romajiTarget:'hiro',meaning:'plaza / square',targetIndex:0},
+      {word:'広大',reading:'こうだい',romajiTarget:'kou',meaning:'vast / extensive',targetIndex:0},
       {word:'広告',reading:'こうこく',romajiTarget:'kou',meaning:'advertisement',targetIndex:0},
     ],
     kunWords: [
       {word:'広い',reading:'ひろい',romajiTarget:'hiro',meaning:'wide / spacious',targetIndex:0},
       {word:'広まる',reading:'ひろまる',romajiTarget:'hiro',meaning:'to spread',targetIndex:0},
+      {word:'広場',reading:'ひろば',romajiTarget:'hiro',meaning:'plaza / square',targetIndex:0},
     ],
     standalone:{on:false,kun:false}
   },
@@ -3396,6 +3426,7 @@ const KANJI_DATA = [
     kunYomi: [{kana:'おそ',romaji:'oso'},{kana:'おく',romaji:'oku'}],
     onWords: [
       {word:'遅延',reading:'ちえん',romajiTarget:'chi',meaning:'delay',targetIndex:0},
+      {word:'遅刻',reading:'ちこく',romajiTarget:'chi',meaning:'being late / tardiness',targetIndex:0},
     ],
     kunWords: [
       {word:'遅い',reading:'おそい',romajiTarget:'oso',meaning:'late / slow',targetIndex:0},
@@ -3455,9 +3486,10 @@ const KANJI_DATA = [
     kunYomi: [{kana:'で',romaji:'de'},{kana:'だ',romaji:'da'}],
     onWords: [
       {word:'出発',reading:'しゅっぱつ',romajiTarget:'shutsu',meaning:'departure',targetIndex:0},
-      {word:'出口',reading:'でぐち',romajiTarget:'de',meaning:'exit',targetIndex:0},
+      {word:'外出',reading:'がいしゅつ',romajiTarget:'shutsu',meaning:'going out',targetIndex:1},
     ],
     kunWords: [
+      {word:'出口',reading:'でぐち',romajiTarget:'de',meaning:'exit',targetIndex:0},
       {word:'出る',reading:'でる',romajiTarget:'de',meaning:'to exit / come out',targetIndex:0},
       {word:'出す',reading:'だす',romajiTarget:'da',meaning:'to put out / submit',targetIndex:0},
     ],
@@ -3484,12 +3516,13 @@ const KANJI_DATA = [
     onYomi: [{kana:'リツ',romaji:'ritsu'},{kana:'リュウ',romaji:'ryuu'}],
     kunYomi: [{kana:'た',romaji:'ta'}],
     onWords: [
-      {word:'立場',reading:'たちば',romajiTarget:'tachi',meaning:'standpoint / position',targetIndex:0},
+      {word:'国立',reading:'こくりつ',romajiTarget:'ritsu',meaning:'national (institution)',targetIndex:1},
       {word:'独立',reading:'どくりつ',romajiTarget:'ritsu',meaning:'independence',targetIndex:1},
     ],
     kunWords: [
       {word:'立つ',reading:'たつ',romajiTarget:'ta',meaning:'to stand',targetIndex:0},
       {word:'立てる',reading:'たてる',romajiTarget:'ta',meaning:'to stand up / establish',targetIndex:0},
+      {word:'立場',reading:'たちば',romajiTarget:'tachi',meaning:'standpoint / position',targetIndex:0},
     ],
     standalone:{on:false,kun:false}
   },
@@ -3500,7 +3533,7 @@ const KANJI_DATA = [
     kunYomi: [{kana:'すわ',romaji:'suwa'}],
     onWords: [
       {word:'座席',reading:'ざせき',romajiTarget:'za',meaning:'seat',targetIndex:0},
-      {word:'銀座',reading:'ぎんざ',romajiTarget:'za',meaning:'Ginza (district)',targetIndex:1},
+      {word:'正座',reading:'せいざ',romajiTarget:'za',meaning:'seiza / formal sitting',targetIndex:1},
     ],
     kunWords: [
       {word:'座る',reading:'すわる',romajiTarget:'suwa',meaning:'to sit',targetIndex:0},
@@ -3513,7 +3546,7 @@ const KANJI_DATA = [
     onYomi: [{kana:'キ',romaji:'ki'}],
     kunYomi: [{kana:'お',romaji:'o'}],
     onWords: [
-      {word:'起動',reading:'きどう',romajiTarget:'ki',meaning:'startup / boot',targetIndex:0},
+      {word:'起立',reading:'きりつ',romajiTarget:'ki',meaning:'standing up / rise',targetIndex:0},
       {word:'早起き',reading:'はやおき',romajiTarget:'ki',meaning:'early rising',targetIndex:1},
     ],
     kunWords: [
@@ -3528,7 +3561,7 @@ const KANJI_DATA = [
     onYomi: [{kana:'シン',romaji:'shin'}],
     kunYomi: [{kana:'ね',romaji:'ne'}],
     onWords: [
-      {word:'就寝',reading:'しゅうしん',romajiTarget:'shin',meaning:'going to bed',targetIndex:1},
+      {word:'寝室',reading:'しんしつ',romajiTarget:'shin',meaning:'bedroom',targetIndex:0},
     ],
     kunWords: [
       {word:'寝る',reading:'ねる',romajiTarget:'ne',meaning:'to sleep / lie down',targetIndex:0},
@@ -3573,7 +3606,7 @@ const KANJI_DATA = [
     kunYomi: [{kana:'も',romaji:'mo'}],
     onWords: [
       {word:'持続',reading:'じぞく',romajiTarget:'ji',meaning:'continuation / sustainability',targetIndex:0},
-      {word:'気持ち',reading:'きもち',romajiTarget:'ji',meaning:'feeling',targetIndex:1},
+      {word:'持参',reading:'じさん',romajiTarget:'ji',meaning:'bringing along',targetIndex:0},
     ],
     kunWords: [
       {word:'持つ',reading:'もつ',romajiTarget:'mo',meaning:'to hold / have',targetIndex:0},
@@ -3617,10 +3650,11 @@ const KANJI_DATA = [
     kunYomi: [{kana:'き',romaji:'ki'}],
     onWords: [
       {word:'大切',reading:'たいせつ',romajiTarget:'setsu',meaning:'important / precious',targetIndex:1},
-      {word:'切手',reading:'きって',romajiTarget:'ki',meaning:'postage stamp',targetIndex:0},
+      {word:'切断',reading:'せつだん',romajiTarget:'setsu',meaning:'cutting off / severing',targetIndex:0},
     ],
     kunWords: [
       {word:'切る',reading:'きる',romajiTarget:'ki',meaning:'to cut',targetIndex:0},
+      {word:'切手',reading:'きって',romajiTarget:'ki',meaning:'postage stamp',targetIndex:0},
       {word:'切れる',reading:'きれる',romajiTarget:'ki',meaning:'to be cut / to run out',targetIndex:0},
     ],
     standalone:{on:false,kun:false}
@@ -3646,7 +3680,7 @@ const KANJI_DATA = [
     onYomi: [{kana:'シ',romaji:'shi'}],
     kunYomi: [{kana:'おも',romaji:'omo'}],
     onWords: [
-      {word:'思想',reading:'しそう',romajiTarget:'shi',meaning:'thought / ideology',targetIndex:0},
+      {word:'思考',reading:'しこう',romajiTarget:'shi',meaning:'thought / thinking',targetIndex:0},
     ],
     kunWords: [
       {word:'思う',reading:'おもう',romajiTarget:'omo',meaning:'to think / feel',targetIndex:0},
@@ -3734,7 +3768,7 @@ const KANJI_DATA = [
     kunYomi: [],
     onWords: [
       {word:'勉強',reading:'べんきょう',romajiTarget:'ben',meaning:'study',targetIndex:0},
-      {word:'勤勉',reading:'きんべん',romajiTarget:'ben',meaning:'diligence',targetIndex:1},
+      {word:'勉学',reading:'べんがく',romajiTarget:'ben',meaning:'studying / scholarship',targetIndex:0},
     ],
     kunWords: [],
     standalone:{on:false,kun:false}
@@ -3776,10 +3810,11 @@ const KANJI_DATA = [
     kunYomi: [{kana:'す',romaji:'su'},{kana:'この',romaji:'kono'}],
     onWords: [
       {word:'好意',reading:'こうい',romajiTarget:'kou',meaning:'goodwill / favor',targetIndex:0},
-      {word:'好き嫌い',reading:'すききらい',romajiTarget:'su',meaning:'likes and dislikes',targetIndex:0},
+      {word:'好物',reading:'こうぶつ',romajiTarget:'kou',meaning:'favourite food / thing',targetIndex:0},
     ],
     kunWords: [
       {word:'好き',reading:'すき',romajiTarget:'su',meaning:'like / favorite',targetIndex:0},
+      {word:'好き嫌い',reading:'すききらい',romajiTarget:'su',meaning:'likes and dislikes',targetIndex:0},
       {word:'好む',reading:'このむ',romajiTarget:'kono',meaning:'to prefer / like',targetIndex:0},
     ],
     standalone:{on:false,kun:false}
@@ -3790,7 +3825,7 @@ const KANJI_DATA = [
     onYomi: [{kana:'ケン',romaji:'ken'},{kana:'ゲン',romaji:'gen'}],
     kunYomi: [{kana:'きら',romaji:'kira'},{kana:'いや',romaji:'iya'}],
     onWords: [
-      {word:'嫌悪',reading:'けんお',romajiTarget:'ken',meaning:'disgust / hatred',targetIndex:0},
+      {word:'機嫌',reading:'きげん',romajiTarget:'ken',meaning:'mood / humor',targetIndex:1},
     ],
     kunWords: [
       {word:'嫌い',reading:'きらい',romajiTarget:'kira',meaning:'dislike',targetIndex:0},
@@ -3809,7 +3844,7 @@ const KANJI_DATA = [
     ],
     kunWords: [
       {word:'急ぐ',reading:'いそぐ',romajiTarget:'iso',meaning:'to hurry',targetIndex:0},
-      {word:'急き',reading:'いそき',romajiTarget:'iso',meaning:'in a hurry',targetIndex:0},
+      {word:'急ぎ',reading:'いそぎ',romajiTarget:'iso',meaning:'haste / in a hurry',targetIndex:0},
     ],
     standalone:{on:false,kun:false}
   },
@@ -3931,10 +3966,10 @@ const KANJI_DATA = [
     kanji: '転',
     meanings: ['roll', 'turn', 'change'],
     onYomi: [{kana:'テン',romaji:'ten'}],
-    kunYomi: [{kana:'ころ',romaji:'koro'},{kana:'うた',romaji:'uta'}],
+    kunYomi: [{kana:'ころ',romaji:'koro'}],
     onWords: [
       {word:'運転',reading:'うんてん',romajiTarget:'ten',meaning:'driving',targetIndex:1},
-      {word:'転換',reading:'てんかん',romajiTarget:'ten',meaning:'conversion / shift',targetIndex:0},
+      {word:'自転車',reading:'じてんしゃ',romajiTarget:'ten',meaning:'bicycle',targetIndex:1},
     ],
     kunWords: [
       {word:'転ぶ',reading:'ころぶ',romajiTarget:'koro',meaning:'to fall / tumble',targetIndex:0},
@@ -4021,7 +4056,7 @@ const KANJI_DATA = [
     onYomi: [{kana:'エン',romaji:'en'},{kana:'オン',romaji:'on'}],
     kunYomi: [{kana:'とお',romaji:'too'}],
     onWords: [
-      {word:'遠距離',reading:'えんきょり',romajiTarget:'en',meaning:'long distance',targetIndex:0},
+      {word:'遠足',reading:'えんそく',romajiTarget:'en',meaning:'excursion / field trip',targetIndex:0},
       {word:'永遠',reading:'えいえん',romajiTarget:'en',meaning:'eternity',targetIndex:1},
     ],
     kunWords: [
@@ -4036,7 +4071,7 @@ const KANJI_DATA = [
     onYomi: [{kana:'メイ',romaji:'mei'},{kana:'ミョウ',romaji:'myou'}],
     kunYomi: [{kana:'あか',romaji:'aka'},{kana:'あ',romaji:'a'}],
     onWords: [
-      {word:'明日',reading:'あした',romajiTarget:'myou',meaning:'tomorrow',targetIndex:0},
+      {word:'明日',reading:'みょうにち',romajiTarget:'myou',meaning:'tomorrow (formal)',targetIndex:0},
       {word:'説明',reading:'せつめい',romajiTarget:'mei',meaning:'explanation',targetIndex:1},
     ],
     kunWords: [
@@ -4130,6 +4165,7 @@ const KANJI_DATA = [
     ],
     kunWords: [
       {word:'黄色い',reading:'きいろい',romajiTarget:'ki',meaning:'yellow',targetIndex:0},
+      {word:'黄身',reading:'きみ',romajiTarget:'ki',meaning:'egg yolk',targetIndex:0},
     ],
     standalone:{on:false,kun:false}
   },
@@ -4171,15 +4207,21 @@ function isDue(card) {
   return card.learning && card.nextReview <= Date.now();
 }
 
-function gradeCard(card, correct) {
+function gradeCard(card, correct, secondChanceCorrect = false) {
   if (!card.learning) return card;
   const newCard = {...card};
-  if (correct) {
+  if (correct && !secondChanceCorrect) {
+    // Clean first-attempt correct: +1 level
     newCard.level = Math.min(newCard.level + 1, MAX_SRS_LEVEL);
+  } else if (correct && secondChanceCorrect) {
+    // Got it right on second attempt: only −1 level (less harsh)
+    newCard.level = Math.max(0, newCard.level - 1);
   } else {
-    // Level 5+ → drop to level 3. Level 4 and below → subtract 2, min 0
+    // Wrong on both attempts: drop, but floor is 1 higher than the old rule
+    // Old: level 5+ → drop to 3, lower → subtract 2
+    // New: level 5+ → drop to 4, lower → subtract 2 (min 0)
     if (newCard.level >= 5) {
-      newCard.level = 3;
+      newCard.level = 4;
     } else {
       newCard.level = Math.max(0, newCard.level - 2);
     }
@@ -4526,6 +4568,7 @@ let session = {
   wasCorrect: false,
   userAnswer: '',
   wordHistory: {}, // key: "idx-stage" → array of recently used word indices
+  firstAttemptWrong: false, // two-chance mechanic for on/kun reading questions
 };
 
 // For lessons
@@ -4778,6 +4821,9 @@ function renderQuizCard() {
   session.answered = false;
   session.item = item;
   session.userAnswer = '';
+  session.firstAttemptWrong = false;
+  session.usedSecondChance = false;
+  session.lastSecondChance = false;
 
   // Progress
   const pct = (session.currentIdx / session.queue.length) * 100;
@@ -4907,7 +4953,7 @@ function selectMeaning(btn, selected, correct) {
   void card.offsetWidth; // force reflow
   card.classList.add(wasCorrect ? 'flash-correct' : 'flash-wrong');
 
-  setTimeout(() => showReviewScreen(), 700);
+  setTimeout(() => showReviewScreen(), 1400);
 }
 
 function submitReading() {
@@ -4917,31 +4963,48 @@ function submitReading() {
   const userVal = input.value.trim();
   if (!userVal) return;
 
-  session.answered = true;
-  session.userAnswer = userVal;
-
   const item = session.item;
   const kd = KANJI_DATA[item.idx];
 
   // Determine correct answers
   let correctAnswers = [];
   if (item.stage === 'on') {
-    // If word context, get the specific reading for that word
-    if (session.selectedWord) {
-      correctAnswers = [session.selectedWord.romajiTarget];
-    } else {
-      correctAnswers = kd.onYomi.map(r => r.romaji);
-    }
+    correctAnswers = session.selectedWord ? [session.selectedWord.romajiTarget] : kd.onYomi.map(r => r.romaji);
   } else {
-    if (session.selectedWord) {
-      correctAnswers = [session.selectedWord.romajiTarget];
-    } else {
-      correctAnswers = kd.kunYomi.map(r => r.romaji);
-    }
+    correctAnswers = session.selectedWord ? [session.selectedWord.romajiTarget] : kd.kunYomi.map(r => r.romaji);
   }
 
   const wasCorrect = correctAnswers.some(a => checkRomajiAnswer(userVal, a));
+
+  if (!wasCorrect && !session.firstAttemptWrong) {
+    // First wrong attempt — shake, clear, let them try once more
+    session.firstAttemptWrong = true;
+    input.classList.add('wrong', 'shake');
+    // Show a gentle hint under the input
+    let hint = document.getElementById('retry-hint');
+    if (!hint) {
+      hint = document.createElement('div');
+      hint.id = 'retry-hint';
+      hint.style.cssText = 'font-size:12px;color:var(--red);margin-top:6px;text-align:center;font-family:var(--font-sans)';
+      input.parentNode.insertBefore(hint, input.nextSibling);
+    }
+    hint.textContent = 'Not quite — try once more';
+    setTimeout(() => {
+      input.classList.remove('wrong', 'shake');
+      input.value = '';
+      const preview = document.getElementById('kana-preview');
+      if (preview) { preview.textContent = 'type romaji below...'; preview.className = 'kana-preview placeholder'; }
+      input.focus({ preventScroll: true });
+    }, 600);
+    return; // don't advance yet
+  }
+
+  // Final submission (either correct on first, correct on second, or wrong on second)
+  session.answered = true;
+  session.userAnswer = userVal;
+  // If they got it right on second attempt, mark as partially wrong for grading
   session.wasCorrect = wasCorrect;
+  session.usedSecondChance = session.firstAttemptWrong && wasCorrect;
 
   const inputEl = document.getElementById('romaji-input');
   const submitBtn = document.getElementById('submit-btn');
@@ -4951,20 +5014,22 @@ function submitReading() {
     submitBtn.textContent = 'Next →';
     submitBtn.onclick = nextQuizItem;
   }
+  if (!wasCorrect) inputEl.classList.add('shake');
 
-  if (!wasCorrect) {
-    inputEl.classList.add('shake');
-  }
+  // Remove retry hint if present
+  const hint = document.getElementById('retry-hint');
+  if (hint) hint.remove();
 
+  session.lastSecondChance = session.firstAttemptWrong && wasCorrect;
   gradeCurrentCard(wasCorrect);
 
-  // Flash card background
+  // Flash card
   const card = document.getElementById('quiz-card');
   card.classList.remove('flash-correct', 'flash-wrong');
   void card.offsetWidth;
   card.classList.add(wasCorrect ? 'flash-correct' : 'flash-wrong');
 
-  setTimeout(() => showReviewScreen(), 600);
+  setTimeout(() => showReviewScreen(), 1400);
 }
 
 function allStagesLearning(idx) {
@@ -4983,23 +5048,21 @@ function gradeCurrentCard(wasCorrect) {
   const idx = item.idx;
   const kd = KANJI_DATA[idx];
   const c = state.cards[idx];
+  const secondChance = session.usedSecondChance || false;
+  session.usedSecondChance = false; // reset for next card
 
   if (wasCorrect) session.correct++;
   else session.wrong++;
 
   if (allStagesLearning(idx)) {
-    // All stages unlocked — grade the one answered, then sync all to lowest result
-    const gradedCard = gradeCard(c[item.stage], wasCorrect);
+    const gradedCard = gradeCard(c[item.stage], wasCorrect, secondChance);
     const newLevel = gradedCard.level;
     const nextReview = gradedCard.nextReview;
-
-    // Apply same new level & nextReview to ALL stages
     c.meaning = { ...c.meaning, level: newLevel, nextReview };
     if (kd.onYomi.length > 0) c.on = { ...c.on, level: newLevel, nextReview };
     if (kd.kunYomi.length > 0) c.kun = { ...c.kun, level: newLevel, nextReview };
   } else {
-    // Stages still unlocking individually — grade only this stage
-    state.cards[idx][item.stage] = gradeCard(c[item.stage], wasCorrect);
+    state.cards[idx][item.stage] = gradeCard(c[item.stage], wasCorrect, secondChance);
   }
 
   tryUnlockNext();
@@ -5017,10 +5080,18 @@ function showReviewScreen() {
   const levelLabel = displayCard.level >= MAX_SRS_LEVEL ? '⭐ Mastered' : `Level ${displayCard.level} / ${MAX_SRS_LEVEL}`;
   const nextReviewLabel = formatNextReview(displayCard.nextReview);
 
+  const secondChanceUsed = session.usedSecondChance;
+  // Note: usedSecondChance is reset in gradeCurrentCard, so read it before that runs.
+  // Actually we store it on session.lastSecondChance for display purposes.
+  const showSecondChance = session.lastSecondChance;
+  session.lastSecondChance = false;
+
   let html = `
     <div class="review-result-banner ${wasCorrect ? 'correct-banner' : 'wrong-banner'}"></div>
     <div class="review-result-label ${wasCorrect ? 'correct-label' : 'wrong-label'}">
-      ${wasCorrect ? '✓ Correct' : '✗ Incorrect'}
+      ${wasCorrect
+        ? (showSecondChance ? '✓ Correct (2nd try)' : '✓ Correct')
+        : '✗ Incorrect'}
     </div>
     <div class="review-kanji-big">${kd.kanji}</div>
     <div class="review-meaning">${kd.meanings[0]}</div>
@@ -5103,46 +5174,124 @@ function showComplete() {
 // ===================================================
 // BROWSE
 // ===================================================
-function showBrowse() {
-  const grid = document.getElementById('browse-grid');
-  grid.innerHTML = KANJI_DATA.map((kd, i) => {
-    const c = state.cards[i];
-    const unlocked = i < state.unlockedCount;
+// Groups for browse screen — array of [groupName, array of kanji indices]
+const BROWSE_GROUPS = [
+  ['Numbers',        [14,15,16,17,18,19,20,21,22,23,24,25,26]],         // 一二三四五六七八九十百千万
+  ['Time & Calendar',  [57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76]], // 年週曜毎朝昼夜春夏秋冬時間今半来
+  ['Nature',         [1,2,3,4,5,6,7,8,9,10,62,63,64,65,44,45,46,47,48,49,50,51,52,53,54,55,56]], // 日月火水木金土山川田天地空海林森花草石雨雪風
+  ['Colors',         [159,160,161,162,163]],                              // 白黒赤青黄
+  ['People & Family',[40,41,42,43,84,85,86,87,88,89,90,91,92,93,94,95]], // 人男女子父母兄姉弟妹友先後前
+  ['Body',           [72,73,74,75,76,77,78,79,80,81,82,83]],             // 目口手足耳鼻頭体心力
+  ['Animals',        [56,98,99,100,101,102]],                             // 鳥魚牛犬馬
+  ['Places & Geography', [103,104,105,106,107,108,109,110,111,112,113,114,115]], // 東西南北国都県市町村家
+  ['Around Town',    [68,116,117,118,119,120,121,122,123,124,125]],       // 道駅橋門池店屋部店車電
+  ['School & Learning', [31,32,33,34,35,127,128,129,130,131,132,133,134,135]], // 学生語言書読聞見話教習勉強弱
+  ['Food & Drink',   [36,37,138,139,140,141,142]],                       // 食飲肉米茶薬医病
+  ['Actions & Verbs',[143,144,145,146,147,148,149,150,151,152,153,154,155,156,157,158]], // 来行帰出入立座起寝使作持買売切知思会社仕働休
+  ['Descriptions',   [27,28,29,30,164,165,166,167,168,169,170,171,172,173,174,175,176,177,178,179,180,181,182,183,184,185,186,187,188,189,190,191,192,193,194,195,196,197]], // 大小上下中高低長短多少広細重軽早遅新古明暗好嫌急待始終近遠
+  ['Music & Arts',   [164,165,166,167]],                                  // 音楽歌絵色形
+];
 
-    let levelDisplay = '';
-    if (!unlocked) {
-      levelDisplay = `<div class="browse-level-locked">—</div>`;
-    } else if (!c) {
-      levelDisplay = `<div class="browse-level-locked">—</div>`;
-    } else {
-      const meaningLvl = c.meaning.learning ? c.meaning.level : null;
-      const onLvl = kd.onYomi.length > 0 ? (c.on.learning ? c.on.level : null) : undefined;
-      const kunLvl = kd.kunYomi.length > 0 ? (c.kun.learning ? c.kun.level : null) : undefined;
-      const allLevels = [meaningLvl, onLvl, kunLvl].filter(v => v !== undefined);
-      const allLearning = allLevels.every(v => v !== null);
+// Deduplicate and build a clean group list based on actual KANJI_DATA length
+function buildBrowseGroups() {
+  const total = KANJI_DATA.length;
+  const assigned = new Set();
 
-      if (!c.meaning.learning) {
-        levelDisplay = `<div class="browse-level" style="color:var(--ink-light)">new</div>`;
-      } else if (allLearning) {
-        const minLvl = Math.min(...allLevels);
-        const color = minLvl >= 10 ? 'var(--green-light)' : minLvl >= 5 ? 'var(--blue-light)' : 'var(--gold)';
-        levelDisplay = `<div class="browse-level" style="color:${color}">Lv ${minLvl}</div>`;
-      } else {
-        const color = meaningLvl >= 5 ? 'var(--blue-light)' : 'var(--gold)';
-        levelDisplay = `<div class="browse-level" style="color:${color}">Lv ${meaningLvl}</div>`;
+  // Define groups by kanji character for reliability
+  const groupDefs = [
+    { name: 'Numbers',            kanji: '一二三四五六七八九十百千万' },
+    { name: 'Colors',             kanji: '白黒赤青黄' },
+    { name: 'Nature & Weather',   kanji: '日月火水木金土山川田林森花草石雨雪風空海天地' },
+    { name: 'Animals',            kanji: '鳥魚牛犬馬' },
+    { name: 'Body & Mind',        kanji: '目口手足耳鼻頭体心力' },
+    { name: 'People & Family',    kanji: '人男女子父母兄姉弟妹友' },
+    { name: 'Time & Seasons',     kanji: '年週曜毎朝昼夜春夏秋冬時間今半' },
+    { name: 'Directions',         kanji: '東西南北上下左右中外内前後' },
+    { name: 'Places & Town',      kanji: '国都県市町村家道駅橋門池店屋部電車' },
+    { name: 'School & Learning',  kanji: '学生語言書読聞見話教習勉強弱考知思問答' },
+    { name: 'Food & Health',      kanji: '食飲肉米茶薬医病' },
+    { name: 'Actions',            kanji: '来行帰出入立座起寝使作持買売切会話転運動止待始終急' },
+    { name: 'Descriptions',       kanji: '大小高低長短多少広細重軽早遅新古明暗好嫌近遠' },
+    { name: 'Arts & Media',       kanji: '音楽歌絵色形' },
+    { name: 'Work & Society',     kanji: '社仕働休力' },
+  ];
+
+  const kanjiToIdx = {};
+  KANJI_DATA.forEach((kd, i) => { kanjiToIdx[kd.kanji] = i; });
+
+  const groups = [];
+  for (const gd of groupDefs) {
+    const indices = [];
+    for (const ch of gd.kanji) {
+      const idx = kanjiToIdx[ch];
+      if (idx !== undefined && !assigned.has(idx)) {
+        indices.push(idx);
+        assigned.add(idx);
       }
     }
+    if (indices.length > 0) groups.push({ name: gd.name, indices });
+  }
 
-    return `
-      <div class="browse-kanji-card" style="${!unlocked ? 'opacity:0.35' : ''}" data-idx="${i}">
-        <span class="browse-kanji-char" style="${!unlocked ? 'filter:blur(2px)' : ''}">${kd.kanji}</span>
-        <div class="browse-kanji-meaning">${kd.meanings[0]}</div>
-        ${levelDisplay}
+  // Any leftover kanji go into Miscellaneous
+  const leftover = [];
+  for (let i = 0; i < total; i++) {
+    if (!assigned.has(i)) leftover.push(i);
+  }
+  if (leftover.length > 0) groups.push({ name: 'Other', indices: leftover });
+
+  return groups;
+}
+
+function makeBrowseCard(i) {
+  const kd = KANJI_DATA[i];
+  const c = state.cards[i];
+  const unlocked = i < state.unlockedCount;
+
+  let levelDisplay = '';
+  if (!unlocked) {
+    levelDisplay = `<div class="browse-level-locked">—</div>`;
+  } else if (!c) {
+    levelDisplay = `<div class="browse-level-locked">—</div>`;
+  } else {
+    const meaningLvl = c.meaning.learning ? c.meaning.level : null;
+    const onLvl = kd.onYomi.length > 0 ? (c.on.learning ? c.on.level : null) : undefined;
+    const kunLvl = kd.kunYomi.length > 0 ? (c.kun.learning ? c.kun.level : null) : undefined;
+    const allLevels = [meaningLvl, onLvl, kunLvl].filter(v => v !== undefined);
+    const allLearning = allLevels.every(v => v !== null);
+
+    if (!c.meaning.learning) {
+      levelDisplay = `<div class="browse-level" style="color:var(--ink-light)">new</div>`;
+    } else if (allLearning) {
+      const minLvl = Math.min(...allLevels);
+      const color = minLvl >= 10 ? 'var(--green-light)' : minLvl >= 5 ? 'var(--blue-light)' : 'var(--gold)';
+      levelDisplay = `<div class="browse-level" style="color:${color}">Lv ${minLvl}</div>`;
+    } else {
+      const color = meaningLvl >= 5 ? 'var(--blue-light)' : 'var(--gold)';
+      levelDisplay = `<div class="browse-level" style="color:${color}">Lv ${meaningLvl}</div>`;
+    }
+  }
+
+  return `<div class="browse-kanji-card" style="${!unlocked ? 'opacity:0.35' : ''}" data-idx="${i}">
+    <span class="browse-kanji-char" style="${!unlocked ? 'filter:blur(2px)' : ''}">${kd.kanji}</span>
+    <div class="browse-kanji-meaning">${kd.meanings[0]}</div>
+    ${levelDisplay}
+  </div>`;
+}
+
+function showBrowse() {
+  const grid = document.getElementById('browse-grid');
+  const groups = buildBrowseGroups();
+
+  grid.innerHTML = groups.map(g => `
+    <div class="browse-group">
+      <div class="browse-group-title">${g.name}</div>
+      <div class="browse-group-grid">
+        ${g.indices.map(i => makeBrowseCard(i)).join('')}
       </div>
-    `;
-  }).join('');
+    </div>
+  `).join('');
 
-  // Attach click handlers
+  // Single delegated click handler
   grid.addEventListener('click', e => {
     const card = e.target.closest('.browse-kanji-card');
     if (card) openKanjiModal(parseInt(card.dataset.idx));
@@ -5375,7 +5524,7 @@ function pretestSelectMeaning(btn, selected, correct) {
   const idx = pretest.queue[pretest.pos];
   if (!pretest.results[idx]) pretest.results[idx] = {};
   pretest.results[idx].meaning = wasCorrect;
-  setTimeout(() => advancePretestStage(), 700);
+  setTimeout(() => advancePretestStage(), 1400);
 }
 
 function submitPretestReading() {
@@ -5401,7 +5550,7 @@ function submitPretestReading() {
   card.classList.add(wasCorrect ? 'flash-correct' : 'flash-wrong');
   if (!pretest.results[idx]) pretest.results[idx] = {};
   pretest.results[idx][pretest.stage] = wasCorrect;
-  setTimeout(() => advancePretestStage(), 600);
+  setTimeout(() => advancePretestStage(), 1400);
 }
 
 function advancePretestStage() {
