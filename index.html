@@ -20,9 +20,9 @@
     --blue-light: #6aaee0;
     --green: #4a9e72;
     --green-light: #60c090;
-    --stage-meaning: #c07a50;
-    --stage-on: #4a8ec2;
-    --stage-kun: #3a7ab5;
+    --stage-meaning: #7a9e7e;
+    --stage-on: #b85c5c;
+    --stage-kun: #8a6aaa;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -1248,14 +1248,14 @@ const KANJI_DATA = [
     onYomi: [{kana:'ニチ',romaji:'nichi'},{kana:'ジツ',romaji:'jitsu'}],
     kunYomi: [{kana:'ひ',romaji:'hi'},{kana:'か',romaji:'ka'}],
     onWords: [
-      {word:'日本', reading:'にほん', romajiTarget:'ni', meaning:'Japan', targetIndex:0},
+      {word:'日本', reading:'にほん', romajiTarget:'nichi', meaning:'Japan', targetIndex:0},
       {word:'日曜日', reading:'にちようび', romajiTarget:'nichi', meaning:'Sunday', targetIndex:0},
-      {word:'毎日', reading:'まいにち', romajiTarget:'nichi', meaning:'every day', targetIndex:1},
+      {word:'祝日', reading:'しゅくじつ', romajiTarget:'jitsu', meaning:'national holiday', targetIndex:1},
     ],
     kunWords: [
       {word:'日', reading:'ひ', romajiTarget:'hi', meaning:'sun / day', targetIndex:0},
-      {word:'今日', reading:'きょう', romajiTarget:'kyou', meaning:'today', targetIndex:0},
       {word:'日々', reading:'ひび', romajiTarget:'hi', meaning:'day by day', targetIndex:0},
+      {word:'三日', reading:'みっか', romajiTarget:'ka', meaning:'third day / three days', targetIndex:1},
     ],
     standalone: {on: false, kun: true}
   },
@@ -1271,7 +1271,7 @@ const KANJI_DATA = [
     ],
     kunWords: [
       {word:'月', reading:'つき', romajiTarget:'tsuki', meaning:'moon / month', targetIndex:0},
-      {word:'三日月', reading:'みかづき', romajiTarget:'zuki', meaning:'crescent moon', targetIndex:1},
+      {word:'三日月', reading:'みかづき', romajiTarget:'tsuki', meaning:'crescent moon', targetIndex:1},
     ],
     standalone: {on: false, kun: true}
   },
@@ -1279,14 +1279,14 @@ const KANJI_DATA = [
     kanji: '火',
     meanings: ['fire'],
     onYomi: [{kana:'カ',romaji:'ka'}],
-    kunYomi: [{kana:'ひ',romaji:'hi'},{kana:'ほ',romaji:'ho'}],
+    kunYomi: [{kana:'ひ',romaji:'hi'}],
     onWords: [
       {word:'火曜日', reading:'かようび', romajiTarget:'ka', meaning:'Tuesday', targetIndex:0},
       {word:'火山', reading:'かざん', romajiTarget:'ka', meaning:'volcano', targetIndex:0},
     ],
     kunWords: [
       {word:'火', reading:'ひ', romajiTarget:'hi', meaning:'fire', targetIndex:0},
-      {word:'花火', reading:'はなび', romajiTarget:'bi', meaning:'fireworks', targetIndex:1},
+      {word:'花火', reading:'はなび', romajiTarget:'hi', meaning:'fireworks', targetIndex:1},
     ],
     standalone: {on: false, kun: true}
   },
@@ -1308,15 +1308,17 @@ const KANJI_DATA = [
   {
     kanji: '木',
     meanings: ['tree', 'wood'],
-    onYomi: [{kana:'モク',romaji:'moku'},{kana:'ボク',romaji:'boku'}],
+    onYomi: [{kana:'モク',romaji:'moku'}],
     kunYomi: [{kana:'き',romaji:'ki'},{kana:'こ',romaji:'ko'}],
     onWords: [
       {word:'木曜日', reading:'もくようび', romajiTarget:'moku', meaning:'Thursday', targetIndex:0},
       {word:'木材', reading:'もくざい', romajiTarget:'moku', meaning:'lumber', targetIndex:0},
+      {word:'樹木', reading:'じゅもく', romajiTarget:'moku', meaning:'trees / woody plants', targetIndex:1},
     ],
     kunWords: [
       {word:'木', reading:'き', romajiTarget:'ki', meaning:'tree', targetIndex:0},
       {word:'木々', reading:'きぎ', romajiTarget:'ki', meaning:'trees', targetIndex:0},
+      {word:'木立', reading:'こだち', romajiTarget:'ko', meaning:'grove of trees', targetIndex:0},
     ],
     standalone: {on: false, kun: true}
   },
@@ -1328,10 +1330,12 @@ const KANJI_DATA = [
     onWords: [
       {word:'金曜日', reading:'きんようび', romajiTarget:'kin', meaning:'Friday', targetIndex:0},
       {word:'金額', reading:'きんがく', romajiTarget:'kin', meaning:'amount of money', targetIndex:0},
+      {word:'金剛', reading:'こんごう', romajiTarget:'kon', meaning:'diamond / Vajra', targetIndex:0},
     ],
     kunWords: [
       {word:'お金', reading:'おかね', romajiTarget:'kane', meaning:'money', targetIndex:1},
       {word:'金', reading:'かね', romajiTarget:'kane', meaning:'money / metal', targetIndex:0},
+      {word:'金物', reading:'かなもの', romajiTarget:'kana', meaning:'hardware / metal goods', targetIndex:0},
     ],
     standalone: {on: false, kun: true}
   },
@@ -1343,10 +1347,11 @@ const KANJI_DATA = [
     onWords: [
       {word:'土曜日', reading:'どようび', romajiTarget:'do', meaning:'Saturday', targetIndex:0},
       {word:'土地', reading:'とち', romajiTarget:'to', meaning:'land', targetIndex:0},
+      {word:'土台', reading:'どだい', romajiTarget:'do', meaning:'foundation', targetIndex:0},
     ],
     kunWords: [
       {word:'土', reading:'つち', romajiTarget:'tsuchi', meaning:'earth / soil', targetIndex:0},
-      {word:'土台', reading:'どだい', romajiTarget:'do', meaning:'foundation', targetIndex:0},
+      {word:'土鍋', reading:'どなべ', romajiTarget:'tsuchi', meaning:'earthen pot', targetIndex:0},
     ],
     standalone: {on: false, kun: true}
   },
@@ -1369,11 +1374,12 @@ const KANJI_DATA = [
   {
     kanji: '山',
     meanings: ['mountain'],
-    onYomi: [{kana:'サン',romaji:'san'},{kana:'セン',romaji:'sen'}],
+    onYomi: [{kana:'サン',romaji:'san'}],
     kunYomi: [{kana:'やま',romaji:'yama'}],
     onWords: [
       {word:'富士山', reading:'ふじさん', romajiTarget:'san', meaning:'Mt. Fuji', targetIndex:2},
       {word:'火山', reading:'かざん', romajiTarget:'san', meaning:'volcano', targetIndex:1},
+      {word:'山脈', reading:'さんみゃく', romajiTarget:'san', meaning:'mountain range', targetIndex:0},
     ],
     kunWords: [
       {word:'山', reading:'やま', romajiTarget:'yama', meaning:'mountain', targetIndex:0},
@@ -1413,7 +1419,7 @@ const KANJI_DATA = [
   {
     kanji: '目',
     meanings: ['eye'],
-    onYomi: [{kana:'モク',romaji:'moku'},{kana:'ボク',romaji:'boku'}],
+    onYomi: [{kana:'モク',romaji:'moku'}],
     kunYomi: [{kana:'め',romaji:'me'},{kana:'ま',romaji:'ma'}],
     onWords: [
       {word:'目的', reading:'もくてき', romajiTarget:'moku', meaning:'purpose / goal', targetIndex:0},
@@ -1422,6 +1428,7 @@ const KANJI_DATA = [
     kunWords: [
       {word:'目', reading:'め', romajiTarget:'me', meaning:'eye', targetIndex:0},
       {word:'目玉', reading:'めだま', romajiTarget:'me', meaning:'eyeball', targetIndex:0},
+      {word:'真面目', reading:'まじめ', romajiTarget:'ma', meaning:'serious / earnest', targetIndex:1},
     ],
     standalone: {on: false, kun: true}
   },
@@ -1433,6 +1440,7 @@ const KANJI_DATA = [
     onWords: [
       {word:'人口', reading:'じんこう', romajiTarget:'kou', meaning:'population', targetIndex:1},
       {word:'開口', reading:'かいこう', romajiTarget:'kou', meaning:'opening / beginning to speak', targetIndex:1},
+      {word:'口伝', reading:'くでん', romajiTarget:'ku', meaning:'oral tradition / verbal transmission', targetIndex:0},
     ],
     kunWords: [
       {word:'口', reading:'くち', romajiTarget:'kuchi', meaning:'mouth', targetIndex:0},
@@ -1445,7 +1453,7 @@ const KANJI_DATA = [
     kanji: '手',
     meanings: ['hand'],
     onYomi: [{kana:'シュ',romaji:'shu'}],
-    kunYomi: [{kana:'て',romaji:'te'},{kana:'た',romaji:'ta'}],
+    kunYomi: [{kana:'て',romaji:'te'}],
     onWords: [
       {word:'手術', reading:'しゅじゅつ', romajiTarget:'shu', meaning:'surgery', targetIndex:0},
       {word:'選手', reading:'せんしゅ', romajiTarget:'shu', meaning:'athlete', targetIndex:1},
@@ -1468,6 +1476,7 @@ const KANJI_DATA = [
     kunWords: [
       {word:'足', reading:'あし', romajiTarget:'ashi', meaning:'foot / leg', targetIndex:0},
       {word:'足音', reading:'あしおと', romajiTarget:'ashi', meaning:'footstep sound', targetIndex:0},
+      {word:'足りる', reading:'たりる', romajiTarget:'ta', meaning:'to be sufficient', targetIndex:0},
     ],
     standalone: {on: false, kun: true}
   },
@@ -1529,6 +1538,7 @@ const KANJI_DATA = [
     kunWords: [
       {word:'四つ', reading:'よっつ', romajiTarget:'yo', meaning:'four (things)', targetIndex:0},
       {word:'四日', reading:'よっか', romajiTarget:'yo', meaning:'fourth day', targetIndex:0},
+      {word:'四十', reading:'よんじゅう', romajiTarget:'yon', meaning:'forty', targetIndex:0},
     ],
     standalone: {on: false, kun: false}
   },
@@ -1609,7 +1619,7 @@ const KANJI_DATA = [
   {
     kanji: '十',
     meanings: ['ten'],
-    onYomi: [{kana:'ジュウ',romaji:'juu'},{kana:'ジッ',romaji:'ji'}],
+    onYomi: [{kana:'ジュウ',romaji:'juu'}],
     kunYomi: [{kana:'とお',romaji:'too'},{kana:'と',romaji:'to'}],
     onWords: [
       {word:'十月', reading:'じゅうがつ', romajiTarget:'juu', meaning:'October', targetIndex:0},
@@ -1618,6 +1628,7 @@ const KANJI_DATA = [
     kunWords: [
       {word:'十', reading:'とお', romajiTarget:'too', meaning:'ten', targetIndex:0},
       {word:'十日', reading:'とおか', romajiTarget:'too', meaning:'tenth day / ten days', targetIndex:0},
+      {word:'十分', reading:'とぶん', romajiTarget:'to', meaning:'ten portions (archaic measure)', targetIndex:0},
     ],
     standalone: {on: false, kun: true}
   },
@@ -1655,6 +1666,7 @@ const KANJI_DATA = [
     onWords: [
       {word:'万円', reading:'まんえん', romajiTarget:'man', meaning:'10,000 yen', targetIndex:0},
       {word:'一万', reading:'いちまん', romajiTarget:'man', meaning:'ten thousand', targetIndex:1},
+      {word:'万能', reading:'ばんのう', romajiTarget:'ban', meaning:'all-purpose / almighty', targetIndex:0},
     ],
     kunWords: [],
     standalone: {on: false, kun: false}
@@ -1670,7 +1682,7 @@ const KANJI_DATA = [
     ],
     kunWords: [
       {word:'大きい', reading:'おおきい', romajiTarget:'oo', meaning:'big', targetIndex:0},
-      {word:'大人', reading:'おとな', romajiTarget:'oo', meaning:'adult', targetIndex:0},
+      {word:'大通り', reading:'おおどおり', romajiTarget:'oo', meaning:'main street / boulevard', targetIndex:0},
     ],
     standalone: {on: false, kun: false}
   },
@@ -1678,7 +1690,7 @@ const KANJI_DATA = [
     kanji: '小',
     meanings: ['small', 'little'],
     onYomi: [{kana:'ショウ',romaji:'shou'}],
-    kunYomi: [{kana:'ちい',romaji:'chi'},{kana:'こ',romaji:'ko'},{kana:'お',romaji:'o'}],
+    kunYomi: [{kana:'ちい',romaji:'chi'},{kana:'こ',romaji:'ko'}],
     onWords: [
       {word:'小学校', reading:'しょうがっこう', romajiTarget:'shou', meaning:'elementary school', targetIndex:0},
       {word:'小説', reading:'しょうせつ', romajiTarget:'shou', meaning:'novel', targetIndex:0},
@@ -1692,8 +1704,8 @@ const KANJI_DATA = [
   {
     kanji: '上',
     meanings: ['up', 'above', 'upper'],
-    onYomi: [{kana:'ジョウ',romaji:'jou'},{kana:'ショウ',romaji:'shou'},{kana:'カミ',romaji:'kami'}],
-    kunYomi: [{kana:'うえ',romaji:'ue'},{kana:'のぼ',romaji:'nobo'}],
+    onYomi: [{kana:'ジョウ',romaji:'jou'}],
+    kunYomi: [{kana:'うえ',romaji:'ue'},{kana:'のぼ',romaji:'nobo'},{kana:'かみ',romaji:'kami'}],
     onWords: [
       {word:'上手', reading:'じょうず', romajiTarget:'jou', meaning:'skilled', targetIndex:0},
       {word:'向上', reading:'こうじょう', romajiTarget:'jou', meaning:'improvement', targetIndex:1},
@@ -1701,6 +1713,7 @@ const KANJI_DATA = [
     kunWords: [
       {word:'上', reading:'うえ', romajiTarget:'ue', meaning:'above / top', targetIndex:0},
       {word:'上る', reading:'のぼる', romajiTarget:'nobo', meaning:'to climb up', targetIndex:0},
+      {word:'上手', reading:'かみて', romajiTarget:'kami', meaning:'upstage / upper side', targetIndex:0},
     ],
     standalone: {on: false, kun: true}
   },
@@ -1708,14 +1721,15 @@ const KANJI_DATA = [
     kanji: '下',
     meanings: ['down', 'below', 'under'],
     onYomi: [{kana:'カ',romaji:'ka'},{kana:'ゲ',romaji:'ge'}],
-    kunYomi: [{kana:'した',romaji:'shita'},{kana:'さ',romaji:'sa'},{kana:'くだ',romaji:'kuda'}],
+    kunYomi: [{kana:'した',romaji:'shita'},{kana:'くだ',romaji:'kuda'}],
     onWords: [
       {word:'地下', reading:'ちか', romajiTarget:'ka', meaning:'underground', targetIndex:1},
       {word:'下降', reading:'かこう', romajiTarget:'ka', meaning:'descent', targetIndex:0},
+      {word:'下校', reading:'げこう', romajiTarget:'ge', meaning:'leaving school', targetIndex:0},
     ],
     kunWords: [
       {word:'下', reading:'した', romajiTarget:'shita', meaning:'below / bottom', targetIndex:0},
-      {word:'下りる', reading:'おりる', romajiTarget:'shita', meaning:'to get off / descend', targetIndex:0},
+      {word:'下る', reading:'くだる', romajiTarget:'kuda', meaning:'to go down / descend', targetIndex:0},
     ],
     standalone: {on: false, kun: true}
   },
@@ -1755,13 +1769,14 @@ const KANJI_DATA = [
     onYomi: [{kana:'ネン',romaji:'nen'}],
     kunYomi: [{kana:'とし',romaji:'toshi'}],
     onWords: [
-      {word:'今年', reading:'ことし', romajiTarget:'nen', meaning:'this year', targetIndex:1},
       {word:'去年', reading:'きょねん', romajiTarget:'nen', meaning:'last year', targetIndex:1},
-      {word:'毎年', reading:'まいとし', romajiTarget:'nen', meaning:'every year', targetIndex:1},
+      {word:'来年', reading:'らいねん', romajiTarget:'nen', meaning:'next year', targetIndex:1},
+      {word:'年間', reading:'ねんかん', romajiTarget:'nen', meaning:'annual / year-long', targetIndex:0},
     ],
     kunWords: [
       {word:'年', reading:'とし', romajiTarget:'toshi', meaning:'year / age', targetIndex:0},
       {word:'年上', reading:'としうえ', romajiTarget:'toshi', meaning:'older person', targetIndex:0},
+      {word:'今年', reading:'ことし', romajiTarget:'toshi', meaning:'this year', targetIndex:1},
     ],
     standalone: {on: false, kun: true}
   },
@@ -1789,6 +1804,7 @@ const KANJI_DATA = [
       {word:'学生', reading:'がくせい', romajiTarget:'sei', meaning:'student', targetIndex:1},
       {word:'先生', reading:'せんせい', romajiTarget:'sei', meaning:'teacher', targetIndex:1},
       {word:'人生', reading:'じんせい', romajiTarget:'sei', meaning:'life (human life)', targetIndex:1},
+      {word:'一生', reading:'いっしょう', romajiTarget:'shou', meaning:'ones whole life', targetIndex:1},
     ],
     kunWords: [
       {word:'生きる', reading:'いきる', romajiTarget:'i', meaning:'to live', targetIndex:0},
@@ -1825,6 +1841,7 @@ const KANJI_DATA = [
     kunWords: [
       {word:'食べる', reading:'たべる', romajiTarget:'ta', meaning:'to eat', targetIndex:0},
       {word:'食べ物', reading:'たべもの', romajiTarget:'ta', meaning:'food', targetIndex:0},
+      {word:'食う', reading:'くう', romajiTarget:'ku', meaning:'to eat (casual)', targetIndex:0},
     ],
     standalone: {on: false, kun: false}
   },
@@ -1861,7 +1878,7 @@ const KANJI_DATA = [
   {
     kanji: '聞',
     meanings: ['hear', 'listen', 'ask'],
-    onYomi: [{kana:'ブン',romaji:'bun'},{kana:'モン',romaji:'mon'}],
+    onYomi: [{kana:'ブン',romaji:'bun'}],
     kunYomi: [{kana:'き',romaji:'ki'}],
     onWords: [
       {word:'新聞', reading:'しんぶん', romajiTarget:'bun', meaning:'newspaper', targetIndex:1},
@@ -1881,6 +1898,7 @@ const KANJI_DATA = [
     onWords: [
       {word:'言語', reading:'げんご', romajiTarget:'gen', meaning:'language', targetIndex:0},
       {word:'発言', reading:'はつげん', romajiTarget:'gen', meaning:'statement / remark', targetIndex:1},
+      {word:'遺言', reading:'ゆいごん', romajiTarget:'gon', meaning:'will / last words', targetIndex:1},
     ],
     kunWords: [
       {word:'言う', reading:'いう', romajiTarget:'i', meaning:'to say', targetIndex:0},
@@ -1906,7 +1924,7 @@ const KANJI_DATA = [
   {
     kanji: '読',
     meanings: ['read'],
-    onYomi: [{kana:'ドク',romaji:'doku'},{kana:'トク',romaji:'toku'}],
+    onYomi: [{kana:'ドク',romaji:'doku'}],
     kunYomi: [{kana:'よ',romaji:'yo'}],
     onWords: [
       {word:'読書', reading:'どくしょ', romajiTarget:'doku', meaning:'reading (books)', targetIndex:0},
@@ -1951,7 +1969,7 @@ const KANJI_DATA = [
   {
     kanji: '南',
     meanings: ['south'],
-    onYomi: [{kana:'ナン',romaji:'nan'},{kana:'ナ',romaji:'na'}],
+    onYomi: [{kana:'ナン',romaji:'nan'}],
     kunYomi: [{kana:'みなみ',romaji:'minami'}],
     onWords: [
       {word:'南北', reading:'なんぼく', romajiTarget:'nan', meaning:'north and south', targetIndex:0},
@@ -1987,12 +2005,8 @@ const KANJI_DATA = [
       {word:'天気', reading:'てんき', romajiTarget:'ki', meaning:'weather', targetIndex:1},
       {word:'気持ち', reading:'きもち', romajiTarget:'ki', meaning:'feeling / mood', targetIndex:0},
       {word:'電気', reading:'でんき', romajiTarget:'ki', meaning:'electricity', targetIndex:1},
+      {word:'気配', reading:'けはい', romajiTarget:'ke', meaning:'sign / presence', targetIndex:0},
     ],
-    kunWords: [],
-    standalone: {on: false, kun: false}
-  },
-  {
-    kanji: '電',
     meanings: ['electricity', 'lightning'],
     onYomi: [{kana:'デン',romaji:'den'}],
     kunYomi: [],
@@ -2012,10 +2026,11 @@ const KANJI_DATA = [
     onWords: [
       {word:'電車', reading:'でんしゃ', romajiTarget:'sha', meaning:'train', targetIndex:1},
       {word:'自動車', reading:'じどうしゃ', romajiTarget:'sha', meaning:'automobile', targetIndex:2},
+      {word:'車道', reading:'しゃどう', romajiTarget:'sha', meaning:'roadway', targetIndex:0},
     ],
     kunWords: [
       {word:'車', reading:'くるま', romajiTarget:'kuruma', meaning:'car', targetIndex:0},
-      {word:'車道', reading:'しゃどう', romajiTarget:'kuruma', meaning:'roadway', targetIndex:0},
+      {word:'車椅子', reading:'くるまいす', romajiTarget:'kuruma', meaning:'wheelchair', targetIndex:0},
     ],
     standalone: {on: false, kun: true}
   },
@@ -2028,6 +2043,7 @@ const KANJI_DATA = [
       {word:'道路', reading:'どうろ', romajiTarget:'dou', meaning:'road', targetIndex:0},
       {word:'柔道', reading:'じゅうどう', romajiTarget:'dou', meaning:'judo', targetIndex:1},
       {word:'北海道', reading:'ほっかいどう', romajiTarget:'dou', meaning:'Hokkaido', targetIndex:2},
+      {word:'神道', reading:'しんとう', romajiTarget:'tou', meaning:'Shinto', targetIndex:1},
     ],
     kunWords: [
       {word:'道', reading:'みち', romajiTarget:'michi', meaning:'road / path', targetIndex:0},
@@ -2058,7 +2074,7 @@ const KANJI_DATA = [
     kunYomi: [{kana:'あいだ',romaji:'aida'},{kana:'ま',romaji:'ma'}],
     onWords: [
       {word:'時間', reading:'じかん', romajiTarget:'kan', meaning:'time', targetIndex:1},
-      {word:'人間', reading:'にんげん', romajiTarget:'gen', meaning:'human being', targetIndex:1},
+      {word:'人間', reading:'にんげん', romajiTarget:'ken', meaning:'human being', targetIndex:1},
     ],
     kunWords: [
       {word:'間', reading:'あいだ', romajiTarget:'aida', meaning:'between / interval', targetIndex:0},
@@ -2071,7 +2087,7 @@ const KANJI_DATA = [
     kanji: '天',
     meanings: ['heaven', 'sky', 'God'],
     onYomi: [{kana:'テン',romaji:'ten'}],
-    kunYomi: [{kana:'あま',romaji:'ama'},{kana:'あめ',romaji:'ame'}],
+    kunYomi: [{kana:'あま',romaji:'ama'}],
     onWords: [
       {word:'天気',reading:'てんき',romajiTarget:'ten',meaning:'weather',targetIndex:0},
       {word:'天国',reading:'てんごく',romajiTarget:'ten',meaning:'heaven',targetIndex:0},
@@ -2090,6 +2106,7 @@ const KANJI_DATA = [
       {word:'地図',reading:'ちず',romajiTarget:'chi',meaning:'map',targetIndex:0},
       {word:'地下',reading:'ちか',romajiTarget:'chi',meaning:'underground',targetIndex:0},
       {word:'地球',reading:'ちきゅう',romajiTarget:'chi',meaning:'Earth (planet)',targetIndex:0},
+      {word:'地面',reading:'じめん',romajiTarget:'ji',meaning:'ground surface',targetIndex:0},
     ],
     kunWords: [],
     standalone:{on:false,kun:false}
@@ -2157,12 +2174,13 @@ const KANJI_DATA = [
     onYomi: [{kana:'カ',romaji:'ka'}],
     kunYomi: [{kana:'はな',romaji:'hana'}],
     onWords: [
-      {word:'花火',reading:'はなび',romajiTarget:'ka',meaning:'fireworks',targetIndex:0},
       {word:'花瓶',reading:'かびん',romajiTarget:'ka',meaning:'flower vase',targetIndex:0},
+      {word:'花壇',reading:'かだん',romajiTarget:'ka',meaning:'flower bed',targetIndex:0},
     ],
     kunWords: [
       {word:'花',reading:'はな',romajiTarget:'hana',meaning:'flower',targetIndex:0},
       {word:'花見',reading:'はなみ',romajiTarget:'hana',meaning:'cherry blossom viewing',targetIndex:0},
+      {word:'花火',reading:'はなび',romajiTarget:'hana',meaning:'fireworks',targetIndex:0},
     ],
     standalone:{on:false,kun:true}
   },
@@ -2184,7 +2202,7 @@ const KANJI_DATA = [
   {
     kanji: '石',
     meanings: ['stone', 'rock'],
-    onYomi: [{kana:'セキ',romaji:'seki'},{kana:'シャク',romaji:'shaku'}],
+    onYomi: [{kana:'セキ',romaji:'seki'}],
     kunYomi: [{kana:'いし',romaji:'ishi'}],
     onWords: [
       {word:'石油',reading:'せきゆ',romajiTarget:'seki',meaning:'petroleum / oil',targetIndex:0},
@@ -2232,6 +2250,7 @@ const KANJI_DATA = [
     onWords: [
       {word:'台風',reading:'たいふう',romajiTarget:'fuu',meaning:'typhoon',targetIndex:1},
       {word:'風景',reading:'ふうけい',romajiTarget:'fuu',meaning:'scenery / landscape',targetIndex:0},
+      {word:'風情',reading:'ふぜい',romajiTarget:'fu',meaning:'atmosphere / tasteful appearance',targetIndex:0},
     ],
     kunWords: [
       {word:'風',reading:'かぜ',romajiTarget:'kaze',meaning:'wind',targetIndex:0},
@@ -2265,6 +2284,7 @@ const KANJI_DATA = [
     kunWords: [
       {word:'魚',reading:'さかな',romajiTarget:'sakana',meaning:'fish',targetIndex:0},
       {word:'魚屋',reading:'さかなや',romajiTarget:'sakana',meaning:'fish shop',targetIndex:0},
+      {word:'川魚',reading:'かわうお',romajiTarget:'uo',meaning:'freshwater fish',targetIndex:1},
     ],
     standalone:{on:false,kun:true}
   },
@@ -2299,7 +2319,7 @@ const KANJI_DATA = [
   {
     kanji: '馬',
     meanings: ['horse'],
-    onYomi: [{kana:'バ',romaji:'ba'},{kana:'マ',romaji:'ma'}],
+    onYomi: [{kana:'バ',romaji:'ba'}],
     kunYomi: [{kana:'うま',romaji:'uma'}],
     onWords: [
       {word:'馬力',reading:'ばりき',romajiTarget:'ba',meaning:'horsepower',targetIndex:0},
@@ -2362,6 +2382,7 @@ const KANJI_DATA = [
     onWords: [
       {word:'体育',reading:'たいいく',romajiTarget:'tai',meaning:'physical education',targetIndex:0},
       {word:'体重',reading:'たいじゅう',romajiTarget:'tai',meaning:'body weight',targetIndex:0},
+      {word:'体裁',reading:'ていさい',romajiTarget:'tei',meaning:'appearance / decency',targetIndex:0},
     ],
     kunWords: [
       {word:'体',reading:'からだ',romajiTarget:'karada',meaning:'body',targetIndex:0},
@@ -2391,6 +2412,7 @@ const KANJI_DATA = [
     onWords: [
       {word:'電力',reading:'でんりょく',romajiTarget:'ryoku',meaning:'electric power',targetIndex:1},
       {word:'努力',reading:'どりょく',romajiTarget:'ryoku',meaning:'effort',targetIndex:1},
+      {word:'力士',reading:'りきし',romajiTarget:'riki',meaning:'sumo wrestler',targetIndex:0},
     ],
     kunWords: [
       {word:'力',reading:'ちから',romajiTarget:'chikara',meaning:'strength / power',targetIndex:0},
@@ -2416,8 +2438,8 @@ const KANJI_DATA = [
   {
     kanji: '女',
     meanings: ['woman', 'female'],
-    onYomi: [{kana:'ジョ',romaji:'jo'},{kana:'ニョ',romaji:'nyo'}],
-    kunYomi: [{kana:'おんな',romaji:'onna'},{kana:'め',romaji:'me'}],
+    onYomi: [{kana:'ジョ',romaji:'jo'}],
+    kunYomi: [{kana:'おんな',romaji:'onna'}],
     onWords: [
       {word:'女性',reading:'じょせい',romajiTarget:'jo',meaning:'female / woman',targetIndex:0},
       {word:'長女',reading:'ちょうじょ',romajiTarget:'jo',meaning:'eldest daughter',targetIndex:1},
@@ -2450,11 +2472,12 @@ const KANJI_DATA = [
     onYomi: [{kana:'フ',romaji:'fu'}],
     kunYomi: [{kana:'ちち',romaji:'chichi'}],
     onWords: [
-      {word:'父親',reading:'ちちおや',romajiTarget:'fu',meaning:'father',targetIndex:0},
-      {word:'祖父',reading:'そふ',romajiTarget:'fu',meaning:'grandfather',targetIndex:1},
+      {word:'父兄', reading:'ふけい', romajiTarget:'fu', meaning:'guardians / parents and older siblings', targetIndex:0},
+      {word:'祖父', reading:'そふ', romajiTarget:'fu', meaning:'grandfather', targetIndex:1},
     ],
     kunWords: [
-      {word:'父',reading:'ちち',romajiTarget:'chichi',meaning:'(my) father',targetIndex:0},
+      {word:'父', reading:'ちち', romajiTarget:'chichi', meaning:'(my) father', targetIndex:0},
+      {word:'父親', reading:'ちちおや', romajiTarget:'chichi', meaning:'father', targetIndex:0},
     ],
     standalone:{on:false,kun:true}
   },
@@ -2464,11 +2487,12 @@ const KANJI_DATA = [
     onYomi: [{kana:'ボ',romaji:'bo'}],
     kunYomi: [{kana:'はは',romaji:'haha'}],
     onWords: [
-      {word:'母親',reading:'ははおや',romajiTarget:'bo',meaning:'mother',targetIndex:0},
-      {word:'祖母',reading:'そぼ',romajiTarget:'bo',meaning:'grandmother',targetIndex:1},
+      {word:'母国', reading:'ぼこく', romajiTarget:'bo', meaning:'home country / motherland', targetIndex:0},
+      {word:'祖母', reading:'そぼ', romajiTarget:'bo', meaning:'grandmother', targetIndex:1},
     ],
     kunWords: [
-      {word:'母',reading:'はは',romajiTarget:'haha',meaning:'(my) mother',targetIndex:0},
+      {word:'母', reading:'はは', romajiTarget:'haha', meaning:'(my) mother', targetIndex:0},
+      {word:'母親', reading:'ははおや', romajiTarget:'haha', meaning:'mother', targetIndex:0},
     ],
     standalone:{on:false,kun:true}
   },
@@ -2479,6 +2503,7 @@ const KANJI_DATA = [
     kunYomi: [{kana:'あに',romaji:'ani'}],
     onWords: [
       {word:'兄弟',reading:'きょうだい',romajiTarget:'kyou',meaning:'siblings',targetIndex:0},
+      {word:'義兄',reading:'ぎけい',romajiTarget:'kei',meaning:'brother-in-law (older)',targetIndex:1},
     ],
     kunWords: [
       {word:'兄',reading:'あに',romajiTarget:'ani',meaning:'older brother',targetIndex:0},
@@ -2507,6 +2532,7 @@ const KANJI_DATA = [
     kunYomi: [{kana:'おとうと',romaji:'otouto'}],
     onWords: [
       {word:'兄弟',reading:'きょうだい',romajiTarget:'dai',meaning:'siblings',targetIndex:1},
+      {word:'師弟',reading:'してい',romajiTarget:'tei',meaning:'teacher and student',targetIndex:1},
     ],
     kunWords: [
       {word:'弟',reading:'おとうと',romajiTarget:'otouto',meaning:'younger brother',targetIndex:0},
@@ -2568,6 +2594,7 @@ const KANJI_DATA = [
     kunWords: [
       {word:'後',reading:'あと',romajiTarget:'ato',meaning:'after / later',targetIndex:0},
       {word:'後ろ',reading:'うしろ',romajiTarget:'ushi',meaning:'behind / back',targetIndex:0},
+      {word:'後ほど',reading:'のちほど',romajiTarget:'nochi',meaning:'later on (polite)',targetIndex:0},
     ],
     standalone:{on:false,kun:true}
   },
@@ -2624,17 +2651,19 @@ const KANJI_DATA = [
     onWords: [
       {word:'海外',reading:'かいがい',romajiTarget:'gai',meaning:'overseas',targetIndex:1},
       {word:'外国',reading:'がいこく',romajiTarget:'gai',meaning:'foreign country',targetIndex:0},
+      {word:'外科',reading:'げか',romajiTarget:'ge',meaning:'surgery / surgical department',targetIndex:0},
     ],
     kunWords: [
       {word:'外',reading:'そと',romajiTarget:'soto',meaning:'outside',targetIndex:0},
       {word:'外側',reading:'そとがわ',romajiTarget:'soto',meaning:'outside / exterior',targetIndex:0},
+      {word:'外', reading:'ほか', romajiTarget:'hoka', meaning:'other / besides', targetIndex:0},
     ],
     standalone:{on:false,kun:true}
   },
   {
     kanji: '内',
     meanings: ['inside', 'within', 'home'],
-    onYomi: [{kana:'ナイ',romaji:'nai'},{kana:'ダイ',romaji:'dai'}],
+    onYomi: [{kana:'ナイ',romaji:'nai'}],
     kunYomi: [{kana:'うち',romaji:'uchi'}],
     onWords: [
       {word:'国内',reading:'こくない',romajiTarget:'nai',meaning:'domestic / within the country',targetIndex:1},
@@ -2642,6 +2671,7 @@ const KANJI_DATA = [
     ],
     kunWords: [
       {word:'内',reading:'うち',romajiTarget:'uchi',meaning:'inside / home',targetIndex:0},
+      {word:'内側',reading:'うちがわ',romajiTarget:'uchi',meaning:'inner side',targetIndex:0},
     ],
     standalone:{on:false,kun:true}
   },
@@ -2666,11 +2696,12 @@ const KANJI_DATA = [
     onYomi: [{kana:'カ',romaji:'ka'}],
     kunYomi: [{kana:'なに',romaji:'nani'},{kana:'なん',romaji:'nan'}],
     onWords: [
-      {word:'何者',reading:'なにもの',romajiTarget:'ka',meaning:'who / what kind of person',targetIndex:0},
+      {word:'如何', reading:'いかん', romajiTarget:'ka', meaning:'how / in what way (formal)', targetIndex:1},
     ],
     kunWords: [
-      {word:'何',reading:'なに',romajiTarget:'nani',meaning:'what',targetIndex:0},
-      {word:'何時',reading:'なんじ',romajiTarget:'nan',meaning:'what time',targetIndex:0},
+      {word:'何', reading:'なに', romajiTarget:'nani', meaning:'what', targetIndex:0},
+      {word:'何時', reading:'なんじ', romajiTarget:'nan', meaning:'what time', targetIndex:0},
+      {word:'何者', reading:'なにもの', romajiTarget:'nani', meaning:'who / what kind of person', targetIndex:0},
     ],
     standalone:{on:false,kun:true}
   },
@@ -2682,6 +2713,7 @@ const KANJI_DATA = [
     onWords: [
       {word:'今日',reading:'こんにち',romajiTarget:'kon',meaning:'today / nowadays',targetIndex:0},
       {word:'今週',reading:'こんしゅう',romajiTarget:'kon',meaning:'this week',targetIndex:0},
+      {word:'今上',reading:'きんじょう',romajiTarget:'kin',meaning:'the reigning emperor',targetIndex:0},
     ],
     kunWords: [
       {word:'今',reading:'いま',romajiTarget:'ima',meaning:'now',targetIndex:0},
@@ -2748,11 +2780,12 @@ const KANJI_DATA = [
     kunYomi: [{kana:'あさ',romaji:'asa'}],
     onWords: [
       {word:'朝食',reading:'ちょうしょく',romajiTarget:'chou',meaning:'breakfast',targetIndex:0},
-      {word:'毎朝',reading:'まいあさ',romajiTarget:'chou',meaning:'every morning',targetIndex:1},
+      {word:'朝刊',reading:'ちょうかん',romajiTarget:'chou',meaning:'morning newspaper',targetIndex:0},
     ],
     kunWords: [
       {word:'朝',reading:'あさ',romajiTarget:'asa',meaning:'morning',targetIndex:0},
       {word:'朝ご飯',reading:'あさごはん',romajiTarget:'asa',meaning:'breakfast',targetIndex:0},
+      {word:'毎朝',reading:'まいあさ',romajiTarget:'asa',meaning:'every morning',targetIndex:1},
     ],
     standalone:{on:false,kun:true}
   },
@@ -2791,9 +2824,8 @@ const KANJI_DATA = [
     onYomi: [{kana:'シュン',romaji:'shun'}],
     kunYomi: [{kana:'はる',romaji:'haru'}],
     onWords: [
-      {word:'青春',reading:'せいしゅん',romajiTarget:'shun',meaning:'youth / springtime of life',targetIndex:1},
-      {word:'春分',reading:'しゅんぶん',romajiTarget:'shun',meaning:'vernal equinox',targetIndex:0},
-      {word:'青春',reading:'せいしゅん',romajiTarget:'shun',meaning:'youth / springtime of life',targetIndex:1},
+      {word:'青春', reading:'せいしゅん', romajiTarget:'shun', meaning:'youth / springtime of life', targetIndex:1},
+      {word:'春分', reading:'しゅんぶん', romajiTarget:'shun', meaning:'vernal equinox', targetIndex:0},
     ],
     kunWords: [
       {word:'春',reading:'はる',romajiTarget:'haru',meaning:'spring',targetIndex:0},
@@ -2804,7 +2836,7 @@ const KANJI_DATA = [
   {
     kanji: '夏',
     meanings: ['summer'],
-    onYomi: [{kana:'カ',romaji:'ka'},{kana:'ゲ',romaji:'ge'}],
+    onYomi: [{kana:'カ',romaji:'ka'}],
     kunYomi: [{kana:'なつ',romaji:'natsu'}],
     onWords: [
       {word:'夏期',reading:'かき',romajiTarget:'ka',meaning:'summer period',targetIndex:0},
@@ -2890,7 +2922,7 @@ const KANJI_DATA = [
   {
     kanji: '都',
     meanings: ['capital', 'metropolis'],
-    onYomi: [{kana:'ト',romaji:'to'},{kana:'ツ',romaji:'tsu'}],
+    onYomi: [{kana:'ト',romaji:'to'}],
     kunYomi: [{kana:'みやこ',romaji:'miyako'}],
     onWords: [
       {word:'東京都',reading:'とうきょうと',romajiTarget:'to',meaning:'Tokyo Metropolis',targetIndex:2},
@@ -2916,7 +2948,7 @@ const KANJI_DATA = [
   {
     kanji: '家',
     meanings: ['house', 'home', 'family'],
-    onYomi: [{kana:'カ',romaji:'ka'},{kana:'ケ',romaji:'ke'}],
+    onYomi: [{kana:'カ',romaji:'ka'}],
     kunYomi: [{kana:'いえ',romaji:'ie'},{kana:'うち',romaji:'uchi'}],
     onWords: [
       {word:'家族',reading:'かぞく',romajiTarget:'ka',meaning:'family',targetIndex:0},
@@ -2925,6 +2957,7 @@ const KANJI_DATA = [
     kunWords: [
       {word:'家',reading:'いえ',romajiTarget:'ie',meaning:'house / home',targetIndex:0},
       {word:'家出',reading:'いえで',romajiTarget:'ie',meaning:'running away from home',targetIndex:0},
+      {word:'家',reading:'うち',romajiTarget:'uchi',meaning:'home / our place (humble)',targetIndex:0},
     ],
     standalone:{on:false,kun:true}
   },
@@ -3039,13 +3072,15 @@ const KANJI_DATA = [
     kanji: '病',
     meanings: ['illness', 'disease'],
     onYomi: [{kana:'ビョウ',romaji:'byou'},{kana:'ヘイ',romaji:'hei'}],
-    kunYomi: [{kana:'やま',romaji:'yama'}],
+    kunYomi: [{kana:'やむ',romaji:'yamu'},{kana:'やまい',romaji:'yamai'}],
     onWords: [
       {word:'病院',reading:'びょういん',romajiTarget:'byou',meaning:'hospital',targetIndex:0},
       {word:'病気',reading:'びょうき',romajiTarget:'byou',meaning:'illness',targetIndex:0},
+      {word:'疾病',reading:'しっぺい',romajiTarget:'hei',meaning:'disease / sickness (formal)',targetIndex:1},
     ],
     kunWords: [
-      {word:'病む',reading:'やむ',romajiTarget:'ya',meaning:'to be ill',targetIndex:0},
+      {word:'病む',reading:'やむ',romajiTarget:'yamu',meaning:'to be ill',targetIndex:0},
+      {word:'病',reading:'やまい',romajiTarget:'yamai',meaning:'illness / ailment',targetIndex:0},
     ],
     standalone:{on:false,kun:false}
   },
@@ -3098,6 +3133,7 @@ const KANJI_DATA = [
     onWords: [
       {word:'お茶',reading:'おちゃ',romajiTarget:'cha',meaning:'tea',targetIndex:1},
       {word:'茶色',reading:'ちゃいろ',romajiTarget:'cha',meaning:'brown color',targetIndex:0},
+      {word:'茶道',reading:'さどう',romajiTarget:'sa',meaning:'tea ceremony',targetIndex:0},
     ],
     kunWords: [],
     standalone:{on:false,kun:false}
@@ -3105,7 +3141,7 @@ const KANJI_DATA = [
   {
     kanji: '音',
     meanings: ['sound', 'noise'],
-    onYomi: [{kana:'オン',romaji:'on'},{kana:'イン',romaji:'in'}],
+    onYomi: [{kana:'オン',romaji:'on'}],
     kunYomi: [{kana:'おと',romaji:'oto'},{kana:'ね',romaji:'ne'}],
     onWords: [
       {word:'音楽',reading:'おんがく',romajiTarget:'on',meaning:'music',targetIndex:0},
@@ -3114,6 +3150,7 @@ const KANJI_DATA = [
     kunWords: [
       {word:'音',reading:'おと',romajiTarget:'oto',meaning:'sound / noise',targetIndex:0},
       {word:'足音',reading:'あしおと',romajiTarget:'oto',meaning:'footsteps',targetIndex:1},
+      {word:'音色',reading:'ねいろ',romajiTarget:'ne',meaning:'tone / timbre',targetIndex:0},
     ],
     standalone:{on:false,kun:true}
   },
@@ -3125,6 +3162,7 @@ const KANJI_DATA = [
     onWords: [
       {word:'音楽',reading:'おんがく',romajiTarget:'gaku',meaning:'music',targetIndex:1},
       {word:'楽器',reading:'がっき',romajiTarget:'gaku',meaning:'musical instrument',targetIndex:0},
+      {word:'気楽',reading:'きらく',romajiTarget:'raku',meaning:'carefree / comfortable',targetIndex:1},
     ],
     kunWords: [
       {word:'楽しい',reading:'たのしい',romajiTarget:'tano',meaning:'fun / enjoyable',targetIndex:0},
@@ -3136,7 +3174,7 @@ const KANJI_DATA = [
     kanji: '歌',
     meanings: ['song', 'sing'],
     onYomi: [{kana:'カ',romaji:'ka'}],
-    kunYomi: [{kana:'うた',romaji:'uta'},{kana:'ころ',romaji:'koro'}],
+    kunYomi: [{kana:'うた',romaji:'uta'}],
     onWords: [
       {word:'歌手',reading:'かしゅ',romajiTarget:'ka',meaning:'singer',targetIndex:0},
       {word:'国歌',reading:'こっか',romajiTarget:'ka',meaning:'national anthem',targetIndex:1},
@@ -3162,7 +3200,7 @@ const KANJI_DATA = [
   {
     kanji: '色',
     meanings: ['color', 'type'],
-    onYomi: [{kana:'ショク',romaji:'shoku'},{kana:'シキ',romaji:'shiki'}],
+    onYomi: [{kana:'シキ',romaji:'shiki'}],
     kunYomi: [{kana:'いろ',romaji:'iro'}],
     onWords: [
       {word:'色彩',reading:'しきさい',romajiTarget:'shiki',meaning:'color / coloring',targetIndex:0},
@@ -3186,6 +3224,7 @@ const KANJI_DATA = [
     ],
     kunWords: [
       {word:'形',reading:'かたち',romajiTarget:'katachi',meaning:'shape',targetIndex:0},
+      {word:'形見',reading:'かたみ',romajiTarget:'kata',meaning:'memento / keepsake',targetIndex:0},
     ],
     standalone:{on:false,kun:true}
   },
@@ -3193,7 +3232,7 @@ const KANJI_DATA = [
     kanji: '新',
     meanings: ['new', 'fresh'],
     onYomi: [{kana:'シン',romaji:'shin'}],
-    kunYomi: [{kana:'あたら',romaji:'atara'},{kana:'あら',romaji:'ara'},{kana:'にい',romaji:'nii'}],
+    kunYomi: [{kana:'あたら',romaji:'atara'},{kana:'あら',romaji:'ara'}],
     onWords: [
       {word:'新聞',reading:'しんぶん',romajiTarget:'shin',meaning:'newspaper',targetIndex:0},
       {word:'新幹線',reading:'しんかんせん',romajiTarget:'shin',meaning:'bullet train',targetIndex:0},
@@ -3345,6 +3384,7 @@ const KANJI_DATA = [
     onWords: [
       {word:'重要',reading:'じゅうよう',romajiTarget:'juu',meaning:'important',targetIndex:0},
       {word:'体重',reading:'たいじゅう',romajiTarget:'juu',meaning:'body weight',targetIndex:1},
+      {word:'貴重',reading:'きちょう',romajiTarget:'chou',meaning:'precious / valuable',targetIndex:1},
     ],
     kunWords: [
       {word:'重い',reading:'おもい',romajiTarget:'omo',meaning:'heavy',targetIndex:0},
@@ -3414,15 +3454,17 @@ const KANJI_DATA = [
   {
     kanji: '行',
     meanings: ['go', 'conduct', 'line (of text)'],
-    onYomi: [{kana:'コウ',romaji:'kou'},{kana:'ギョウ',romaji:'gyou'},{kana:'アン',romaji:'an'}],
+    onYomi: [{kana:'コウ',romaji:'kou'},{kana:'ギョウ',romaji:'gyou'}],
     kunYomi: [{kana:'い',romaji:'i'},{kana:'ゆ',romaji:'yu'},{kana:'おこな',romaji:'okona'}],
     onWords: [
       {word:'銀行',reading:'ぎんこう',romajiTarget:'kou',meaning:'bank',targetIndex:1},
       {word:'行動',reading:'こうどう',romajiTarget:'kou',meaning:'action / behavior',targetIndex:0},
+      {word:'行列',reading:'ぎょうれつ',romajiTarget:'gyou',meaning:'queue / procession',targetIndex:0},
     ],
     kunWords: [
       {word:'行く',reading:'いく',romajiTarget:'i',meaning:'to go',targetIndex:0},
       {word:'行う',reading:'おこなう',romajiTarget:'okona',meaning:'to perform / carry out',targetIndex:0},
+      {word:'行方',reading:'ゆくえ',romajiTarget:'yu',meaning:'whereabouts',targetIndex:0},
     ],
     standalone:{on:false,kun:false}
   },
@@ -3444,7 +3486,7 @@ const KANJI_DATA = [
   {
     kanji: '出',
     meanings: ['exit', 'go out', 'put out'],
-    onYomi: [{kana:'シュツ',romaji:'shutsu'},{kana:'スイ',romaji:'sui'}],
+    onYomi: [{kana:'シュツ',romaji:'shutsu'}],
     kunYomi: [{kana:'で',romaji:'de'},{kana:'だ',romaji:'da'}],
     onWords: [
       {word:'出発',reading:'しゅっぱつ',romajiTarget:'shutsu',meaning:'departure',targetIndex:0},
@@ -3480,11 +3522,12 @@ const KANJI_DATA = [
     onWords: [
       {word:'国立',reading:'こくりつ',romajiTarget:'ritsu',meaning:'national (institution)',targetIndex:1},
       {word:'独立',reading:'どくりつ',romajiTarget:'ritsu',meaning:'independence',targetIndex:1},
+      {word:'建立',reading:'こんりゅう',romajiTarget:'ryuu',meaning:'erection of a building/temple',targetIndex:1},
     ],
     kunWords: [
       {word:'立つ',reading:'たつ',romajiTarget:'ta',meaning:'to stand',targetIndex:0},
       {word:'立てる',reading:'たてる',romajiTarget:'ta',meaning:'to stand up / establish',targetIndex:0},
-      {word:'立場',reading:'たちば',romajiTarget:'tachi',meaning:'standpoint / position',targetIndex:0},
+      {word:'立場',reading:'たちば',romajiTarget:'ta',meaning:'standpoint / position',targetIndex:0},
     ],
     standalone:{on:false,kun:false}
   },
@@ -3554,6 +3597,7 @@ const KANJI_DATA = [
     onWords: [
       {word:'作品',reading:'さくひん',romajiTarget:'saku',meaning:'work (of art)',targetIndex:0},
       {word:'作家',reading:'さっか',romajiTarget:'saku',meaning:'author / writer',targetIndex:0},
+      {word:'動作',reading:'どうさ',romajiTarget:'sa',meaning:'movement / action',targetIndex:1},
     ],
     kunWords: [
       {word:'作る',reading:'つくる',romajiTarget:'tsuku',meaning:'to make / create',targetIndex:0},
@@ -3608,7 +3652,7 @@ const KANJI_DATA = [
   {
     kanji: '切',
     meanings: ['cut', 'sever'],
-    onYomi: [{kana:'セツ',romaji:'setsu'},{kana:'サイ',romaji:'sai'}],
+    onYomi: [{kana:'セツ',romaji:'setsu'}],
     kunYomi: [{kana:'き',romaji:'ki'}],
     onWords: [
       {word:'大切',reading:'たいせつ',romajiTarget:'setsu',meaning:'important / precious',targetIndex:1},
@@ -3738,8 +3782,8 @@ const KANJI_DATA = [
   {
     kanji: '強',
     meanings: ['strong', 'powerful', 'force'],
-    onYomi: [{kana:'キョウ',romaji:'kyou'},{kana:'ゴウ',romaji:'gou'}],
-    kunYomi: [{kana:'つよ',romaji:'tsuyo'},{kana:'し',romaji:'shi'}],
+    onYomi: [{kana:'キョウ',romaji:'kyou'}],
+    kunYomi: [{kana:'つよ',romaji:'tsuyo'}],
     onWords: [
       {word:'勉強',reading:'べんきょう',romajiTarget:'kyou',meaning:'study',targetIndex:1},
       {word:'強力',reading:'きょうりょく',romajiTarget:'kyou',meaning:'powerful',targetIndex:0},
@@ -3788,6 +3832,8 @@ const KANJI_DATA = [
     kunYomi: [{kana:'きら',romaji:'kira'},{kana:'いや',romaji:'iya'}],
     onWords: [
       {word:'機嫌',reading:'きげん',romajiTarget:'ken',meaning:'mood / humor',targetIndex:1},
+      {word:'嫌悪',reading:'けんお',romajiTarget:'ken',meaning:'disgust / hatred',targetIndex:0},
+      {word:'機嫌',reading:'きげん',romajiTarget:'gen',meaning:'mood / temper',targetIndex:1},
     ],
     kunWords: [
       {word:'嫌い',reading:'きらい',romajiTarget:'kira',meaning:'dislike',targetIndex:0},
@@ -3862,6 +3908,7 @@ const KANJI_DATA = [
     onWords: [
       {word:'会社',reading:'かいしゃ',romajiTarget:'kai',meaning:'company',targetIndex:0},
       {word:'会議',reading:'かいぎ',romajiTarget:'kai',meaning:'meeting',targetIndex:0},
+      {word:'法会',reading:'ほうえ',romajiTarget:'e',meaning:'Buddhist ceremony',targetIndex:1},
     ],
     kunWords: [
       {word:'会う',reading:'あう',romajiTarget:'a',meaning:'to meet',targetIndex:0},
@@ -3886,7 +3933,7 @@ const KANJI_DATA = [
   {
     kanji: '仕',
     meanings: ['serve', 'work', 'do'],
-    onYomi: [{kana:'シ',romaji:'shi'},{kana:'ジ',romaji:'ji'}],
+    onYomi: [{kana:'シ',romaji:'shi'}],
     kunYomi: [],
     onWords: [
       {word:'仕事',reading:'しごと',romajiTarget:'shi',meaning:'work / job',targetIndex:0},
@@ -3901,11 +3948,12 @@ const KANJI_DATA = [
     onYomi: [{kana:'ドウ',romaji:'dou'}],
     kunYomi: [{kana:'はたら',romaji:'hatara'}],
     onWords: [
-      {word:'労働',reading:'ろうどう',romajiTarget:'dou',meaning:'labor / work',targetIndex:1},
-      {word:'働き',reading:'はたらき',romajiTarget:'dou',meaning:'work / function',targetIndex:0},
+      {word:'労働', reading:'ろうどう', romajiTarget:'dou', meaning:'labor / work', targetIndex:1},
+      {word:'労働者', reading:'ろうどうしゃ', romajiTarget:'dou', meaning:'worker / laborer', targetIndex:1},
     ],
     kunWords: [
-      {word:'働く',reading:'はたらく',romajiTarget:'hatara',meaning:'to work',targetIndex:0},
+      {word:'働く', reading:'はたらく', romajiTarget:'hatara', meaning:'to work', targetIndex:0},
+      {word:'働き', reading:'はたらき', romajiTarget:'hatara', meaning:'work / function', targetIndex:0},
     ],
     standalone:{on:false,kun:false}
   },
@@ -4015,7 +4063,7 @@ const KANJI_DATA = [
   {
     kanji: '遠',
     meanings: ['far', 'distant'],
-    onYomi: [{kana:'エン',romaji:'en'},{kana:'オン',romaji:'on'}],
+    onYomi: [{kana:'エン',romaji:'en'}],
     kunYomi: [{kana:'とお',romaji:'too'}],
     onWords: [
       {word:'遠足',reading:'えんそく',romajiTarget:'en',meaning:'excursion / field trip',targetIndex:0},
@@ -4059,7 +4107,7 @@ const KANJI_DATA = [
   {
     kanji: '白',
     meanings: ['white'],
-    onYomi: [{kana:'ハク',romaji:'haku'},{kana:'ビャク',romaji:'byaku'}],
+    onYomi: [{kana:'ハク',romaji:'haku'}],
     kunYomi: [{kana:'しろ',romaji:'shiro'},{kana:'しら',romaji:'shira'}],
     onWords: [
       {word:'白米',reading:'はくまい',romajiTarget:'haku',meaning:'white rice',targetIndex:0},
@@ -4089,22 +4137,23 @@ const KANJI_DATA = [
   {
     kanji: '赤',
     meanings: ['red'],
-    onYomi: [{kana:'セキ',romaji:'seki'},{kana:'シャク',romaji:'shaku'}],
+    onYomi: [{kana:'セキ',romaji:'seki'}],
     kunYomi: [{kana:'あか',romaji:'aka'}],
     onWords: [
       {word:'赤道',reading:'せきどう',romajiTarget:'seki',meaning:'equator',targetIndex:0},
-      {word:'赤字',reading:'あかじ',romajiTarget:'seki',meaning:'deficit / red letters',targetIndex:0},
+      {word:'赤十字',reading:'せきじゅうじ',romajiTarget:'seki',meaning:'Red Cross',targetIndex:0},
     ],
     kunWords: [
       {word:'赤い',reading:'あかい',romajiTarget:'aka',meaning:'red',targetIndex:0},
       {word:'赤ちゃん',reading:'あかちゃん',romajiTarget:'aka',meaning:'baby',targetIndex:0},
+      {word:'赤字',reading:'あかじ',romajiTarget:'aka',meaning:'deficit / red ink',targetIndex:0},
     ],
     standalone:{on:false,kun:false}
   },
   {
     kanji: '青',
     meanings: ['blue', 'green', 'young'],
-    onYomi: [{kana:'セイ',romaji:'sei'},{kana:'ショウ',romaji:'shou'}],
+    onYomi: [{kana:'セイ',romaji:'sei'}],
     kunYomi: [{kana:'あお',romaji:'ao'}],
     onWords: [
       {word:'青春',reading:'せいしゅん',romajiTarget:'sei',meaning:'youth / springtime of life',targetIndex:0},
@@ -4122,12 +4171,13 @@ const KANJI_DATA = [
     onYomi: [{kana:'コウ',romaji:'kou'},{kana:'オウ',romaji:'ou'}],
     kunYomi: [{kana:'き',romaji:'ki'}],
     onWords: [
-      {word:'黄色',reading:'きいろ',romajiTarget:'ou',meaning:'yellow',targetIndex:0},
       {word:'黄金',reading:'おうごん',romajiTarget:'ou',meaning:'gold',targetIndex:0},
+      {word:'黄河',reading:'こうが',romajiTarget:'kou',meaning:'Yellow River',targetIndex:0},
     ],
     kunWords: [
       {word:'黄色い',reading:'きいろい',romajiTarget:'ki',meaning:'yellow',targetIndex:0},
       {word:'黄身',reading:'きみ',romajiTarget:'ki',meaning:'egg yolk',targetIndex:0},
+      {word:'黄色',reading:'きいろ',romajiTarget:'ki',meaning:'yellow (color)',targetIndex:0},
     ],
     standalone:{on:false,kun:false}
   },
