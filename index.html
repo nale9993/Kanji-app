@@ -1245,7 +1245,7 @@ const KANJI_DATA = [
   {
     kanji: '日',
     meanings: ['sun', 'day', 'Japan'],
-    onYomi: [{kana:'ニチ',romaji:'nichi'},{kana:'ジツ',romaji:'jitsu'}],
+    onYomi: [{kana:'ニチ',romaji:'nichi'},{kana:'ジツ',romaji:'jitsu'},{kana:'ニ',romaji:'ni'}],
     kunYomi: [{kana:'ひ',romaji:'hi'},{kana:'か',romaji:'ka'}],
     onWords: [
       {word:'日本', reading:'にほん', romajiTarget:'ni', meaning:'Japan', targetIndex:0},
@@ -1348,10 +1348,10 @@ const KANJI_DATA = [
       {word:'土曜日', reading:'どようび', romajiTarget:'do', meaning:'Saturday', targetIndex:0},
       {word:'土地', reading:'とち', romajiTarget:'to', meaning:'land', targetIndex:0},
       {word:'土台', reading:'どだい', romajiTarget:'do', meaning:'foundation', targetIndex:0},
+      {word:'土鍋', reading:'どなべ', romajiTarget:'do', meaning:'earthen pot', targetIndex:0},
     ],
     kunWords: [
       {word:'土', reading:'つち', romajiTarget:'tsuchi', meaning:'earth / soil', targetIndex:0},
-      {word:'土鍋', reading:'どなべ', romajiTarget:'tsuchi', meaning:'earthen pot', targetIndex:0},
     ],
     standalone: {on: false, kun: true}
   },
@@ -1620,7 +1620,7 @@ const KANJI_DATA = [
     kanji: '十',
     meanings: ['ten'],
     onYomi: [{kana:'ジュウ',romaji:'juu'}],
-    kunYomi: [{kana:'とお',romaji:'too'},{kana:'と',romaji:'to'}],
+    kunYomi: [{kana:'とお',romaji:'too'}],
     onWords: [
       {word:'十月', reading:'じゅうがつ', romajiTarget:'juu', meaning:'October', targetIndex:0},
       {word:'二十', reading:'にじゅう', romajiTarget:'juu', meaning:'twenty', targetIndex:1},
@@ -1628,7 +1628,6 @@ const KANJI_DATA = [
     kunWords: [
       {word:'十', reading:'とお', romajiTarget:'too', meaning:'ten', targetIndex:0},
       {word:'十日', reading:'とおか', romajiTarget:'too', meaning:'tenth day / ten days', targetIndex:0},
-      {word:'十分', reading:'とぶん', romajiTarget:'to', meaning:'ten portions (archaic measure)', targetIndex:0},
     ],
     standalone: {on: false, kun: true}
   },
@@ -2007,6 +2006,11 @@ const KANJI_DATA = [
       {word:'電気', reading:'でんき', romajiTarget:'ki', meaning:'electricity', targetIndex:1},
       {word:'気配', reading:'けはい', romajiTarget:'ke', meaning:'sign / presence', targetIndex:0},
     ],
+    kunWords: [],
+    standalone: {on: false, kun: false}
+  },
+  {
+    kanji: '電',
     meanings: ['electricity', 'lightning'],
     onYomi: [{kana:'デン',romaji:'den'}],
     kunYomi: [],
@@ -3831,7 +3835,6 @@ const KANJI_DATA = [
     onYomi: [{kana:'ケン',romaji:'ken'},{kana:'ゲン',romaji:'gen'}],
     kunYomi: [{kana:'きら',romaji:'kira'},{kana:'いや',romaji:'iya'}],
     onWords: [
-      {word:'機嫌',reading:'きげん',romajiTarget:'ken',meaning:'mood / humor',targetIndex:1},
       {word:'嫌悪',reading:'けんお',romajiTarget:'ken',meaning:'disgust / hatred',targetIndex:0},
       {word:'機嫌',reading:'きげん',romajiTarget:'gen',meaning:'mood / temper',targetIndex:1},
     ],
