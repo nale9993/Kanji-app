@@ -432,6 +432,18 @@
     justify-content: center;
     /* Prevent content from pushing layout when keyboard opens */
     min-height: 0;
+    transition: box-shadow 0.3s, border-color 0.3s;
+  }
+
+  .quiz-card.flash-correct {
+    border-color: var(--green) !important;
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--green) 35%, transparent);
+    transition: box-shadow 0.3s, border-color 0.3s;
+  }
+  .quiz-card.flash-wrong {
+    border-color: var(--red) !important;
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--red) 35%, transparent);
+    transition: box-shadow 0.3s, border-color 0.3s;
   }
 
   .quiz-card::before {
@@ -564,35 +576,35 @@
   .quiz-card.flash-correct::before {
     background: var(--green) !important;
     height: 6px;
-    transition: background 0.45s, height 0.45s;
+    transition: background 0.3s, height 0.3s;
   }
   .quiz-card.flash-wrong::before {
     background: var(--red) !important;
     height: 6px;
-    transition: background 0.45s, height 0.45s;
+    transition: background 0.3s, height 0.3s;
   }
 
   /* Meaning screen: the big standalone kanji flashes and stays */
   .quiz-card.flash-correct .quiz-kanji {
     color: var(--green) !important;
-    transition: color 0.45s;
+    transition: color 0.3s;
   }
   .quiz-card.flash-wrong .quiz-kanji {
     color: var(--red) !important;
-    transition: color 0.45s;
+    transition: color 0.3s;
   }
 
   /* On/kun screens: only the highlighted target kanji changes, not the whole word */
   .quiz-card.flash-correct .target-kanji {
     color: var(--green) !important;
-    transition: color 0.45s;
+    transition: color 0.3s;
   }
   .quiz-card.flash-correct .target-kanji::after {
     background: var(--green) !important;
   }
   .quiz-card.flash-wrong .target-kanji {
     color: var(--red) !important;
-    transition: color 0.45s;
+    transition: color 0.3s;
   }
   .quiz-card.flash-wrong .target-kanji::after {
     background: var(--red) !important;
@@ -4804,15 +4816,16 @@ function getWordForItem(item) {
   if (words.length === 0) return null;
   if (words.length === 1) return words[0];
 
-  // Rotate through words so all get tested — track last used per kanji+stage
+  // Rotate through words so all get tested — persist history in state across sessions
   const key = `${item.idx}-${item.stage}`;
-  if (!session.wordHistory) session.wordHistory = {};
-  const used = session.wordHistory[key] || [];
-  const unused = words.filter((_, i) => !used.includes(i));
+  if (!state.wordHistory) state.wordHistory = {};
+  const used = state.wordHistory[key] || [];
+  const unused = words.map((_, i) => i).filter(i => !used.includes(i));
   const pool = unused.length > 0 ? unused : words.map((_, i) => i); // reset if all used
   const pick = pool[Math.floor(Math.random() * pool.length)];
-  // Update history — keep last (words.length - 1) used so one is always fresh
-  session.wordHistory[key] = [...used.filter(i => i !== pick), pick].slice(-(words.length - 1));
+  // Update history — keep last (words.length - 1) used so one is always fresh next time
+  state.wordHistory[key] = [...used.filter(i => i !== pick), pick].slice(-(words.length - 1));
+  saveState();
   return words[pick];
 }
 
@@ -5397,8 +5410,11 @@ let pretest = {
 
 function startPretest() {
   // Include any kanji not yet fast-tracked (below PRETEST_LEVEL on any applicable stage)
+  // Exclude kanji that were previously marked as failed/skipped (stored in state.pretestFailed)
+  if (!state.pretestFailed) state.pretestFailed = [];
   pretest.queue = [];
   for (let i = 0; i < KANJI_DATA.length; i++) {
+    if (state.pretestFailed.includes(i)) continue; // permanently excluded
     const c = state.cards[i];
     const kd = KANJI_DATA[i];
     if (!c) {
@@ -5533,9 +5549,12 @@ function pretestSelectMeaning(btn, selected, correct) {
   if (!pretest.results[idx]) pretest.results[idx] = {};
   pretest.results[idx].meaning = wasCorrect;
   if (!wasCorrect) {
-    // Wrong answer — mark all stages failed and skip to next kanji
+    // Wrong answer — mark all stages failed, exclude from future pretest sessions
     pretest.results[idx].on = false;
     pretest.results[idx].kun = false;
+    if (!state.pretestFailed) state.pretestFailed = [];
+    if (!state.pretestFailed.includes(idx)) state.pretestFailed.push(idx);
+    saveState();
     setTimeout(() => advancePretestKanji(), 900);
   } else {
     setTimeout(() => advancePretestStage(), 900);
@@ -5566,8 +5585,11 @@ function submitPretestReading() {
   if (!pretest.results[idx]) pretest.results[idx] = {};
   pretest.results[idx][pretest.stage] = wasCorrect;
   if (!wasCorrect) {
-    // Wrong answer — mark remaining stages failed and skip to next kanji
+    // Wrong answer — mark remaining stages failed, exclude from future pretest sessions
     if (pretest.stage === 'on') pretest.results[idx].kun = false;
+    if (!state.pretestFailed) state.pretestFailed = [];
+    if (!state.pretestFailed.includes(idx)) state.pretestFailed.push(idx);
+    saveState();
     setTimeout(() => advancePretestKanji(), 900);
   } else {
     setTimeout(() => advancePretestStage(), 900);
@@ -5579,6 +5601,7 @@ function advancePretestKanji() {
   pretest.pos++;
   if (pretest.pos >= pretest.queue.length) {
     pretestInProgress = false;
+    state.pretestDismissed = true;
     tryUnlockNext();
     saveState();
     updateHomeStats();
@@ -5634,6 +5657,7 @@ function advancePretestStage() {
   if (pretest.pos >= pretest.queue.length) {
     // Done with pretest
     pretestInProgress = false;
+    state.pretestDismissed = true;
     tryUnlockNext();
     saveState();
     updateHomeStats();
@@ -5659,6 +5683,7 @@ function pretestGiveUp() {
   // Permanently end the pretest — lock it, save fast-tracked progress, go home
   if (!confirm('End the pretest? Any kanji you already passed are saved, but the pretest will be locked.')) return;
   pretestInProgress = false;
+  state.pretestDismissed = true;
   tryUnlockNext();
   saveState();
   updateHomeStats();
@@ -5667,15 +5692,20 @@ function pretestGiveUp() {
 
 function skipPretestKanji() {
   // Mark this kanji as unknown (failed all stages) — it stays in normal lesson flow
+  // and is permanently excluded from future pretest sessions
   const idx = pretest.queue[pretest.pos];
   if (!pretest.results[idx]) pretest.results[idx] = {};
   pretest.results[idx].meaning = false;
   pretest.results[idx].on = false;
   pretest.results[idx].kun = false;
+  if (!state.pretestFailed) state.pretestFailed = [];
+  if (!state.pretestFailed.includes(idx)) state.pretestFailed.push(idx);
+  saveState();
   // Move to next kanji
   pretest.pos++;
   if (pretest.pos >= pretest.queue.length) {
     pretestInProgress = false;
+    state.pretestDismissed = true;
     tryUnlockNext();
     saveState();
     updateHomeStats();
@@ -5692,7 +5722,7 @@ function confirmReset() {
     localStorage.removeItem('sumi_state');
     localStorage.removeItem('sumi_pretest');
     // Reset all in-memory state
-    state = { cards: {}, unlockedCount: 0 };
+    state = { cards: {}, unlockedCount: 0, pretestFailed: [], pretestDismissed: false, wordHistory: {} };
     pretestInProgress = false;
     pretest.queue = [];
     pretest.pos = 0;
