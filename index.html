@@ -564,35 +564,35 @@
   .quiz-card.flash-correct::before {
     background: var(--green) !important;
     height: 6px;
-    transition: background 0.7s, height 0.7s;
+    transition: background 0.45s, height 0.45s;
   }
   .quiz-card.flash-wrong::before {
     background: var(--red) !important;
     height: 6px;
-    transition: background 0.7s, height 0.7s;
+    transition: background 0.45s, height 0.45s;
   }
 
   /* Meaning screen: the big standalone kanji flashes and stays */
   .quiz-card.flash-correct .quiz-kanji {
     color: var(--green) !important;
-    transition: color 0.7s;
+    transition: color 0.45s;
   }
   .quiz-card.flash-wrong .quiz-kanji {
     color: var(--red) !important;
-    transition: color 0.7s;
+    transition: color 0.45s;
   }
 
   /* On/kun screens: only the highlighted target kanji changes, not the whole word */
   .quiz-card.flash-correct .target-kanji {
     color: var(--green) !important;
-    transition: color 0.7s;
+    transition: color 0.45s;
   }
   .quiz-card.flash-correct .target-kanji::after {
     background: var(--green) !important;
   }
   .quiz-card.flash-wrong .target-kanji {
     color: var(--red) !important;
-    transition: color 0.7s;
+    transition: color 0.45s;
   }
   .quiz-card.flash-wrong .target-kanji::after {
     background: var(--red) !important;
@@ -4609,13 +4609,14 @@ function updateHomeStats() {
   document.getElementById('home-review-count').textContent = reviews;
 
   // Show pretest banner if: no lessons started yet OR pretest is in progress
+  // Once any kanji is learning, the banner is gone (unless pretest is in progress)
   const anyLearning = Object.values(state.cards).some(c =>
     c && (c.meaning.learning || c.on.learning || c.kun.learning)
   );
   const banner = document.getElementById('pretest-banner');
   const pretestTitle = document.getElementById('pretest-banner-title');
   if (banner) {
-    const showBanner = !anyLearning || pretestInProgress;
+    const showBanner = (!anyLearning && !state.pretestDismissed) || pretestInProgress;
     banner.style.display = showBanner ? 'block' : 'none';
     if (pretestTitle) {
       pretestTitle.textContent = pretestInProgress
@@ -4665,6 +4666,13 @@ function startLessons() {
   if (lessonQueue.length === 0) {
     alert('No new lessons right now! Come back after reviewing.');
     return;
+  }
+  // Dismiss pretest banner when user starts lessons (they've chosen lessons over pretest)
+  if (!pretestInProgress) {
+    const banner = document.getElementById('pretest-banner');
+    if (banner) banner.style.display = 'none';
+    state.pretestDismissed = true;
+    saveState();
   }
   lessonPos = 0;
   showScreen('lesson');
@@ -4953,7 +4961,7 @@ function selectMeaning(btn, selected, correct) {
   void card.offsetWidth; // force reflow
   card.classList.add(wasCorrect ? 'flash-correct' : 'flash-wrong');
 
-  setTimeout(() => showReviewScreen(), 1400);
+  setTimeout(() => showReviewScreen(), 900);
 }
 
 function submitReading() {
@@ -5029,7 +5037,7 @@ function submitReading() {
   void card.offsetWidth;
   card.classList.add(wasCorrect ? 'flash-correct' : 'flash-wrong');
 
-  setTimeout(() => showReviewScreen(), 1400);
+  setTimeout(() => showReviewScreen(), 900);
 }
 
 function allStagesLearning(idx) {
@@ -5524,7 +5532,14 @@ function pretestSelectMeaning(btn, selected, correct) {
   const idx = pretest.queue[pretest.pos];
   if (!pretest.results[idx]) pretest.results[idx] = {};
   pretest.results[idx].meaning = wasCorrect;
-  setTimeout(() => advancePretestStage(), 1400);
+  if (!wasCorrect) {
+    // Wrong answer — mark all stages failed and skip to next kanji
+    pretest.results[idx].on = false;
+    pretest.results[idx].kun = false;
+    setTimeout(() => advancePretestKanji(), 900);
+  } else {
+    setTimeout(() => advancePretestStage(), 900);
+  }
 }
 
 function submitPretestReading() {
@@ -5550,7 +5565,29 @@ function submitPretestReading() {
   card.classList.add(wasCorrect ? 'flash-correct' : 'flash-wrong');
   if (!pretest.results[idx]) pretest.results[idx] = {};
   pretest.results[idx][pretest.stage] = wasCorrect;
-  setTimeout(() => advancePretestStage(), 1400);
+  if (!wasCorrect) {
+    // Wrong answer — mark remaining stages failed and skip to next kanji
+    if (pretest.stage === 'on') pretest.results[idx].kun = false;
+    setTimeout(() => advancePretestKanji(), 900);
+  } else {
+    setTimeout(() => advancePretestStage(), 900);
+  }
+}
+
+function advancePretestKanji() {
+  // Move directly to the next kanji (used when a wrong answer disqualifies current kanji)
+  pretest.pos++;
+  if (pretest.pos >= pretest.queue.length) {
+    pretestInProgress = false;
+    tryUnlockNext();
+    saveState();
+    updateHomeStats();
+    alert(`Pretest complete! ${pretest.fastTracked} kanji fast-tracked to Level 6.`);
+    goHome();
+    return;
+  }
+  pretest.stage = 'meaning';
+  renderPretestCard();
 }
 
 function advancePretestStage() {
@@ -5629,6 +5666,13 @@ function pretestGiveUp() {
 }
 
 function skipPretestKanji() {
+  // Mark this kanji as unknown (failed all stages) — it stays in normal lesson flow
+  const idx = pretest.queue[pretest.pos];
+  if (!pretest.results[idx]) pretest.results[idx] = {};
+  pretest.results[idx].meaning = false;
+  pretest.results[idx].on = false;
+  pretest.results[idx].kun = false;
+  // Move to next kanji
   pretest.pos++;
   if (pretest.pos >= pretest.queue.length) {
     pretestInProgress = false;
