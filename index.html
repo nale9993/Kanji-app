@@ -432,18 +432,18 @@
     justify-content: center;
     /* Prevent content from pushing layout when keyboard opens */
     min-height: 0;
-    transition: box-shadow 0.3s, border-color 0.3s;
+    transition: box-shadow 0.4s, border-color 0.4s;
   }
 
   .quiz-card.flash-correct {
     border-color: var(--green) !important;
     box-shadow: 0 0 0 3px color-mix(in srgb, var(--green) 35%, transparent);
-    transition: box-shadow 0.3s, border-color 0.3s;
+    transition: box-shadow 0.4s, border-color 0.4s;
   }
   .quiz-card.flash-wrong {
     border-color: var(--red) !important;
     box-shadow: 0 0 0 3px color-mix(in srgb, var(--red) 35%, transparent);
-    transition: box-shadow 0.3s, border-color 0.3s;
+    transition: box-shadow 0.4s, border-color 0.4s;
   }
 
   .quiz-card::before {
@@ -576,35 +576,35 @@
   .quiz-card.flash-correct::before {
     background: var(--green) !important;
     height: 6px;
-    transition: background 0.3s, height 0.3s;
+    transition: background 0.4s, height 0.4s;
   }
   .quiz-card.flash-wrong::before {
     background: var(--red) !important;
     height: 6px;
-    transition: background 0.3s, height 0.3s;
+    transition: background 0.4s, height 0.4s;
   }
 
   /* Meaning screen: the big standalone kanji flashes and stays */
   .quiz-card.flash-correct .quiz-kanji {
     color: var(--green) !important;
-    transition: color 0.3s;
+    transition: color 0.4s;
   }
   .quiz-card.flash-wrong .quiz-kanji {
     color: var(--red) !important;
-    transition: color 0.3s;
+    transition: color 0.4s;
   }
 
   /* On/kun screens: only the highlighted target kanji changes, not the whole word */
   .quiz-card.flash-correct .target-kanji {
     color: var(--green) !important;
-    transition: color 0.3s;
+    transition: color 0.4s;
   }
   .quiz-card.flash-correct .target-kanji::after {
     background: var(--green) !important;
   }
   .quiz-card.flash-wrong .target-kanji {
     color: var(--red) !important;
-    transition: color 0.3s;
+    transition: color 0.4s;
   }
   .quiz-card.flash-wrong .target-kanji::after {
     background: var(--red) !important;
@@ -4679,12 +4679,12 @@ function startLessons() {
     alert('No new lessons right now! Come back after reviewing.');
     return;
   }
-  // Dismiss pretest banner when user starts lessons (they've chosen lessons over pretest)
+  // Lock the pretest when user starts lessons — same as giving up
   if (!pretestInProgress) {
-    const banner = document.getElementById('pretest-banner');
-    if (banner) banner.style.display = 'none';
+    pretestInProgress = false;
     state.pretestDismissed = true;
     saveState();
+    updateHomeStats();
   }
   lessonPos = 0;
   showScreen('lesson');
