@@ -4965,14 +4965,37 @@ function normalizeAnswer(s) {
     .replace(/\s+/g, '');
 }
 
+// Normalize doubled trailing consonants so e.g. "gett" / "gecc" / "gebb" all match げっ
+// Step 1: collapse doubled consonant (gett → get)
+// Step 2: strip the remaining trailing consonant (get → ge)
+// This way any doubled consonant signals っ regardless of which letter is used
+function normalizeGeminate(romaji) {
+  // Collapse e.g. "tt" → "t", "cc" → "c", "bb" → "b"
+  const collapsed = romaji.replace(/([bcdfghjklmnpqrstvwxyz])+$/i, '$1');
+  if (collapsed === romaji) return romaji; // no doubling found, unchanged
+  // Strip the leftover single trailing consonant (the っ marker)
+  return collapsed.replace(/[bcdfghjklmnpqrstvwxyz]$/i, '');
+}
+
 function checkRomajiAnswer(userInput, correctRomaji) {
   const user = normalizeAnswer(userInput);
   const correct = normalizeAnswer(correctRomaji);
   if (user === correct) return true;
-  // Also try converting and comparing
+
+  // Convert both to kana and compare
   const userKana = toHiragana(user);
   const correctKana = toHiragana(correct);
-  return userKana === correctKana;
+  if (userKana === correctKana) return true;
+
+  // Also try normalizing doubled trailing consonant (gett/gecc/gebb → ge)
+  // so users can signal っ by doubling any consonant at the end
+  const userNorm = normalizeGeminate(user);
+  if (userNorm !== user) {
+    if (userNorm === correct) return true;
+    if (toHiragana(userNorm) === correctKana) return true;
+  }
+
+  return false;
 }
 
 // ===================================================
