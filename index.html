@@ -4921,6 +4921,8 @@ function kanaToRomaji(kana) {
   let result = '';
   for (let i = 0; i < kana.length; i++) {
     // っ: double the first consonant of the next kana
+    // if っ is at the end with nothing after it, preserve it as 'っ' so
+    // correctKana.endsWith('っ') stays true and the geminate gate works
     if (kana[i] === 'っ') {
       const next = map[kana[i+1]];
       if (next) result += next[0];
