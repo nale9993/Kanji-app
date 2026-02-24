@@ -4971,7 +4971,7 @@ function normalizeAnswer(s) {
 // This way any doubled consonant signals っ regardless of which letter is used
 function normalizeGeminate(romaji) {
   // Collapse e.g. "tt" → "t", "cc" → "c", "bb" → "b"
-  const collapsed = romaji.replace(/([bcdfghjklmnpqrstvwxyz])+$/i, '$1');
+  const collapsed = romaji.replace(/([bcdfghjklmnpqrstvwxyz])\1+$/i, '$1');
   if (collapsed === romaji) return romaji; // no doubling found, unchanged
   // Strip the leftover single trailing consonant (the っ marker)
   return collapsed.replace(/[bcdfghjklmnpqrstvwxyz]$/i, '');
@@ -4987,12 +4987,14 @@ function checkRomajiAnswer(userInput, correctRomaji) {
   const correctKana = toHiragana(correct);
   if (userKana === correctKana) return true;
 
-  // Also try normalizing doubled trailing consonant (gett/gecc/gebb → ge)
-  // so users can signal っ by doubling any consonant at the end
-  const userNorm = normalizeGeminate(user);
-  if (userNorm !== user) {
-    if (userNorm === correct) return true;
-    if (toHiragana(userNorm) === correctKana) return true;
+  // Only accept doubled trailing consonant (gett/gecc → ge) when the correct
+  // answer actually ends in っ — so nikk never wrongly matches ni
+  if (correctKana.endsWith('っ')) {
+    const userNorm = normalizeGeminate(user);
+    if (userNorm !== user) {
+      if (userNorm === correct) return true;
+      if (toHiragana(userNorm) === correctKana) return true;
+    }
   }
 
   return false;
@@ -5382,6 +5384,13 @@ function toKatakana(romaji) {
   return hira.replace(/[\u3041-\u3096]/g, c => String.fromCharCode(c.charCodeAt(0) + 0x60));
 }
 
+function romajiForPreview(val) {
+  // Convert a trailing doubled consonant to っ so the user can see it's being accepted
+  // e.g. "gett" → "げっ", "gakk" → "がっ"
+  return val.replace(/([bcdfghjklmnpqrstvwxyz])\1+$/i, 'っ$1')
+            .replace(/っ[bcdfghjklmnpqrstvwxyz]$/i, 'っ');
+}
+
 function onRomajiInput(input) {
   const val = input.value;
   const preview = document.getElementById('kana-preview');
@@ -5389,8 +5398,9 @@ function onRomajiInput(input) {
     preview.textContent = 'type romaji below...';
     preview.className = 'kana-preview placeholder';
   } else {
+    const previewVal = romajiForPreview(val);
     const isOn = session.item && session.item.stage === 'on';
-    preview.textContent = isOn ? toKatakana(val) : toHiragana(val);
+    preview.textContent = isOn ? toKatakana(previewVal) : toHiragana(previewVal);
     preview.className = 'kana-preview';
   }
 }
@@ -5975,8 +5985,9 @@ function onPretestRomajiInput(input) {
     preview.textContent = 'type romaji below...';
     preview.className = 'kana-preview placeholder';
   } else {
+    const previewVal = romajiForPreview(input.value);
     const isOn = pretest.stage === 'on';
-    preview.textContent = isOn ? toKatakana(input.value) : toHiragana(input.value);
+    preview.textContent = isOn ? toKatakana(previewVal) : toHiragana(previewVal);
     preview.className = 'kana-preview';
   }
 }
