@@ -4776,7 +4776,12 @@ function getReviewQueue() {
       // All stages learning: only add as a group if meaning is due
       // (all share same nextReview, so checking meaning is enough)
       if (isDue(c.meaning)) {
-        groupedKanji.push(i);
+        groupedKanji.push({idx: i, type: 'full'});
+      }
+    } else if (meaningOnPaired(i)) {
+      // Meaning+on paired: reviewed together, kun not yet unlocked
+      if (isDue(c.meaning)) {
+        groupedKanji.push({idx: i, type: 'pair'});
       }
     } else {
       // Staged: add each due stage individually
@@ -4798,11 +4803,23 @@ function getReviewQueue() {
     [groupedKanji[i], groupedKanji[j]] = [groupedKanji[j], groupedKanji[i]];
   }
   const groupItems = [];
-  for (const idx of groupedKanji) {
+  for (const entry of groupedKanji) {
+    const idx = entry.idx;
     const kd = KANJI_DATA[idx];
     groupItems.push({idx, stage: 'meaning'});
-    if (kd.onYomi.length > 0) groupItems.push({idx, stage: 'on'});
-    if (kd.kunYomi.length > 0) groupItems.push({idx, stage: 'kun'});
+    if (entry.type === 'full' && kd.kunYomi.length > 0) {
+      // Randomly decide whether on or kun comes second
+      if (Math.random() < 0.5) {
+        groupItems.push({idx, stage: 'on'});
+        groupItems.push({idx, stage: 'kun'});
+      } else {
+        groupItems.push({idx, stage: 'kun'});
+        groupItems.push({idx, stage: 'on'});
+      }
+    } else {
+      // Pair (meaning+on only) — on always second
+      groupItems.push({idx, stage: 'on'});
+    }
   }
 
   return [...soloItems, ...groupItems];
@@ -5099,15 +5116,9 @@ function updateHomeStats() {
   for (let i = 0; i < state.unlockedCount; i++) {
     const c = state.cards[i];
     if (!c) continue;
-    const kd = KANJI_DATA[i];
-    if (allStagesLearning(i)) {
-      // Count kanji once at its unified level
-      levels[Math.min(c.meaning.level, MAX_SRS_LEVEL)]++;
-    } else {
-      // Count each stage separately during staged unlocking
-      if (c.meaning.learning) levels[Math.min(c.meaning.level, MAX_SRS_LEVEL)]++;
-      if (kd.onYomi.length > 0 && c.on.learning) levels[Math.min(c.on.level, MAX_SRS_LEVEL)]++;
-      if (kd.kunYomi.length > 0 && c.kun.learning) levels[Math.min(c.kun.level, MAX_SRS_LEVEL)]++;
+    // Always count each kanji once at its lowest active stage level
+    if (c.meaning.learning) {
+      levels[Math.min(kanjiDisplayLevel(i), MAX_SRS_LEVEL)]++;
     }
   }
   const total = levels.reduce((a,b) => a+b, 0) || 1;
@@ -5356,10 +5367,8 @@ function renderQuizCard() {
           oninput="onRomajiInput(this)"
           onkeydown="onRomajiKeydown(event)"
           autocomplete="off" autocorrect="off" spellcheck="false">
-        <div style="display:flex;gap:10px;width:100%;">
-          <button class="submit-btn" onclick="submitReading()" id="submit-btn" style="flex:1;">Check</button>
-          <button class="submit-btn" onclick="dontKnow()" id="dont-know-btn" style="flex:0 0 auto;background:var(--paper-darker);color:var(--ink-light);font-size:13px;">I don't know</button>
-        </div>
+        <button class="submit-btn" onclick="submitReading()" id="submit-btn" style="width:100%;">Check</button>
+        <button onclick="dontKnow()" id="dont-know-btn" style="background:none;border:none;color:var(--ink-light);font-size:11px;cursor:pointer;padding:4px 0;letter-spacing:0.05em;opacity:0.6;">I don't know</button>
       </div>
     `;
   }
@@ -5554,6 +5563,32 @@ function allStagesLearning(idx) {
     (!needsKun || c.kun.learning);
 }
 
+// Returns true when meaning+on are both learning but kun is not yet unlocked.
+// These two stages are reviewed as a pair (same logic as allStagesLearning).
+function meaningOnPaired(idx) {
+  const c = state.cards[idx];
+  if (!c) return false;
+  const kd = KANJI_DATA[idx];
+  if (kd.onYomi.length === 0) return false; // no on'yomi to pair with
+  if (allStagesLearning(idx)) return false;  // already fully grouped
+  return c.meaning.learning && c.on.learning && !c.kun.learning;
+}
+
+// Returns the display level for a kanji — always the lowest active stage level.
+function kanjiDisplayLevel(idx) {
+  const c = state.cards[idx];
+  if (!c) return 0;
+  const kd = KANJI_DATA[idx];
+  let lvl = c.meaning.learning ? c.meaning.level : null;
+  if (kd.onYomi.length > 0 && c.on.learning) {
+    lvl = lvl === null ? c.on.level : Math.min(lvl, c.on.level);
+  }
+  if (kd.kunYomi.length > 0 && c.kun.learning) {
+    lvl = lvl === null ? c.kun.level : Math.min(lvl, c.kun.level);
+  }
+  return lvl === null ? 0 : lvl;
+}
+
 function gradeCurrentCard(wasCorrect) {
   const item = session.item;
   const idx = item.idx;
@@ -5565,7 +5600,7 @@ function gradeCurrentCard(wasCorrect) {
   if (wasCorrect) session.correct++;
   else session.wrong++;
 
-  if (allStagesLearning(idx)) {
+  if (allStagesLearning(idx) || meaningOnPaired(idx)) {
     // Grouped kanji: buffer results per kanji, only apply grading once all stages answered
     if (!session.groupResults) session.groupResults = {};
     if (!session.groupResults[idx]) session.groupResults[idx] = { stages: {}, worstChance: false, demoted: false };
@@ -5573,24 +5608,25 @@ function gradeCurrentCard(wasCorrect) {
     gr.stages[item.stage] = wasCorrect;
     if (!wasCorrect || secondChance) gr.worstChance = true;
 
+    // Determine which stages are expected for this group
+    const expectedStages = ['meaning', 'on']; // minimum: meaning+on
+    if (allStagesLearning(idx) && kd.kunYomi.length > 0) expectedStages.push('kun');
+
     if (!wasCorrect) {
       // Immediately demote once and flag remaining stages to be skipped
       const gradedCard = gradeCard(c.meaning, false, false);
       c.meaning = { ...c.meaning, level: gradedCard.level, nextReview: gradedCard.nextReview };
-      if (kd.onYomi.length > 0) c.on = { ...c.on, level: gradedCard.level, nextReview: gradedCard.nextReview };
-      if (kd.kunYomi.length > 0) c.kun = { ...c.kun, level: gradedCard.level, nextReview: gradedCard.nextReview };
+      c.on = { ...c.on, level: gradedCard.level, nextReview: gradedCard.nextReview };
+      if (kd.kunYomi.length > 0 && c.kun.learning) c.kun = { ...c.kun, level: gradedCard.level, nextReview: gradedCard.nextReview };
       gr.demoted = true;
     } else {
-      const expectedStages = ['meaning'];
-      if (kd.onYomi.length > 0) expectedStages.push('on');
-      if (kd.kunYomi.length > 0) expectedStages.push('kun');
       const allAnswered = expectedStages.every(s => s in gr.stages);
       if (allAnswered) {
-        // All stages answered correctly — level up once
+        // All expected stages answered correctly — level up once
         const gradedCard = gradeCard(c.meaning, true, gr.worstChance);
         c.meaning = { ...c.meaning, level: gradedCard.level, nextReview: gradedCard.nextReview };
-        if (kd.onYomi.length > 0) c.on = { ...c.on, level: gradedCard.level, nextReview: gradedCard.nextReview };
-        if (kd.kunYomi.length > 0) c.kun = { ...c.kun, level: gradedCard.level, nextReview: gradedCard.nextReview };
+        c.on = { ...c.on, level: gradedCard.level, nextReview: gradedCard.nextReview };
+        if (kd.kunYomi.length > 0 && c.kun.learning) c.kun = { ...c.kun, level: gradedCard.level, nextReview: gradedCard.nextReview };
       }
       // Otherwise don't touch card state yet — waiting for remaining stages
     }
@@ -5613,13 +5649,12 @@ function showReviewScreen() {
   const gr = session.groupResults && session.groupResults[item.idx];
   const gradingApplied = gr && (gr.demoted || (() => {
     const kd2 = KANJI_DATA[item.idx];
-    const expected = ['meaning'];
-    if (kd2.onYomi.length > 0) expected.push('on');
-    if (kd2.kunYomi.length > 0) expected.push('kun');
+    const expected = ['meaning', 'on'];
+    if (allStagesLearning(item.idx) && kd2.kunYomi.length > 0) expected.push('kun');
     return expected.every(s => s in gr.stages);
   })());
   let levelLabel, nextReviewLabel;
-  if (allStagesLearning(item.idx) && !gradingApplied) {
+  if ((allStagesLearning(item.idx) || meaningOnPaired(item.idx)) && !gradingApplied) {
     // Grading hasn't been applied yet — show current level with pending note
     levelLabel = (displayCard.level >= MAX_SRS_LEVEL ? '⭐ Mastered' : `Level ${displayCard.level} / ${MAX_SRS_LEVEL}`) + ' (pending)';
     nextReviewLabel = 'after all stages';
@@ -5871,7 +5906,7 @@ function openKanjiModal(idx) {
   if (!unlocked) {
     levelHtml = `<div class="kanji-modal-level">Not yet unlocked</div>`;
   } else if (c && c.meaning.learning) {
-    const lvl = allStagesLearning(idx) ? c.meaning.level : c.meaning.level;
+    const lvl = kanjiDisplayLevel(idx);
     levelHtml = `<div class="kanji-modal-level">${lvl >= MAX_SRS_LEVEL ? '⭐ Mastered' : 'Level ' + lvl}</div>`;
   } else {
     levelHtml = `<div class="kanji-modal-level">In lessons</div>`;
