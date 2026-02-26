@@ -5230,6 +5230,7 @@ function nextLesson() {
     session.currentIdx = 0;
     session.correct = 0;
     session.wrong = 0;
+    session.groupResults = {};
     startQuiz();
   }
 }
@@ -5248,6 +5249,7 @@ function startReviews() {
   session.currentIdx = 0;
   session.correct = 0;
   session.wrong = 0;
+  session.groupResults = {};
   startQuiz();
 }
 
@@ -5529,18 +5531,40 @@ function gradeCurrentCard(wasCorrect) {
   const kd = KANJI_DATA[idx];
   const c = state.cards[idx];
   const secondChance = session.usedSecondChance || false;
-  session.usedSecondChance = false; // reset for next card
+  session.usedSecondChance = false;
 
   if (wasCorrect) session.correct++;
   else session.wrong++;
 
   if (allStagesLearning(idx)) {
-    const gradedCard = gradeCard(c[item.stage], wasCorrect, secondChance);
-    const newLevel = gradedCard.level;
-    const nextReview = gradedCard.nextReview;
-    c.meaning = { ...c.meaning, level: newLevel, nextReview };
-    if (kd.onYomi.length > 0) c.on = { ...c.on, level: newLevel, nextReview };
-    if (kd.kunYomi.length > 0) c.kun = { ...c.kun, level: newLevel, nextReview };
+    // Grouped kanji: buffer results per kanji, only apply grading once all stages answered
+    if (!session.groupResults) session.groupResults = {};
+    if (!session.groupResults[idx]) session.groupResults[idx] = { stages: {}, worstChance: false, demoted: false };
+    const gr = session.groupResults[idx];
+    gr.stages[item.stage] = wasCorrect;
+    if (!wasCorrect || secondChance) gr.worstChance = true;
+
+    if (!wasCorrect) {
+      // Immediately demote once and flag remaining stages to be skipped
+      const gradedCard = gradeCard(c.meaning, false, false);
+      c.meaning = { ...c.meaning, level: gradedCard.level, nextReview: gradedCard.nextReview };
+      if (kd.onYomi.length > 0) c.on = { ...c.on, level: gradedCard.level, nextReview: gradedCard.nextReview };
+      if (kd.kunYomi.length > 0) c.kun = { ...c.kun, level: gradedCard.level, nextReview: gradedCard.nextReview };
+      gr.demoted = true;
+    } else {
+      const expectedStages = ['meaning'];
+      if (kd.onYomi.length > 0) expectedStages.push('on');
+      if (kd.kunYomi.length > 0) expectedStages.push('kun');
+      const allAnswered = expectedStages.every(s => s in gr.stages);
+      if (allAnswered) {
+        // All stages answered correctly — level up once
+        const gradedCard = gradeCard(c.meaning, true, gr.worstChance);
+        c.meaning = { ...c.meaning, level: gradedCard.level, nextReview: gradedCard.nextReview };
+        if (kd.onYomi.length > 0) c.on = { ...c.on, level: gradedCard.level, nextReview: gradedCard.nextReview };
+        if (kd.kunYomi.length > 0) c.kun = { ...c.kun, level: gradedCard.level, nextReview: gradedCard.nextReview };
+      }
+      // Otherwise don't touch card state yet — waiting for remaining stages
+    }
   } else {
     state.cards[idx][item.stage] = gradeCard(c[item.stage], wasCorrect, secondChance);
   }
@@ -5555,10 +5579,25 @@ function showReviewScreen() {
   const wasCorrect = session.wasCorrect;
   const word = session.selectedWord;
   const card = state.cards[item.idx][item.stage];
-  // If all stages are unified, show the shared level; otherwise show this stage's level
   const displayCard = allStagesLearning(item.idx) ? state.cards[item.idx].meaning : card;
-  const levelLabel = displayCard.level >= MAX_SRS_LEVEL ? '⭐ Mastered' : `Level ${displayCard.level} / ${MAX_SRS_LEVEL}`;
-  const nextReviewLabel = formatNextReview(displayCard.nextReview);
+  // For grouped kanji, figure out if grading has already been applied this session
+  const gr = session.groupResults && session.groupResults[item.idx];
+  const gradingApplied = gr && (gr.demoted || (() => {
+    const kd2 = KANJI_DATA[item.idx];
+    const expected = ['meaning'];
+    if (kd2.onYomi.length > 0) expected.push('on');
+    if (kd2.kunYomi.length > 0) expected.push('kun');
+    return expected.every(s => s in gr.stages);
+  })());
+  let levelLabel, nextReviewLabel;
+  if (allStagesLearning(item.idx) && !gradingApplied) {
+    // Grading hasn't been applied yet — show current level with pending note
+    levelLabel = (displayCard.level >= MAX_SRS_LEVEL ? '⭐ Mastered' : `Level ${displayCard.level} / ${MAX_SRS_LEVEL}`) + ' (pending)';
+    nextReviewLabel = 'after all stages';
+  } else {
+    levelLabel = displayCard.level >= MAX_SRS_LEVEL ? '⭐ Mastered' : `Level ${displayCard.level} / ${MAX_SRS_LEVEL}`;
+    nextReviewLabel = formatNextReview(displayCard.nextReview);
+  }
 
   const secondChanceUsed = session.usedSecondChance;
   // Note: usedSecondChance is reset in gradeCurrentCard, so read it before that runs.
@@ -5634,6 +5673,18 @@ function showReviewScreen() {
 
 function nextQuizItem() {
   session.currentIdx++;
+  // Skip any remaining stages for a kanji that was already demoted this session
+  while (session.currentIdx < session.queue.length) {
+    const nextItem = session.queue[session.currentIdx];
+    const gr = session.groupResults && session.groupResults[nextItem.idx];
+    if (gr && gr.demoted && !(nextItem.stage in gr.stages)) {
+      // This stage belongs to a demoted kanji and hasn't been answered yet — skip it
+      session.wrong++; // count as wrong for session stats
+      session.currentIdx++;
+    } else {
+      break;
+    }
+  }
   showScreen('quiz');
   renderQuizCard();
 }
