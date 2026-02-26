@@ -4825,6 +4825,26 @@ function getReviewQueue() {
   return [...soloItems, ...groupItems];
 }
 
+// Returns the number of kanji due for review (grouped kanji count as 1 each)
+function getReviewCount() {
+  let count = 0;
+  for (let i = 0; i < state.unlockedCount; i++) {
+    const c = state.cards[i];
+    if (!c) continue;
+    const kd = KANJI_DATA[i];
+    if (allStagesLearning(i)) {
+      if (isDue(c.meaning)) count++;
+    } else if (meaningOnPaired(i)) {
+      if (isDue(c.meaning)) count++;
+    } else {
+      if (isDue(c.meaning)) count++;
+      if (kd.onYomi.length > 0 && isDue(c.on)) count++;
+      if (kd.kunYomi.length > 0 && isDue(c.kun)) count++;
+    }
+  }
+  return count;
+}
+
 // ===================================================
 // ROMAJI → KANA CONVERSION
 // ===================================================
@@ -5085,7 +5105,7 @@ function getStageLabel(stage) {
 
 function updateHomeStats() {
   const lessons = getLessonQueue().length;
-  const reviews = getReviewQueue().length;
+  const reviews = getReviewCount();
   let mastered = 0;
   for (let i = 0; i < state.unlockedCount; i++) {
     if (isKanjiMastered(i)) mastered++;
