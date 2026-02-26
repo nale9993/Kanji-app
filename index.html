@@ -5229,6 +5229,10 @@ function renderLesson() {
   const nextBtn = document.getElementById('lesson-next-btn');
   prevBtn.style.display = lessonPos === 0 ? 'none' : '';
   nextBtn.textContent = lessonPos === lessonQueue.length - 1 ? 'Start Quiz →' : 'Next →';
+
+  // Mark this card as seen the moment it's displayed — ensures it enters reviews
+  // even if the user hits Back before pressing Next all the way through.
+  markCurrentLessonSeen();
 }
 
 function prevLesson() {
@@ -5245,7 +5249,6 @@ function markCurrentLessonSeen() {
 }
 
 function nextLesson() {
-  markCurrentLessonSeen();
   if (lessonPos < lessonQueue.length - 1) {
     lessonPos++;
     renderLesson();
@@ -5331,11 +5334,13 @@ function renderQuizCard() {
   session.usedSecondChance = false;
   session.lastSecondChance = false;
 
-  // Progress
-  const pct = (session.currentIdx / session.queue.length) * 100;
+  // Progress — count unique kanji, not individual stage slots
+  const uniqueTotal = new Set(session.queue.map(it => it.idx)).size;
+  const uniqueDone = new Set(session.queue.slice(0, session.currentIdx).map(it => it.idx)).size;
+  const pct = (uniqueDone / uniqueTotal) * 100;
   document.getElementById('quiz-progress-fill').style.width = pct + '%';
   document.getElementById('quiz-progress-fill').style.background = color;
-  document.getElementById('quiz-count').textContent = `${session.currentIdx}/${session.queue.length}`;
+  document.getElementById('quiz-count').textContent = `${uniqueDone}/${uniqueTotal}`;
 
   const card = document.getElementById('quiz-card');
   card.className = `quiz-card animate-in stage-${item.stage}`;
@@ -5617,9 +5622,6 @@ function gradeCurrentCard(wasCorrect) {
   const secondChance = session.usedSecondChance || false;
   session.usedSecondChance = false;
 
-  if (wasCorrect) session.correct++;
-  else session.wrong++;
-
   if (allStagesLearning(idx) || meaningOnPaired(idx)) {
     // Grouped kanji: buffer results per kanji, only apply grading once all stages answered
     if (!session.groupResults) session.groupResults = {};
@@ -5639,18 +5641,24 @@ function gradeCurrentCard(wasCorrect) {
       c.on = { ...c.on, level: gradedCard.level, nextReview: gradedCard.nextReview };
       if (kd.kunYomi.length > 0 && c.kun.learning) c.kun = { ...c.kun, level: gradedCard.level, nextReview: gradedCard.nextReview };
       gr.demoted = true;
+      // Count this kanji as wrong (once)
+      session.wrong++;
     } else {
       const allAnswered = expectedStages.every(s => s in gr.stages);
       if (allAnswered) {
-        // All expected stages answered correctly — level up once
+        // All expected stages answered correctly — level up once, count as correct (once)
         const gradedCard = gradeCard(c.meaning, true, gr.worstChance);
         c.meaning = { ...c.meaning, level: gradedCard.level, nextReview: gradedCard.nextReview };
         c.on = { ...c.on, level: gradedCard.level, nextReview: gradedCard.nextReview };
         if (kd.kunYomi.length > 0 && c.kun.learning) c.kun = { ...c.kun, level: gradedCard.level, nextReview: gradedCard.nextReview };
+        session.correct++;
       }
       // Otherwise don't touch card state yet — waiting for remaining stages
     }
   } else {
+    // Solo staged card — counts individually
+    if (wasCorrect) session.correct++;
+    else session.wrong++;
     state.cards[idx][item.stage] = gradeCard(c[item.stage], wasCorrect, secondChance);
   }
 
@@ -5762,8 +5770,7 @@ function nextQuizItem() {
     const nextItem = session.queue[session.currentIdx];
     const gr = session.groupResults && session.groupResults[nextItem.idx];
     if (gr && gr.demoted && !(nextItem.stage in gr.stages)) {
-      // This stage belongs to a demoted kanji and hasn't been answered yet — skip it
-      session.wrong++; // count as wrong for session stats
+      // This stage belongs to a demoted kanji and hasn't been answered yet — skip silently
       session.currentIdx++;
     } else {
       break;
