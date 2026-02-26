@@ -5153,29 +5153,30 @@ function renderLesson() {
     <div class="stage-badge" style="--stage-color:${color}">${label}</div>
     <div class="kanji-display">${kd.kanji}</div>
     <div class="lesson-meaning">${kd.meanings.join(', ')}</div>
-    <div class="lesson-readings">
   `;
 
-  if (kd.onYomi.length > 0) {
+  if (item.stage === 'on') {
+    content += `<div class="lesson-readings">`;
     content += kd.onYomi.map(r => `
       <div class="reading-chip on">
         <span class="reading-chip-label">On</span>
         <span class="reading-chip-text">${r.kana} (${r.romaji})</span>
       </div>
     `).join('');
-  }
-  if (kd.kunYomi.length > 0) {
+    content += `</div>`;
+  } else if (item.stage === 'kun') {
+    content += `<div class="lesson-readings">`;
     content += kd.kunYomi.map(r => `
       <div class="reading-chip kun">
         <span class="reading-chip-label">Kun</span>
         <span class="reading-chip-text">${r.kana} (${r.romaji})</span>
       </div>
     `).join('');
+    content += `</div>`;
   }
-  content += `</div>`;
 
-  // Show relevant examples
-  const words = item.stage === 'on' ? kd.onWords : item.stage === 'kun' ? kd.kunWords : [...kd.onWords.slice(0,1), ...kd.kunWords.slice(0,1)];
+  // Show relevant examples for this stage only
+  const words = item.stage === 'on' ? kd.onWords : item.stage === 'kun' ? kd.kunWords : [];
   if (words.length > 0) {
     content += `<div class="lesson-examples"><h4>Example Words</h4>`;
     content += words.slice(0,3).map(w => `
@@ -5355,7 +5356,10 @@ function renderQuizCard() {
           oninput="onRomajiInput(this)"
           onkeydown="onRomajiKeydown(event)"
           autocomplete="off" autocorrect="off" spellcheck="false">
-        <button class="submit-btn" onclick="submitReading()" id="submit-btn">Check</button>
+        <div style="display:flex;gap:10px;width:100%;">
+          <button class="submit-btn" onclick="submitReading()" id="submit-btn" style="flex:1;">Check</button>
+          <button class="submit-btn" onclick="dontKnow()" id="dont-know-btn" style="flex:0 0 auto;background:var(--paper-darker);color:var(--ink-light);font-size:13px;">I don't know</button>
+        </div>
       </div>
     `;
   }
@@ -5438,6 +5442,29 @@ function selectMeaning(btn, selected, correct) {
   setTimeout(() => showReviewScreen(), 900);
 }
 
+function dontKnow() {
+  if (session.answered) return;
+  session.firstAttemptWrong = true;
+  session.answered = true;
+  session.wasCorrect = false;
+  session.usedSecondChance = false;
+  session.userAnswer = '';
+  const input = document.getElementById('romaji-input');
+  if (input) { input.disabled = true; input.classList.add('wrong'); }
+  const submitBtn = document.getElementById('submit-btn');
+  if (submitBtn) { submitBtn.textContent = 'Next →'; submitBtn.onclick = nextQuizItem; }
+  const dontKnowBtn = document.getElementById('dont-know-btn');
+  if (dontKnowBtn) dontKnowBtn.disabled = true;
+  const hint = document.getElementById('retry-hint');
+  if (hint) hint.remove();
+  gradeCurrentCard(false);
+  const card = document.getElementById('quiz-card');
+  card.classList.remove('flash-correct', 'flash-wrong');
+  void card.offsetWidth;
+  card.classList.add('flash-wrong');
+  setTimeout(() => showReviewScreen(), 900);
+}
+
 function submitReading() {
   if (session.answered) return;
   const input = document.getElementById('romaji-input');
@@ -5496,6 +5523,8 @@ function submitReading() {
     submitBtn.textContent = 'Next →';
     submitBtn.onclick = nextQuizItem;
   }
+  const dontKnowBtn = document.getElementById('dont-know-btn');
+  if (dontKnowBtn) dontKnowBtn.disabled = true;
   if (!wasCorrect) inputEl.classList.add('shake');
 
   // Remove retry hint if present
