@@ -1281,7 +1281,7 @@ const KANJI_DATA = [
     kunYomi: [{kana:'ふた',romaji:'futa'}],
     onWords: [
       {word:'二月', reading:'にがつ', targetReading:'に', meaning:'February'},
-      {word:'二人', reading:'ふたり', targetReading:'ふた', meaning:'two people'},
+      {word:'二', reading:'に', targetReading:'に', meaning:'two'},
     ],
     kunWords: [
       {word:'二つ', reading:'ふたつ', targetReading:'ふた', meaning:'two (things)'},
@@ -5253,15 +5253,54 @@ function nextLesson() {
     lessonPos++;
     renderLesson();
   } else {
-    const quizQueue = lessonQueue.filter(item =>
+    const rawQueue = lessonQueue.filter(item =>
       state.cards[item.idx] && state.cards[item.idx][item.stage].learning
     );
-    session.mode = 'lesson';
-    session.queue = [...quizQueue];
-    for (let i = session.queue.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [session.queue[i], session.queue[j]] = [session.queue[j], session.queue[i]];
+    // Group raw items by kanji idx
+    const byIdx = {};
+    for (const item of rawQueue) {
+      if (!byIdx[item.idx]) byIdx[item.idx] = [];
+      byIdx[item.idx].push(item.stage);
     }
+    // For each kanji, build the full stage sequence:
+    // - Always meaning first (injected if not already present)
+    // - Then on/kun in random order if both present, otherwise just whichever is there
+    const expanded = [];
+    for (const [idxStr, stages] of Object.entries(byIdx)) {
+      const idx = parseInt(idxStr);
+      const hasOn = stages.includes('on');
+      const hasKun = stages.includes('kun');
+      const hasMeaning = stages.includes('meaning');
+      // Always start with meaning
+      expanded.push({idx, stage: 'meaning', _injected: !hasMeaning});
+      // Then on/kun in random order
+      if (hasOn && hasKun) {
+        if (Math.random() < 0.5) {
+          expanded.push({idx, stage: 'on'});
+          expanded.push({idx, stage: 'kun'});
+        } else {
+          expanded.push({idx, stage: 'kun'});
+          expanded.push({idx, stage: 'on'});
+        }
+      } else if (hasOn) {
+        expanded.push({idx, stage: 'on'});
+      } else if (hasKun) {
+        expanded.push({idx, stage: 'kun'});
+      }
+      // meaning-only lesson stays as just meaning
+    }
+    // Shuffle kanji groups, preserving internal order
+    const idxOrder = Object.keys(byIdx).map(Number);
+    for (let i = idxOrder.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [idxOrder[i], idxOrder[j]] = [idxOrder[j], idxOrder[i]];
+    }
+    const quizQueue = [];
+    for (const idx of idxOrder) {
+      quizQueue.push(...expanded.filter(it => it.idx === idx));
+    }
+    session.mode = 'lesson';
+    session.queue = quizQueue;
     session.currentIdx = 0;
     session.correct = 0;
     session.wrong = 0;
@@ -5630,9 +5669,20 @@ function gradeCurrentCard(wasCorrect) {
     gr.stages[item.stage] = wasCorrect;
     if (!wasCorrect || secondChance) gr.worstChance = true;
 
-    // Determine which stages are expected for this group
-    const expectedStages = ['meaning', 'on']; // minimum: meaning+on
-    if (allStagesLearning(idx) && kd.kunYomi.length > 0) expectedStages.push('kun');
+    // Determine which stages are expected for this group —
+    // only count stages that are actually in the current session queue for this kanji
+    const stagesInQueue = new Set(session.queue.map(it => it.idx === idx ? it.stage : null).filter(Boolean));
+    const expectedStages = ['meaning', 'on'].filter(s => stagesInQueue.has(s));
+    if (allStagesLearning(idx) && kd.kunYomi.length > 0 && stagesInQueue.has('kun')) expectedStages.push('kun');
+    // Fallback: if somehow no expected stages, treat as solo
+    if (expectedStages.length === 0) {
+      if (wasCorrect) session.correct++;
+      else session.wrong++;
+      state.cards[idx][item.stage] = gradeCard(c[item.stage], wasCorrect, secondChance);
+      tryUnlockNext();
+      saveState();
+      return;
+    }
 
     if (!wasCorrect) {
       // Immediately demote once and flag remaining stages to be skipped
