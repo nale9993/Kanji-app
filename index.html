@@ -5710,13 +5710,16 @@ function gradeCurrentCard(wasCorrect) {
       if (allAnswered) {
         // All correct: level up only if no stage used a second chance.
         // If any stage needed a second attempt, keep level the same (no gain, no loss).
+        // Always base grading off the lowest stage level so stages converge correctly
+        const baseLevel = kanjiDisplayLevel(idx);
+        const baseCard = { ...c.meaning, level: baseLevel };
         let newLevel, newNextReview;
         if (gr.worstChance) {
-          // At least one second-chance — hold level, just reschedule at current interval
-          newLevel = c.meaning.level;
+          // At least one second-chance — hold at base level, reschedule at that interval
+          newLevel = baseLevel;
           newNextReview = Date.now() + (SRS_INTERVALS_MINS[newLevel] || 1) * 60000;
         } else {
-          const gradedCard = gradeCard(c.meaning, true, false);
+          const gradedCard = gradeCard(baseCard, true, false);
           newLevel = gradedCard.level;
           newNextReview = gradedCard.nextReview;
         }
@@ -5760,8 +5763,10 @@ function showReviewScreen() {
   const gr = session.groupResults && session.groupResults[idx];
   const isGrouped = allStagesLearning(idx) || meaningOnPaired(idx);
   const overallCorrect = isGrouped && gr ? !gr.demoted : session.wasCorrect;
+  // Use the lowest stage level for display (stages converge after grouped review)
+  const displayLevel = kanjiDisplayLevel(idx);
   const displayCard = state.cards[idx].meaning;
-  const levelLabel = displayCard.level >= MAX_SRS_LEVEL ? '⭐ Mastered' : `Level ${displayCard.level} / ${MAX_SRS_LEVEL}`;
+  const levelLabel = displayLevel >= MAX_SRS_LEVEL ? '⭐ Mastered' : `Level ${displayLevel} / ${MAX_SRS_LEVEL}`;
   const nextReviewLabel = formatNextReview(displayCard.nextReview);
   session.lastSecondChance = false;
 
