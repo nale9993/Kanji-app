@@ -4608,7 +4608,7 @@ const MAX_IN_PROGRESS = 15;
 
 // Color scale: light green (0) → teal → blue → deep purple (10)
 function srsLevelColor(lvl) {
-  const c = ['#88cc88','#6dbf80','#4eae7a','#3a9e84','#2e8a99','#2e70b0','#2a54c4','#4040cc','#6030bb','#7a20aa','#8b0fa0'];
+  const c = ['#a8d8a8','#8ecf90','#72c47a','#56b870','#3aaa82','#2e8a99','#2e6bb0','#3050c0','#5038b8','#6a28a8','#7a1898'];
   return c[Math.min(Math.max(lvl,0),10)];
 }
 
@@ -4813,14 +4813,18 @@ function getReviewQueue() {
     const kd = KANJI_DATA[i];
 
     if (allStagesLearning(i)) {
-      // All stages learning: only add as a group if meaning is due
-      // (all share same nextReview, so checking meaning is enough)
-      if (isDue(c.meaning)) {
+      // All stages learning: add as a group if ANY stage is due.
+      // (After kun unlocks, kun may be due before meaning/on are.)
+      const kd2 = KANJI_DATA[i];
+      const anyDue = isDue(c.meaning) ||
+        (kd2.onYomi.length > 0 && isDue(c.on)) ||
+        (kd2.kunYomi.length > 0 && isDue(c.kun));
+      if (anyDue) {
         groupedKanji.push({idx: i, type: 'full'});
       }
     } else if (meaningOnPaired(i)) {
       // Meaning+on paired: reviewed together, kun not yet unlocked
-      if (isDue(c.meaning)) {
+      if (isDue(c.meaning) || isDue(c.on)) {
         groupedKanji.push({idx: i, type: 'pair'});
       }
     } else {
@@ -4873,9 +4877,13 @@ function getReviewCount() {
     if (!c) continue;
     const kd = KANJI_DATA[i];
     if (allStagesLearning(i)) {
-      if (isDue(c.meaning)) count++;
+      // Count as 1 if any stage is due (matches getReviewQueue)
+      const anyDue = isDue(c.meaning) ||
+        (kd.onYomi.length > 0 && isDue(c.on)) ||
+        (kd.kunYomi.length > 0 && isDue(c.kun));
+      if (anyDue) count++;
     } else if (meaningOnPaired(i)) {
-      if (isDue(c.meaning)) count++;
+      if (isDue(c.meaning) || isDue(c.on)) count++;
     } else {
       if (isDue(c.meaning)) count++;
       if (kd.onYomi.length > 0 && isDue(c.on)) count++;
@@ -5182,7 +5190,7 @@ function updateHomeStats() {
     }
   }
   const total = levels.reduce((a,b) => a+b, 0) || 1;
-  const colors = ['#88cc88','#6dbf80','#4eae7a','#3a9e84','#2e8a99','#2e70b0','#2a54c4','#4040cc','#6030bb','#7a20aa','#8b0fa0'];
+  const colors = ['#a8d8a8','#8ecf90','#72c47a','#56b870','#3aaa82','#2e8a99','#2e6bb0','#3050c0','#5038b8','#6a28a8','#7a1898'];
   const labels = ['0','1','2','3','4','5','6','7','8','9','10'];
   const container = document.getElementById('srs-levels-display');
   container.innerHTML = levels.map((count, i) => `
@@ -5268,7 +5276,7 @@ function renderLesson() {
   const prevBtn = document.getElementById('lesson-prev-btn');
   const nextBtn = document.getElementById('lesson-next-btn');
   prevBtn.style.display = lessonPos === 0 ? 'none' : '';
-  nextBtn.textContent = lessonPos === lessonQueue.length - 1 ? 'Start Quiz →' : 'Next →';
+  nextBtn.textContent = lessonPos === lessonQueue.length - 1 ? 'Done →' : 'Next →';
 
   // Mark this card as seen the moment it's displayed — ensures it enters reviews
   // even if the user hits Back before pressing Next all the way through.
@@ -5293,61 +5301,8 @@ function nextLesson() {
     lessonPos++;
     renderLesson();
   } else {
-    const rawQueue = lessonQueue.filter(item =>
-      state.cards[item.idx] && state.cards[item.idx][item.stage].learning
-    );
-    // Group raw items by kanji idx
-    const byIdx = {};
-    for (const item of rawQueue) {
-      if (!byIdx[item.idx]) byIdx[item.idx] = [];
-      byIdx[item.idx].push(item.stage);
-    }
-    // For each kanji, build the full stage sequence:
-    // - Always meaning first (injected if not already present)
-    // - Then on/kun in random order if both present, otherwise just whichever is there
-    const expanded = [];
-    for (const [idxStr, stages] of Object.entries(byIdx)) {
-      const idx = parseInt(idxStr);
-      const hasOn = stages.includes('on');
-      const hasKun = stages.includes('kun');
-      const hasMeaning = stages.includes('meaning');
-      // Always start with meaning
-      expanded.push({idx, stage: 'meaning', _injected: !hasMeaning});
-      // Then on/kun in random order
-      if (hasOn && hasKun) {
-        if (Math.random() < 0.5) {
-          expanded.push({idx, stage: 'on'});
-          expanded.push({idx, stage: 'kun'});
-        } else {
-          expanded.push({idx, stage: 'kun'});
-          expanded.push({idx, stage: 'on'});
-        }
-      } else if (hasOn) {
-        expanded.push({idx, stage: 'on'});
-      } else if (hasKun) {
-        expanded.push({idx, stage: 'kun'});
-      }
-      // meaning-only lesson stays as just meaning
-    }
-    // Shuffle kanji groups, preserving internal order
-    const idxOrder = Object.keys(byIdx).map(Number);
-    for (let i = idxOrder.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [idxOrder[i], idxOrder[j]] = [idxOrder[j], idxOrder[i]];
-    }
-    const quizQueue = [];
-    for (const idx of idxOrder) {
-      quizQueue.push(...expanded.filter(it => it.idx === idx));
-    }
-    session.mode = 'lesson';
-    session.queue = quizQueue;
-    session.currentIdx = 0;
-    session.correct = 0;
-    session.wrong = 0;
-    session.groupResults = {};
-    session.stageWords = {};
-    session.stageAnswers = {};
-    startQuiz();
+    // All lessons viewed — go home so reviews handle all testing
+    goHome();
   }
 }
 
@@ -5727,11 +5682,9 @@ function gradeCurrentCard(wasCorrect) {
     gr.stages[item.stage] = wasCorrect;
     if (!wasCorrect || secondChance) gr.worstChance = true;
 
-    // Determine which stages are expected for this group —
-    // only count stages that are actually in the current session queue for this kanji
+    // Determine which stages are expected — exactly what's in the queue for this kanji
     const stagesInQueue = new Set(session.queue.map(it => it.idx === idx ? it.stage : null).filter(Boolean));
-    const expectedStages = ['meaning', 'on'].filter(s => stagesInQueue.has(s));
-    if (allStagesLearning(idx) && kd.kunYomi.length > 0 && stagesInQueue.has('kun')) expectedStages.push('kun');
+    const expectedStages = ['meaning', 'on', 'kun'].filter(s => stagesInQueue.has(s));
     // Fallback: if somehow no expected stages, treat as solo
     if (expectedStages.length === 0) {
       if (wasCorrect) session.correct++;
@@ -5743,8 +5696,10 @@ function gradeCurrentCard(wasCorrect) {
     }
 
     if (!wasCorrect) {
-      // Immediately demote once and flag remaining stages to be skipped
-      const gradedCard = gradeCard(c.meaning, false, false);
+      // Demote using the lowest current stage level so we don't punish unevenly
+      const lowestLevel = kanjiDisplayLevel(idx);
+      const refCard = { ...c.meaning, level: lowestLevel };
+      const gradedCard = gradeCard(refCard, false, false);
       c.meaning = { ...c.meaning, level: gradedCard.level, nextReview: gradedCard.nextReview };
       c.on = { ...c.on, level: gradedCard.level, nextReview: gradedCard.nextReview };
       if (kd.kunYomi.length > 0 && c.kun.learning) c.kun = { ...c.kun, level: gradedCard.level, nextReview: gradedCard.nextReview };
@@ -5754,11 +5709,21 @@ function gradeCurrentCard(wasCorrect) {
     } else {
       const allAnswered = expectedStages.every(s => s in gr.stages);
       if (allAnswered) {
-        // All expected stages answered correctly — level up once, count as correct (once)
-        const gradedCard = gradeCard(c.meaning, true, gr.worstChance);
-        c.meaning = { ...c.meaning, level: gradedCard.level, nextReview: gradedCard.nextReview };
-        c.on = { ...c.on, level: gradedCard.level, nextReview: gradedCard.nextReview };
-        if (kd.kunYomi.length > 0 && c.kun.learning) c.kun = { ...c.kun, level: gradedCard.level, nextReview: gradedCard.nextReview };
+        // All correct: level up only if no stage used a second chance.
+        // If any stage needed a second attempt, keep level the same (no gain, no loss).
+        let newLevel, newNextReview;
+        if (gr.worstChance) {
+          // At least one second-chance — hold level, just reschedule at current interval
+          newLevel = c.meaning.level;
+          newNextReview = Date.now() + (SRS_INTERVALS_MINS[newLevel] || 1) * 60000;
+        } else {
+          const gradedCard = gradeCard(c.meaning, true, false);
+          newLevel = gradedCard.level;
+          newNextReview = gradedCard.nextReview;
+        }
+        c.meaning = { ...c.meaning, level: newLevel, nextReview: newNextReview };
+        c.on = { ...c.on, level: newLevel, nextReview: newNextReview };
+        if (kd.kunYomi.length > 0 && c.kun.learning) c.kun = { ...c.kun, level: newLevel, nextReview: newNextReview };
         session.correct++;
       }
       // Otherwise don't touch card state yet — waiting for remaining stages
@@ -5784,8 +5749,8 @@ function shouldShowReview() {
   if (gr.demoted) return true;
   const kd = KANJI_DATA[idx];
   const stagesInQueue = new Set(session.queue.map(it => it.idx === idx ? it.stage : null).filter(Boolean));
-  const expected = ['meaning', 'on'].filter(s => stagesInQueue.has(s));
-  if (allStagesLearning(idx) && kd.kunYomi.length > 0 && stagesInQueue.has('kun')) expected.push('kun');
+  // Build expected from what's actually in the queue for this kanji
+  const expected = ['meaning', 'on', 'kun'].filter(s => stagesInQueue.has(s));
   return expected.every(s => s in gr.stages);
 }
 
