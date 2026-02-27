@@ -592,6 +592,15 @@
   .submit-btn:active { transform: translateY(0); }
   .submit-btn:disabled { opacity: 0.5; cursor: default; transform: none; }
 
+  .review-stage-row {
+    display: flex;
+    align-items: baseline;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--paper-darker);
+    flex-wrap: wrap;
+  }
+  .review-stage-row:last-of-type { border-bottom: none; }
+
   /* REVIEW SCREEN */
   .review-screen {
     background: var(--paper-dark);
@@ -733,25 +742,50 @@
   }
 
   .browse-group {
-    margin-bottom: 28px;
+    margin-bottom: 8px;
+    border: 1.5px solid var(--paper-darker);
+    border-radius: 10px;
+    overflow: hidden;
   }
-
+  .browse-group-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    background: var(--paper-dark);
+    transition: background 0.15s;
+  }
+  .browse-group-header:hover { background: var(--paper-darker); }
   .browse-group-title {
-    font-size: 11px;
+    font-size: 12px;
     text-transform: uppercase;
     letter-spacing: 0.1em;
     color: var(--ink-light);
     font-weight: 600;
-    margin-bottom: 10px;
-    padding-bottom: 6px;
-    border-bottom: 1px solid var(--paper-darker);
   }
-
+  .browse-group-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 11px;
+    color: var(--ink-light);
+  }
+  .browse-group-chevron {
+    font-size: 10px;
+    transition: transform 0.2s;
+  }
+  .browse-group-chevron.open { transform: rotate(180deg); }
   .browse-group-grid {
-    display: grid;
+    display: none;
     grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
     gap: 8px;
+    padding: 12px;
+    background: var(--paper);
   }
+  .browse-group-grid.open { display: grid; }
 
   /* KANJI DETAIL MODAL */
   .kanji-modal-overlay {
@@ -1281,6 +1315,7 @@ const KANJI_DATA = [
     kunYomi: [{kana:'ふた',romaji:'futa'}],
     onWords: [
       {word:'二月', reading:'にがつ', targetReading:'に', meaning:'February'},
+      {word:'二人', reading:'ふたり', targetReading:'ふた', meaning:'two people'},
     ],
     kunWords: [
       {word:'二つ', reading:'ふたつ', targetReading:'ふた', meaning:'two (things)'},
@@ -4571,6 +4606,12 @@ const MASTER_THRESHOLD = 10;  // shown as "mastered" in stats
 const PRETEST_LEVEL = 6;      // fast-track level for passed pretest cards
 const MAX_IN_PROGRESS = 15;
 
+// Color scale: light green (0) → teal → blue → deep purple (10)
+function srsLevelColor(lvl) {
+  const c = ['#88cc88','#6dbf80','#4eae7a','#3a9e84','#2e8a99','#2e70b0','#2a54c4','#4040cc','#6030bb','#7a20aa','#8b0fa0'];
+  return c[Math.min(Math.max(lvl,0),10)];
+}
+
 function formatNextReview(ms) {
   const diff = ms - Date.now();
   if (diff <= 0) return 'due now';
@@ -5141,7 +5182,7 @@ function updateHomeStats() {
     }
   }
   const total = levels.reduce((a,b) => a+b, 0) || 1;
-  const colors = ['#555','#c0392b','#e07030','#e0a030','#c9a84c','#4a8ec2','#6aaee0','#4a9e72','#60c090','#a060c0','#cc88ee'];
+  const colors = ['#88cc88','#6dbf80','#4eae7a','#3a9e84','#2e8a99','#2e70b0','#2a54c4','#4040cc','#6030bb','#7a20aa','#8b0fa0'];
   const labels = ['0','1','2','3','4','5','6','7','8','9','10'];
   const container = document.getElementById('srs-levels-display');
   container.innerHTML = levels.map((count, i) => `
@@ -5304,6 +5345,8 @@ function nextLesson() {
     session.correct = 0;
     session.wrong = 0;
     session.groupResults = {};
+    session.stageWords = {};
+    session.stageAnswers = {};
     startQuiz();
   }
 }
@@ -5323,6 +5366,8 @@ function startReviews() {
   session.correct = 0;
   session.wrong = 0;
   session.groupResults = {};
+  session.stageWords = {};
+  session.stageAnswers = {};
   startQuiz();
 }
 
@@ -5402,6 +5447,8 @@ function renderQuizCard() {
     // Reading quiz with word context
     const word = getWordForItem(item);
     session.selectedWord = word;
+    if (!session.stageWords) session.stageWords = {};
+    session.stageWords[item.stage] = word;
 
     if (word) {
       // Build word display with target kanji highlighted
@@ -5497,6 +5544,8 @@ function selectMeaning(btn, selected, correct) {
   const wasCorrect = selected === correct;
   session.wasCorrect = wasCorrect;
   session.userAnswer = selected;
+  if (!session.stageAnswers) session.stageAnswers = {};
+  session.stageAnswers[session.item.stage] = selected;
 
   document.querySelectorAll('.choice-btn').forEach(b => {
     b.disabled = true;
@@ -5511,7 +5560,10 @@ function selectMeaning(btn, selected, correct) {
   void card.offsetWidth; // force reflow
   card.classList.add(wasCorrect ? 'flash-correct' : 'flash-wrong');
 
-  setTimeout(() => showReviewScreen(), 900);
+  setTimeout(() => {
+    if (shouldShowReview()) showReviewScreen();
+    else nextQuizItem();
+  }, 700);
 }
 
 function dontKnow() {
@@ -5521,6 +5573,8 @@ function dontKnow() {
   session.wasCorrect = false;
   session.usedSecondChance = false;
   session.userAnswer = '';
+  if (!session.stageAnswers) session.stageAnswers = {};
+  session.stageAnswers[session.item.stage] = '';
   const input = document.getElementById('romaji-input');
   if (input) { input.disabled = true; input.classList.add('wrong'); }
   const submitBtn = document.getElementById('submit-btn');
@@ -5534,7 +5588,7 @@ function dontKnow() {
   card.classList.remove('flash-correct', 'flash-wrong');
   void card.offsetWidth;
   card.classList.add('flash-wrong');
-  setTimeout(() => showReviewScreen(), 900);
+  setTimeout(() => showReviewScreen(), 700);
 }
 
 function submitReading() {
@@ -5583,6 +5637,8 @@ function submitReading() {
   // Final submission (either correct on first, correct on second, or wrong on second)
   session.answered = true;
   session.userAnswer = userVal;
+  if (!session.stageAnswers) session.stageAnswers = {};
+  session.stageAnswers[session.item.stage] = userVal;
   // If they got it right on second attempt, mark as partially wrong for grading
   session.wasCorrect = wasCorrect;
   session.usedSecondChance = session.firstAttemptWrong && wasCorrect;
@@ -5612,7 +5668,10 @@ function submitReading() {
   void card.offsetWidth;
   card.classList.add(wasCorrect ? 'flash-correct' : 'flash-wrong');
 
-  setTimeout(() => showReviewScreen(), 900);
+  setTimeout(() => {
+    if (shouldShowReview()) showReviewScreen();
+    else nextQuizItem();
+  }, 700);
 }
 
 function allStagesLearning(idx) {
@@ -5715,99 +5774,102 @@ function gradeCurrentCard(wasCorrect) {
   saveState();
 }
 
+// Returns true if the review summary should show now (last stage answered, or wrong)
+function shouldShowReview() {
+  const item = session.item;
+  const idx = item.idx;
+  if (!(allStagesLearning(idx) || meaningOnPaired(idx))) return true;
+  const gr = session.groupResults && session.groupResults[idx];
+  if (!gr) return true;
+  if (gr.demoted) return true;
+  const kd = KANJI_DATA[idx];
+  const stagesInQueue = new Set(session.queue.map(it => it.idx === idx ? it.stage : null).filter(Boolean));
+  const expected = ['meaning', 'on'].filter(s => stagesInQueue.has(s));
+  if (allStagesLearning(idx) && kd.kunYomi.length > 0 && stagesInQueue.has('kun')) expected.push('kun');
+  return expected.every(s => s in gr.stages);
+}
+
 function showReviewScreen() {
   const item = session.item;
-  const kd = KANJI_DATA[item.idx];
-  const wasCorrect = session.wasCorrect;
-  const word = session.selectedWord;
-  const card = state.cards[item.idx][item.stage];
-  const displayCard = allStagesLearning(item.idx) ? state.cards[item.idx].meaning : card;
-  // For grouped kanji, figure out if grading has already been applied this session
-  const gr = session.groupResults && session.groupResults[item.idx];
-  const gradingApplied = gr && (gr.demoted || (() => {
-    const kd2 = KANJI_DATA[item.idx];
-    const expected = ['meaning', 'on'];
-    if (allStagesLearning(item.idx) && kd2.kunYomi.length > 0) expected.push('kun');
-    return expected.every(s => s in gr.stages);
-  })());
-  let levelLabel, nextReviewLabel;
-  if ((allStagesLearning(item.idx) || meaningOnPaired(item.idx)) && !gradingApplied) {
-    // Grading hasn't been applied yet — show current level with pending note
-    levelLabel = (displayCard.level >= MAX_SRS_LEVEL ? '⭐ Mastered' : `Level ${displayCard.level} / ${MAX_SRS_LEVEL}`) + ' (pending)';
-    nextReviewLabel = 'after all stages';
-  } else {
-    levelLabel = displayCard.level >= MAX_SRS_LEVEL ? '⭐ Mastered' : `Level ${displayCard.level} / ${MAX_SRS_LEVEL}`;
-    nextReviewLabel = formatNextReview(displayCard.nextReview);
-  }
-
-  const secondChanceUsed = session.usedSecondChance;
-  // Note: usedSecondChance is reset in gradeCurrentCard, so read it before that runs.
-  // Actually we store it on session.lastSecondChance for display purposes.
-  const showSecondChance = session.lastSecondChance;
+  const idx = item.idx;
+  const kd = KANJI_DATA[idx];
+  const gr = session.groupResults && session.groupResults[idx];
+  const isGrouped = allStagesLearning(idx) || meaningOnPaired(idx);
+  const overallCorrect = isGrouped && gr ? !gr.demoted : session.wasCorrect;
+  const displayCard = state.cards[idx].meaning;
+  const levelLabel = displayCard.level >= MAX_SRS_LEVEL ? '⭐ Mastered' : `Level ${displayCard.level} / ${MAX_SRS_LEVEL}`;
+  const nextReviewLabel = formatNextReview(displayCard.nextReview);
   session.lastSecondChance = false;
 
   let html = `
-    <div class="review-result-banner ${wasCorrect ? 'correct-banner' : 'wrong-banner'}"></div>
-    <div class="review-result-label ${wasCorrect ? 'correct-label' : 'wrong-label'}">
-      ${wasCorrect
-        ? (showSecondChance ? '✓ Correct (2nd try)' : '✓ Correct')
-        : '✗ Incorrect'}
+    <div class="review-result-banner ${overallCorrect ? 'correct-banner' : 'wrong-banner'}"></div>
+    <div class="review-result-label ${overallCorrect ? 'correct-label' : 'wrong-label'}">
+      ${overallCorrect ? '✓ Correct' : '✗ Incorrect'}
     </div>
     <div class="review-kanji-big">${kd.kanji}</div>
     <div class="review-meaning">${kd.meanings[0]}</div>
-  `;
-
-  if (item.stage === 'on' && kd.onYomi.length > 0) {
-    html += `<div class="review-stage-reading">On'yomi: ${kd.onYomi.map(r => r.kana + ' ('+r.romaji+')').join('・')}</div>`;
-  } else if (item.stage === 'kun' && kd.kunYomi.length > 0) {
-    html += `<div class="review-stage-reading">Kun'yomi: ${kd.kunYomi.map(r => r.kana + ' ('+r.romaji+')').join('・')}</div>`;
-  } else if (item.stage === 'meaning') {
-    html += `<div class="review-stage-reading">Readings: ${kd.onYomi.map(r=>r.kana).concat(kd.kunYomi.map(r=>r.kana)).join('・')}</div>`;
-  }
-
-  // Level and next review info
-  html += `
-    <div style="display:flex; gap:16px; justify-content:center; margin:12px 0; flex-wrap:wrap;">
-      <div style="font-size:12px; color:var(--ink-light); background:var(--paper); padding:6px 14px; border-radius:20px; border:1px solid var(--paper-darker);">
-        ${levelLabel}
-      </div>
-      <div style="font-size:12px; color:var(--ink-light); background:var(--paper); padding:6px 14px; border-radius:20px; border:1px solid var(--paper-darker);">
-        Next review: <strong style="color:var(--gold)">${nextReviewLabel}</strong>
-      </div>
+    <div style="display:flex;gap:16px;justify-content:center;margin:12px 0;flex-wrap:wrap;">
+      <div style="font-size:12px;color:var(--ink-light);background:var(--paper);padding:6px 14px;border-radius:20px;border:1px solid var(--paper-darker);">${levelLabel}</div>
+      <div style="font-size:12px;color:var(--ink-light);background:var(--paper);padding:6px 14px;border-radius:20px;border:1px solid var(--paper-darker);">Next review: <strong style="color:var(--gold)">${nextReviewLabel}</strong></div>
     </div>
   `;
 
-  if (word && item.stage !== 'meaning') {
-    // Show the word reading in the appropriate script
-    const isOn = item.stage === 'on';
-    // Convert reading to katakana if on'yomi
-    const displayReading = isOn
-      ? word.reading.replace(/[\u3041-\u3096]/g, c => String.fromCharCode(c.charCodeAt(0) + 0x60))
-      : word.reading;
-    html += `<hr class="review-divider">`;
-    html += `<div class="review-word-section"><h4>Word Used</h4>
-      <div class="review-word-display">
-        <span class="review-word-kanji">${word.word}</span>
-        <span class="review-word-reading">${displayReading}</span>
-        <span class="review-word-meaning">${word.meaning}</span>
-      </div>
-    </div>`;
+  if (isGrouped && gr && Object.keys(gr.stages).length > 0) {
+    const stageOrder = ['meaning', 'on', 'kun'].filter(s => s in gr.stages);
+    html += '<hr class="review-divider">';
+    for (const stage of stageOrder) {
+      const sc = gr.stages[stage];
+      const col = sc ? 'var(--green-light)' : 'var(--red-light)';
+      const icon = sc ? '✓' : '✗';
+      const word = session.stageWords && session.stageWords[stage];
+      if (stage === 'meaning') {
+        html += `<div class="review-stage-row"><span style="color:${col};font-weight:600;margin-right:8px;">${icon}</span><span style="font-size:12px;text-transform:uppercase;letter-spacing:0.08em;color:var(--ink-light);margin-right:8px;">Meaning</span><span style="font-size:14px;color:var(--ink)">${kd.meanings[0]}</span></div>`;
+      } else if (stage === 'on') {
+        const readings = kd.onYomi.map(r => r.kana + ' (' + r.romaji + ')').join('・');
+        html += `<div class="review-stage-row"><span style="color:${col};font-weight:600;margin-right:8px;">${icon}</span><span style="font-size:12px;text-transform:uppercase;letter-spacing:0.08em;color:var(--ink-light);margin-right:8px;">On'yomi</span><span style="font-size:14px;color:var(--ink)">${readings}</span></div>`;
+        if (word) {
+          const kr = word.reading.replace(/[ぁ-ゖ]/g, c => String.fromCharCode(c.charCodeAt(0) + 0x60));
+          html += `<div class="review-word-display" style="margin:4px 0 10px 24px;"><span class="review-word-kanji">${word.word}</span><span class="review-word-reading">${kr}</span><span class="review-word-meaning">${word.meaning}</span></div>`;
+        }
+        if (!sc) {
+          const ans = (session.stageAnswers && session.stageAnswers[stage] !== undefined) ? session.stageAnswers[stage] : '—';
+          const correct = word ? getCorrectRomaji(word) : kd.onYomi.map(r=>r.romaji).join('/');
+          html += `<div style="margin:0 0 10px 24px;font-size:12px;"><span class="wrong-answer">${ans || '(skipped)'}</span> → <span class="correct-answer">${correct}</span></div>`;
+        }
+      } else if (stage === 'kun') {
+        const readings = kd.kunYomi.map(r => r.kana + ' (' + r.romaji + ')').join('・');
+        html += `<div class="review-stage-row"><span style="color:${col};font-weight:600;margin-right:8px;">${icon}</span><span style="font-size:12px;text-transform:uppercase;letter-spacing:0.08em;color:var(--ink-light);margin-right:8px;">Kun'yomi</span><span style="font-size:14px;color:var(--ink)">${readings}</span></div>`;
+        if (word) {
+          html += `<div class="review-word-display" style="margin:4px 0 10px 24px;"><span class="review-word-kanji">${word.word}</span><span class="review-word-reading">${word.reading}</span><span class="review-word-meaning">${word.meaning}</span></div>`;
+        }
+        if (!sc) {
+          const ans = (session.stageAnswers && session.stageAnswers[stage] !== undefined) ? session.stageAnswers[stage] : '—';
+          const correct = word ? getCorrectRomaji(word) : kd.kunYomi.map(r=>r.romaji).join('/');
+          html += `<div style="margin:0 0 10px 24px;font-size:12px;"><span class="wrong-answer">${ans || '(skipped)'}</span> → <span class="correct-answer">${correct}</span></div>`;
+        }
+      }
+    }
+  } else {
+    const word = session.selectedWord;
+    if (item.stage === 'on' && kd.onYomi.length > 0) {
+      html += `<div class="review-stage-reading">On'yomi: ${kd.onYomi.map(r => r.kana + ' ('+r.romaji+')').join('・')}</div>`;
+    } else if (item.stage === 'kun' && kd.kunYomi.length > 0) {
+      html += `<div class="review-stage-reading">Kun'yomi: ${kd.kunYomi.map(r => r.kana + ' ('+r.romaji+')').join('・')}</div>`;
+    } else {
+      html += `<div class="review-stage-reading">Readings: ${kd.onYomi.map(r=>r.kana).concat(kd.kunYomi.map(r=>r.kana)).join('・')}</div>`;
+    }
+    if (word && item.stage !== 'meaning') {
+      const isOn = item.stage === 'on';
+      const dr = isOn ? word.reading.replace(/[ぁ-ゖ]/g, c => String.fromCharCode(c.charCodeAt(0) + 0x60)) : word.reading;
+      html += `<hr class="review-divider"><div class="review-word-section"><h4>Word Used</h4><div class="review-word-display"><span class="review-word-kanji">${word.word}</span><span class="review-word-reading">${dr}</span><span class="review-word-meaning">${word.meaning}</span></div></div>`;
+    }
+    if (!session.wasCorrect && item.stage !== 'meaning') {
+      const ca = item.stage === 'on' ? (word ? [getCorrectRomaji(word)] : kd.onYomi.map(r=>r.romaji)) : (word ? [getCorrectRomaji(word)] : kd.kunYomi.map(r=>r.romaji));
+      html += `<div style="margin-top:12px;"><div class="your-answer-line">Your answer: <span class="wrong-answer">${session.userAnswer}</span></div><div class="your-answer-line">Correct: <span class="correct-answer">${ca.join(' or ')}</span></div></div>`;
+    }
   }
 
-  if (!wasCorrect && item.stage !== 'meaning') {
-    const correctAnswers = item.stage === 'on'
-      ? (word ? [getCorrectRomaji(word)] : kd.onYomi.map(r=>r.romaji))
-      : (word ? [getCorrectRomaji(word)] : kd.kunYomi.map(r=>r.romaji));
-    html += `
-      <div style="margin-top:12px;">
-        <div class="your-answer-line">Your answer: <span class="wrong-answer">${session.userAnswer}</span></div>
-        <div class="your-answer-line">Correct: <span class="correct-answer">${correctAnswers.join(' or ')}</span></div>
-      </div>
-    `;
-  }
-
-  html += `<button class="next-btn" onclick="nextQuizItem()">Continue →</button>`;
-
+  html += '<button class="next-btn" onclick="nextQuizItem()">Continue →</button>';
   document.getElementById('review-content').innerHTML = html;
   showScreen('review');
 }
@@ -5935,11 +5997,9 @@ function makeBrowseCard(i) {
       levelDisplay = `<div class="browse-level" style="color:var(--ink-light)">new</div>`;
     } else if (allLearning) {
       const minLvl = Math.min(...allLevels);
-      const color = minLvl >= 10 ? 'var(--green-light)' : minLvl >= 5 ? 'var(--blue-light)' : 'var(--gold)';
-      levelDisplay = `<div class="browse-level" style="color:${color}">Lv ${minLvl}</div>`;
+      levelDisplay = `<div class="browse-level" style="color:${srsLevelColor(minLvl)}">Lv ${minLvl}</div>`;
     } else {
-      const color = meaningLvl >= 5 ? 'var(--blue-light)' : 'var(--gold)';
-      levelDisplay = `<div class="browse-level" style="color:${color}">Lv ${meaningLvl}</div>`;
+      levelDisplay = `<div class="browse-level" style="color:${srsLevelColor(meaningLvl)}">Lv ${meaningLvl}</div>`;
     }
   }
 
@@ -5954,22 +6014,38 @@ function showBrowse() {
   const grid = document.getElementById('browse-grid');
   const groups = buildBrowseGroups();
 
-  grid.innerHTML = groups.map(g => `
+  grid.innerHTML = groups.map((g, gi) => {
+    const unlocked = g.indices.filter(i => i < state.unlockedCount).length;
+    return `
     <div class="browse-group">
-      <div class="browse-group-title">${g.name}</div>
-      <div class="browse-group-grid">
+      <div class="browse-group-header" onclick="toggleBrowseGroup(${gi})">
+        <span class="browse-group-title">${g.name}</span>
+        <span class="browse-group-meta">
+          <span>${unlocked}/${g.indices.length}</span>
+          <span class="browse-group-chevron" id="browse-chevron-${gi}">▼</span>
+        </span>
+      </div>
+      <div class="browse-group-grid" id="browse-group-grid-${gi}">
         ${g.indices.map(i => makeBrowseCard(i)).join('')}
       </div>
-    </div>
-  `).join('');
+    </div>`;
+  }).join('');
 
-  // Single delegated click handler
   grid.addEventListener('click', e => {
     const card = e.target.closest('.browse-kanji-card');
     if (card) openKanjiModal(parseInt(card.dataset.idx));
   });
 
   showScreen('browse');
+}
+
+function toggleBrowseGroup(gi) {
+  const gridEl = document.getElementById('browse-group-grid-' + gi);
+  const chevron = document.getElementById('browse-chevron-' + gi);
+  if (!gridEl) return;
+  const isOpen = gridEl.classList.contains('open');
+  gridEl.classList.toggle('open', !isOpen);
+  if (chevron) chevron.classList.toggle('open', !isOpen);
 }
 
 function openKanjiModal(idx) {
@@ -5983,7 +6059,7 @@ function openKanjiModal(idx) {
     levelHtml = `<div class="kanji-modal-level">Not yet unlocked</div>`;
   } else if (c && c.meaning.learning) {
     const lvl = kanjiDisplayLevel(idx);
-    levelHtml = `<div class="kanji-modal-level">${lvl >= MAX_SRS_LEVEL ? '⭐ Mastered' : 'Level ' + lvl}</div>`;
+    levelHtml = `<div class="kanji-modal-level" style="color:${srsLevelColor(lvl)}">${lvl >= MAX_SRS_LEVEL ? '⭐ Mastered' : 'Level ' + lvl}</div>`;
   } else {
     levelHtml = `<div class="kanji-modal-level">In lessons</div>`;
   }
