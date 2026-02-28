@@ -4711,6 +4711,21 @@ function initState() {
     }
     saveState();
   }
+  // Migration: clear learning=true from any kanji that was skipped in the pretest.
+  // Old bug set learning=true just from being displayed — only clear if level is still 0
+  // (genuinely fast-tracked kanji have level >= PRETEST_LEVEL so won't be touched).
+  if (state.pretestFailed && state.pretestFailed.length > 0) {
+    for (const idx of state.pretestFailed) {
+      const c = state.cards[idx];
+      if (!c) continue;
+      if (c.meaning.level === 0 && c.on.level === 0 && c.kun.level === 0) {
+        c.meaning.learning = false;
+        c.on.learning = false;
+        c.kun.learning = false;
+      }
+    }
+  }
+
   // Fix broken state: if too many unlocked due to old bug, trim back to MAX_IN_PROGRESS
   // Keep any that have actual progress, remove excess unlearned ones from the end
   while (state.unlockedCount > MAX_IN_PROGRESS) {
