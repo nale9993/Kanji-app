@@ -6047,7 +6047,7 @@ function showBrowse() {
   const groups = buildBrowseGroups();
 
   grid.innerHTML = groups.map((g, gi) => {
-    const unlocked = g.indices.filter(i => i < state.unlockedCount).length;
+    const unlocked = g.indices.filter(i => state.cards[i] && state.cards[i].meaning.learning).length;
     return `
     <div class="browse-group">
       <div class="browse-group-header" onclick="toggleBrowseGroup(${gi})">
