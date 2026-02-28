@@ -1165,8 +1165,8 @@
       </div>
     </div>
 
-    <div class="progress-section">
-      <h3>SRS Progress</h3>
+    <div class="progress-section" onclick="showSrsProgress()" style="cursor:pointer;" title="View kanji by level">
+      <h3>SRS Progress <span style="font-size:11px;color:var(--ink-light);font-family:'DM Mono',monospace;">↗</span></h3>
       <div class="srs-levels" id="srs-levels-display"></div>
     </div>
 
@@ -1216,6 +1216,14 @@
     <h2 style="font-family:'DM Serif Display',serif; margin-bottom:8px;">Kanji Library</h2>
     <p style="font-size:13px; color:var(--ink-light); margin-bottom:4px;">Tap any kanji to see details.</p>
     <div class="browse-grid" id="browse-grid"></div>
+  </div>
+
+  <!-- SRS PROGRESS SCREEN -->
+  <div class="screen" id="screen-srs-progress">
+    <button class="back-btn" onclick="goHome()">← Back</button>
+    <h2 style="font-family:'DM Serif Display',serif; margin-bottom:8px;">SRS Progress</h2>
+    <p style="font-size:13px; color:var(--ink-light); margin-bottom:12px;">Your unlocked kanji sorted by level.</p>
+    <div class="browse-grid" id="srs-progress-grid"></div>
   </div>
 
   <!-- KANJI DETAIL MODAL -->
@@ -4827,9 +4835,14 @@ function getReviewQueue() {
         groupedKanji.push({idx: i, type: 'pair'});
       }
     } else {
-      // Staged: add each due stage individually
-      if (isDue(c.meaning)) soloItems.push({idx: i, stage: 'meaning'});
-      if (kd.onYomi.length > 0 && isDue(c.on)) soloItems.push({idx: i, stage: 'on'});
+      // Staged: add each due stage individually,
+      // BUT skip a stage if a newer stage is waiting in lessons (not yet marked learning).
+      // This prevents e.g. meaning appearing in review after on unlocks but before its lesson is viewed.
+      const onPendingLesson = kd.onYomi.length > 0 && !c.on.learning && c.meaning.level >= 2;
+      const kunPendingLesson = kd.kunYomi.length > 0 && !c.kun.learning &&
+        (kd.onYomi.length === 0 ? c.meaning.level >= 2 : c.on.level >= 2);
+      if (isDue(c.meaning) && !onPendingLesson) soloItems.push({idx: i, stage: 'meaning'});
+      if (kd.onYomi.length > 0 && isDue(c.on) && !kunPendingLesson) soloItems.push({idx: i, stage: 'on'});
       if (kd.kunYomi.length > 0 && isDue(c.kun)) soloItems.push({idx: i, stage: 'kun'});
     }
   }
@@ -4884,8 +4897,12 @@ function getReviewCount() {
     } else if (meaningOnPaired(i)) {
       if (isDue(c.meaning) || isDue(c.on)) count++;
     } else {
-      if (isDue(c.meaning)) count++;
-      if (kd.onYomi.length > 0 && isDue(c.on)) count++;
+      // Mirror the pending-lesson logic from getReviewQueue
+      const onPendingLesson = kd.onYomi.length > 0 && !c.on.learning && c.meaning.level >= 2;
+      const kunPendingLesson = kd.kunYomi.length > 0 && !c.kun.learning &&
+        (kd.onYomi.length === 0 ? c.meaning.level >= 2 : c.on.level >= 2);
+      if (isDue(c.meaning) && !onPendingLesson) count++;
+      if (kd.onYomi.length > 0 && isDue(c.on) && !kunPendingLesson) count++;
       if (kd.kunYomi.length > 0 && isDue(c.kun)) count++;
     }
   }
@@ -5715,8 +5732,8 @@ function gradeCurrentCard(wasCorrect) {
         const baseCard = { ...c.meaning, level: baseLevel };
         let newLevel, newNextReview;
         if (gr.worstChance) {
-          // At least one second-chance — hold at base level, reschedule at that interval
-          newLevel = baseLevel;
+          // At least one second-chance — penalise -1 level (min 0)
+          newLevel = Math.max(0, baseLevel - 1);
           newNextReview = Date.now() + (SRS_INTERVALS_MINS[newLevel] || 1) * 60000;
         } else {
           const gradedCard = gradeCard(baseCard, true, false);
@@ -5972,11 +5989,57 @@ function makeBrowseCard(i) {
     }
   }
 
-  return `<div class="browse-kanji-card" style="${!unlocked ? 'opacity:0.35' : ''}" data-idx="${i}">
-    <span class="browse-kanji-char" style="${!unlocked ? 'filter:blur(2px)' : ''}">${kd.kanji}</span>
+  // A kanji is only truly "unlocked" in browse if meaning has been taught
+  const trulyUnlocked = unlocked && c && c.meaning.learning;
+  return `<div class="browse-kanji-card" style="${!trulyUnlocked ? 'opacity:0.35' : ''}" data-idx="${i}">
+    <span class="browse-kanji-char" style="${!trulyUnlocked ? 'filter:blur(2px)' : ''}">${kd.kanji}</span>
     <div class="browse-kanji-meaning">${kd.meanings[0]}</div>
     ${levelDisplay}
   </div>`;
+}
+
+function showSrsProgress() {
+  const grid = document.getElementById('srs-progress-grid');
+  // Collect all unlocked kanji that have meaning.learning = true, sorted by level desc
+  const kanjiByLevel = {};
+  for (let i = 0; i < state.unlockedCount; i++) {
+    const c = state.cards[i];
+    if (!c || !c.meaning.learning) continue;
+    const lvl = kanjiDisplayLevel(i);
+    if (!kanjiByLevel[lvl]) kanjiByLevel[lvl] = [];
+    kanjiByLevel[lvl].push(i);
+  }
+  const levels = Object.keys(kanjiByLevel).map(Number).sort((a, b) => b - a);
+  if (levels.length === 0) {
+    grid.innerHTML = '<p style="color:var(--ink-light);text-align:center;margin-top:32px;">No kanji learned yet.</p>';
+    showScreen('srs-progress');
+    return;
+  }
+  grid.innerHTML = levels.map((lvl, gi) => {
+    const indices = kanjiByLevel[lvl];
+    const label = lvl >= MAX_SRS_LEVEL ? '⭐ Mastered' : `Level ${lvl}`;
+    const color = srsLevelColor(lvl);
+    return `
+    <div class="browse-group">
+      <div class="browse-group-header" onclick="toggleBrowseGroup('srs-${gi}')">
+        <span class="browse-group-title" style="color:${color}">${label}</span>
+        <span class="browse-group-meta">
+          <span>${indices.length} kanji</span>
+          <span class="browse-group-chevron" id="browse-chevron-srs-${gi}">▼</span>
+        </span>
+      </div>
+      <div class="browse-group-grid" id="browse-group-grid-srs-${gi}">
+        ${indices.map(i => makeBrowseCard(i)).join('')}
+      </div>
+    </div>`;
+  }).join('');
+
+  grid.addEventListener('click', e => {
+    const card = e.target.closest('.browse-kanji-card');
+    if (card) openKanjiModal(parseInt(card.dataset.idx));
+  });
+
+  showScreen('srs-progress');
 }
 
 function showBrowse() {
@@ -6020,7 +6083,7 @@ function toggleBrowseGroup(gi) {
 function openKanjiModal(idx) {
   const kd = KANJI_DATA[idx];
   const c = state.cards[idx];
-  const unlocked = idx < state.unlockedCount;
+  const unlocked = idx < state.unlockedCount && c && c.meaning.learning;
 
   // Level display
   let levelHtml = '';
