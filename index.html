@@ -4711,28 +4711,6 @@ function initState() {
     }
     saveState();
   }
-  // Migration v2: one-time fix, only runs if not already applied.
-  // Clears learning=true from pretest-skipped kanji that were never actually taught.
-  // Safe condition: idx is beyond the legitimate lesson sequence (>= unlockedCount
-  // before pretest bumped it), meaning nextReview was never set (still 0).
-  if (!state.migrations || !state.migrations.pretestLearningFix) {
-    if (!state.migrations) state.migrations = {};
-    if (state.pretestFailed && state.pretestFailed.length > 0) {
-      for (const idx of state.pretestFailed) {
-        const c = state.cards[idx];
-        if (!c) continue;
-        // Only clear if nextReview is 0 — a card that went through markCurrentLessonSeen
-        // always gets nextReview = Date.now(), so it will never be 0 after a real lesson.
-        if (c.meaning.nextReview === 0 && c.meaning.level === 0) {
-          c.meaning.learning = false;
-          c.on.learning = false;
-          c.kun.learning = false;
-        }
-      }
-    }
-    state.migrations.pretestLearningFix = true;
-  }
-
   // Fix broken state: if too many unlocked due to old bug, trim back to MAX_IN_PROGRESS
   // Keep any that have actual progress, remove excess unlearned ones from the end
   while (state.unlockedCount > MAX_IN_PROGRESS) {
