@@ -1544,7 +1544,7 @@ const KANJI_DATA = [
     kanji: '小',
     meanings: ['small', 'little'],
     onYomi: [{kana:'ショウ',romaji:'shou'}],
-    kunYomi: [{kana:'ちい',romaji:'chi'},{kana:'こ',romaji:'ko'}],
+    kunYomi: [{kana:'ちい',romaji:'chii'},{kana:'こ',romaji:'ko'}],
     onWords: [
       {word:'小学校', reading:'しょうがっこう', targetReading:'しょう', meaning:'elementary school'},
       {word:'小説', reading:'しょうせつ', targetReading:'しょう', meaning:'novel'},
@@ -1862,11 +1862,11 @@ const KANJI_DATA = [
     {
     kanji: '今',
     meanings: ['now', 'the present'],
-    onYomi: [{kana:'コン',romaji:'kon'},{kana:'キョ',romaji:'kyo'}],
+    onYomi: [{kana:'コン',romaji:'kon'}],
     kunYomi: [{kana:'いま',romaji:'ima'}],
     onWords: [
-      {word:'今日', reading:'きょう', targetReading:'きょ', meaning:'today'},
       {word:'今週', reading:'こんしゅう', targetReading:'こん', meaning:'this week'},
+      {word:'今後', reading:'こんご', targetReading:'こん', meaning:'from now on'},
     ],
     kunWords: [
       {word:'今', reading:'いま', targetReading:'いま', meaning:'now'},
@@ -1928,7 +1928,7 @@ const KANJI_DATA = [
     onWords: [
       {word:'公園', reading:'こうえん', targetReading:'こう', meaning:'park'},
       {word:'公式', reading:'こうしき', targetReading:'こう', meaning:'official / formal'},
-      {word:'公共', reading:'くきょう', targetReading:'く', meaning:'public (shared)'},
+      {word:'公共', reading:'こうきょう', targetReading:'こう', meaning:'public (shared)'},
     ],
     kunWords: [
       {word:'公', reading:'おおやけ', targetReading:'おおやけ', meaning:'public / official'},
@@ -2001,8 +2001,7 @@ const KANJI_DATA = [
     {
     kanji: '生',
     meanings: ['life', 'birth', 'raw', 'student'],
-    onYomi: [{kana:'セイ',romaji:'sei'}],
-    kunYomi: [{kana:'い',romaji:'i'},{kana:'う',romaji:'u'},{kana:'なま',romaji:'nama'}],
+    onYomi: [{kana:'セイ',romaji:'sei'},{kana:'ショウ',romaji:'shou'}],
     onWords: [
       {word:'学生', reading:'がくせい', targetReading:'せい', meaning:'student'},
       {word:'先生', reading:'せんせい', targetReading:'せい', meaning:'teacher'},
@@ -3587,7 +3586,7 @@ const KANJI_DATA = [
     onWords: [
       {word:'時間', reading:'じかん', targetReading:'じ', meaning:'time / hour'},
       {word:'何時', reading:'なんじ', targetReading:'じ', meaning:'what time'},
-      {word:'時計', reading:'とけい', targetReading:'と', meaning:'clock / watch'},
+      {word:'同時', reading:'どうじ', targetReading:'じ', meaning:'simultaneous / at the same time'},
     ],
     kunWords: [
       {word:'時', reading:'とき', targetReading:'とき', meaning:'time / moment'},
@@ -3880,7 +3879,7 @@ const KANJI_DATA = [
     onYomi: [{kana:'ブ',romaji:'bu'}],
     kunYomi: [],
     onWords: [
-      {word:'部屋', reading:'へや', targetReading:'へ', meaning:'room'},
+      {word:'部活', reading:'ぶかつ', targetReading:'ぶ', meaning:'club activities'},
       {word:'部分', reading:'ぶぶん', targetReading:'ぶ', meaning:'part / section'},
     ],
     kunWords: [],
@@ -4251,7 +4250,6 @@ const KANJI_DATA = [
       {word:'赤飯', reading:'せきはん', targetReading:'はん', meaning:'red rice (celebratory)'},
     ],
     kunWords: [
-      {word:'ご飯', reading:'ごはん', targetReading:'はん', meaning:'rice / meal'},
       {word:'朝飯', reading:'あさめし', targetReading:'めし', meaning:'breakfast (casual)'},
       {word:'飯', reading:'めし', targetReading:'めし', meaning:'rice / meal (casual)'},
     ],
@@ -4612,6 +4610,9 @@ const PRETEST_LEVEL = 6;      // fast-track level for passed pretest cards
 const MAX_IN_PROGRESS = 15;
 
 // Color scale: light green (0) → teal → blue → deep purple (10)
+// Helper: returns the state.cards key for a given KANJI_DATA index
+function cardKey(idx) { return KANJI_DATA[idx].kanji; }
+
 function srsLevelColor(lvl) {
   const c = ['#a8d8a8','#8ecf90','#72c47a','#56b870','#3aaa82','#2e8a99','#2e6bb0','#3050c0','#5038b8','#6a28a8','#7a1898'];
   return c[Math.min(Math.max(lvl,0),10)];
@@ -4683,6 +4684,39 @@ function initState() {
   if (saved) {
     try { state = JSON.parse(saved); } catch(e) {}
   }
+
+  // ── Migration: old saves used numeric indices as keys; upgrade to kanji chars ──
+  if (state.cards && Object.keys(state.cards).length > 0) {
+    const firstKey = Object.keys(state.cards)[0];
+    if (!isNaN(Number(firstKey))) {
+      const newCards = {};
+      for (const [k, v] of Object.entries(state.cards)) {
+        const n = Number(k);
+        if (n >= 0 && n < KANJI_DATA.length) newCards[KANJI_DATA[n].kanji] = v;
+      }
+      state.cards = newCards;
+      if (Array.isArray(state.pretestFailed)) {
+        state.pretestFailed = state.pretestFailed
+          .map(i => (Number.isInteger(i) && KANJI_DATA[i]) ? KANJI_DATA[i].kanji : i)
+          .filter(Boolean);
+      }
+      // Migrate wordHistory keys from "idx-stage" to "kanji-stage"
+      if (state.wordHistory) {
+        const newWH = {};
+        for (const [k, v] of Object.entries(state.wordHistory)) {
+          const parts = k.split('-');
+          if (parts.length === 2 && !isNaN(Number(parts[0]))) {
+            const n = Number(parts[0]);
+            if (n >= 0 && n < KANJI_DATA.length) newWH[`${KANJI_DATA[n].kanji}-${parts[1]}`] = v;
+          } else {
+            newWH[k] = v; // already migrated
+          }
+        }
+        state.wordHistory = newWH;
+      }
+      saveState();
+    }
+  }
   // Restore in-progress pretest if any
   const savedPretest = localStorage.getItem('sumi_pretest');
   if (savedPretest) {
@@ -4701,7 +4735,7 @@ function initState() {
     const startBatch = Math.min(5, KANJI_DATA.length);
     state.unlockedCount = startBatch;
     for (let i = 0; i < startBatch; i++) {
-      state.cards[i] = {
+      state.cards[cardKey(i)] = {
         meaning: createCardState(),
         on: createCardState(),
         kun: createCardState(),
@@ -4713,10 +4747,10 @@ function initState() {
   // Keep any that have actual progress, remove excess unlearned ones from the end
   while (state.unlockedCount > MAX_IN_PROGRESS) {
     const i = state.unlockedCount - 1;
-    const c = state.cards[i];
+    const c = state.cards[cardKey(i)];
     // Only trim if this card has no progress at all
     if (c && !c.meaning.learning && !c.on.learning && !c.kun.learning) {
-      delete state.cards[i];
+      delete state.cards[cardKey(i)];
       state.unlockedCount--;
     } else {
       break; // Hit a card with progress, stop trimming
@@ -4744,14 +4778,14 @@ function saveState() {
 function getInProgressCount() {
   let count = 0;
   for (let i = 0; i < state.unlockedCount; i++) {
-    const c = state.cards[i];
+    const c = state.cards[cardKey(i)];
     if (c && !isKanjiUnlockReady(i)) count++;
   }
   return count;
 }
 
 function isKanjiUnlockReady(idx) {
-  const c = state.cards[idx];
+  const c = state.cards[cardKey(idx)];
   if (!c) return false;
   const kd = KANJI_DATA[idx];
   const meaningReady = isUnlockReady(c.meaning);
@@ -4761,7 +4795,7 @@ function isKanjiUnlockReady(idx) {
 }
 
 function isKanjiMastered(idx) {
-  const c = state.cards[idx];
+  const c = state.cards[cardKey(idx)];
   if (!c) return false;
   const kd = KANJI_DATA[idx];
   const meaningMastered = isMastered(c.meaning);
@@ -4773,7 +4807,7 @@ function isKanjiMastered(idx) {
 function tryUnlockNext() {
   while (getInProgressCount() < MAX_IN_PROGRESS && state.unlockedCount < KANJI_DATA.length) {
     const i = state.unlockedCount;
-    state.cards[i] = {
+    state.cards[cardKey(i)] = {
       meaning: createCardState(),
       on: createCardState(),
       kun: createCardState(),
@@ -4788,7 +4822,7 @@ function tryUnlockNext() {
 function getLessonQueue() {
   const queue = [];
   for (let i = 0; i < state.unlockedCount; i++) {
-    const c = state.cards[i];
+    const c = state.cards[cardKey(i)];
     if (!c) continue;
     const kd = KANJI_DATA[i];
     if (!c.meaning.learning) {
@@ -4813,7 +4847,7 @@ function getReviewQueue() {
   const groupedKanji = []; // kanji with all stages learning — reviewed as a trio
 
   for (let i = 0; i < state.unlockedCount; i++) {
-    const c = state.cards[i];
+    const c = state.cards[cardKey(i)];
     if (!c) continue;
     const kd = KANJI_DATA[i];
 
@@ -4883,7 +4917,7 @@ function getReviewQueue() {
 function getReviewCount() {
   let count = 0;
   for (let i = 0; i < state.unlockedCount; i++) {
-    const c = state.cards[i];
+    const c = state.cards[cardKey(i)];
     if (!c) continue;
     const kd = KANJI_DATA[i];
     if (allStagesLearning(i)) {
@@ -5196,7 +5230,7 @@ function updateHomeStats() {
   // SRS levels — 11 buckets: level 0 through 10
   const levels = Array(MAX_SRS_LEVEL + 1).fill(0);
   for (let i = 0; i < state.unlockedCount; i++) {
-    const c = state.cards[i];
+    const c = state.cards[cardKey(i)];
     if (!c) continue;
     // Always count each kanji once at its lowest active stage level
     if (c.meaning.learning) {
@@ -5303,9 +5337,9 @@ function prevLesson() {
 
 function markCurrentLessonSeen() {
   const item = lessonQueue[lessonPos];
-  if (item && state.cards[item.idx]) {
-    state.cards[item.idx][item.stage].learning = true;
-    state.cards[item.idx][item.stage].nextReview = Date.now();
+  if (item && state.cards[cardKey(item.idx)]) {
+    state.cards[cardKey(item.idx)][item.stage].learning = true;
+    state.cards[cardKey(item.idx)][item.stage].nextReview = Date.now();
     saveState();
   }
 }
@@ -5357,7 +5391,7 @@ function getWordForItem(item) {
   if (words.length === 1) return words[0];
 
   // Rotate through words so all get tested — persist history in state across sessions
-  const key = `${item.idx}-${item.stage}`;
+  const key = `${KANJI_DATA[item.idx].kanji}-${item.stage}`;
   if (!state.wordHistory) state.wordHistory = {};
   const used = state.wordHistory[key] || [];
   const unused = words.map((_, i) => i).filter(i => !used.includes(i));
@@ -5644,7 +5678,7 @@ function submitReading() {
 }
 
 function allStagesLearning(idx) {
-  const c = state.cards[idx];
+  const c = state.cards[cardKey(idx)];
   if (!c) return false;
   const kd = KANJI_DATA[idx];
   const needsOn = kd.onYomi.length > 0;
@@ -5657,7 +5691,7 @@ function allStagesLearning(idx) {
 // Returns true when meaning+on are both learning but kun is not yet unlocked.
 // These two stages are reviewed as a pair (same logic as allStagesLearning).
 function meaningOnPaired(idx) {
-  const c = state.cards[idx];
+  const c = state.cards[cardKey(idx)];
   if (!c) return false;
   const kd = KANJI_DATA[idx];
   if (kd.onYomi.length === 0) return false; // no on'yomi to pair with
@@ -5667,7 +5701,7 @@ function meaningOnPaired(idx) {
 
 // Returns the display level for a kanji — always the lowest active stage level.
 function kanjiDisplayLevel(idx) {
-  const c = state.cards[idx];
+  const c = state.cards[cardKey(idx)];
   if (!c) return 0;
   const kd = KANJI_DATA[idx];
   let lvl = c.meaning.learning ? c.meaning.level : null;
@@ -5684,7 +5718,7 @@ function gradeCurrentCard(wasCorrect) {
   const item = session.item;
   const idx = item.idx;
   const kd = KANJI_DATA[idx];
-  const c = state.cards[idx];
+  const c = state.cards[cardKey(idx)];
   const secondChance = session.usedSecondChance || false;
   session.usedSecondChance = false;
 
@@ -5703,7 +5737,7 @@ function gradeCurrentCard(wasCorrect) {
     if (expectedStages.length === 0) {
       if (wasCorrect) session.correct++;
       else session.wrong++;
-      state.cards[idx][item.stage] = gradeCard(c[item.stage], wasCorrect, secondChance);
+      state.cards[cardKey(idx)][item.stage] = gradeCard(c[item.stage], wasCorrect, secondChance);
       tryUnlockNext();
       saveState();
       return;
@@ -5749,7 +5783,7 @@ function gradeCurrentCard(wasCorrect) {
     // Solo staged card — counts individually
     if (wasCorrect) session.correct++;
     else session.wrong++;
-    state.cards[idx][item.stage] = gradeCard(c[item.stage], wasCorrect, secondChance);
+    state.cards[cardKey(idx)][item.stage] = gradeCard(c[item.stage], wasCorrect, secondChance);
   }
 
   tryUnlockNext();
@@ -5780,7 +5814,7 @@ function showReviewScreen() {
   const overallCorrect = isGrouped && gr ? !gr.demoted : session.wasCorrect;
   // Use the lowest stage level for display (stages converge after grouped review)
   const displayLevel = kanjiDisplayLevel(idx);
-  const displayCard = state.cards[idx].meaning;
+  const displayCard = state.cards[cardKey(idx)].meaning;
   const levelLabel = displayLevel >= MAX_SRS_LEVEL ? '⭐ Mastered' : `Level ${displayLevel} / ${MAX_SRS_LEVEL}`;
   const nextReviewLabel = formatNextReview(displayCard.nextReview);
   session.lastSecondChance = false;
@@ -5962,7 +5996,7 @@ function buildBrowseGroups() {
 
 function makeBrowseCard(i) {
   const kd = KANJI_DATA[i];
-  const c = state.cards[i];
+  const c = state.cards[cardKey(i)];
   const unlocked = i < state.unlockedCount;
 
   let levelDisplay = '';
@@ -6001,7 +6035,7 @@ function showSrsProgress() {
   // Collect all unlocked kanji that have meaning.learning = true, sorted by level desc
   const kanjiByLevel = {};
   for (let i = 0; i < state.unlockedCount; i++) {
-    const c = state.cards[i];
+    const c = state.cards[cardKey(i)];
     if (!c || !c.meaning.learning) continue;
     const lvl = kanjiDisplayLevel(i);
     if (!kanjiByLevel[lvl]) kanjiByLevel[lvl] = [];
@@ -6045,7 +6079,7 @@ function showBrowse() {
   const groups = buildBrowseGroups();
 
   grid.innerHTML = groups.map((g, gi) => {
-    const unlocked = g.indices.filter(i => state.cards[i] && state.cards[i].meaning.learning).length;
+    const unlocked = g.indices.filter(i => state.cards[cardKey(i)] && state.cards[cardKey(i)].meaning.learning).length;
     return `
     <div class="browse-group">
       <div class="browse-group-header" onclick="toggleBrowseGroup(${gi})">
@@ -6080,7 +6114,7 @@ function toggleBrowseGroup(gi) {
 
 function openKanjiModal(idx) {
   const kd = KANJI_DATA[idx];
-  const c = state.cards[idx];
+  const c = state.cards[cardKey(idx)];
   const unlocked = idx < state.unlockedCount && c && c.meaning.learning;
 
   // Level display
@@ -6171,8 +6205,8 @@ function startPretest() {
   if (!state.pretestFailed) state.pretestFailed = [];
   pretest.queue = [];
   for (let i = 0; i < KANJI_DATA.length; i++) {
-    if (state.pretestFailed.includes(i)) continue; // permanently excluded
-    const c = state.cards[i];
+    if (state.pretestFailed.includes(cardKey(i))) continue; // permanently excluded
+    const c = state.cards[cardKey(i)];
     const kd = KANJI_DATA[i];
     if (!c) {
       pretest.queue.push(i);
@@ -6311,7 +6345,7 @@ function pretestSelectMeaning(btn, selected, correct) {
     pretest.results[idx].on = false;
     pretest.results[idx].kun = false;
     if (!state.pretestFailed) state.pretestFailed = [];
-    if (!state.pretestFailed.includes(idx)) state.pretestFailed.push(idx);
+    if (!state.pretestFailed.includes(cardKey(idx))) state.pretestFailed.push(cardKey(idx));
     saveState();
     setTimeout(() => advancePretestKanji(), 900);
   } else {
@@ -6346,7 +6380,7 @@ function submitPretestReading() {
     // Wrong answer — mark remaining stages failed, exclude from future pretest sessions
     if (pretest.stage === 'on') pretest.results[idx].kun = false;
     if (!state.pretestFailed) state.pretestFailed = [];
-    if (!state.pretestFailed.includes(idx)) state.pretestFailed.push(idx);
+    if (!state.pretestFailed.includes(cardKey(idx))) state.pretestFailed.push(cardKey(idx));
     saveState();
     setTimeout(() => advancePretestKanji(), 900);
   } else {
@@ -6374,7 +6408,7 @@ function advancePretestKanji() {
 function advancePretestStage() {
   const idx = pretest.queue[pretest.pos];
   const kd = KANJI_DATA[idx];
-  const c = state.cards[idx];
+  const c = state.cards[cardKey(idx)];
 
   if (pretest.stage === 'meaning') {
     // Move to on if has on AND it's below pretest level
@@ -6398,14 +6432,14 @@ function advancePretestStage() {
 
   if (meaningPassed && onPassed && kunPassed) {
     // Fast-track this kanji to PRETEST_LEVEL
-    if (!state.cards[idx]) {
-      state.cards[idx] = { meaning: createCardState(), on: createCardState(), kun: createCardState() };
+    if (!state.cards[cardKey(idx)]) {
+      state.cards[cardKey(idx)] = { meaning: createCardState(), on: createCardState(), kun: createCardState() };
       if (idx >= state.unlockedCount) state.unlockedCount = idx + 1;
     }
     const nextReview = Date.now() + SRS_INTERVALS_MINS[PRETEST_LEVEL] * 60000;
-    state.cards[idx].meaning = { level: PRETEST_LEVEL, nextReview, learning: true };
-    if (kd.onYomi.length > 0) state.cards[idx].on = { level: PRETEST_LEVEL, nextReview, learning: true };
-    if (kd.kunYomi.length > 0) state.cards[idx].kun = { level: PRETEST_LEVEL, nextReview, learning: true };
+    state.cards[cardKey(idx)].meaning = { level: PRETEST_LEVEL, nextReview, learning: true };
+    if (kd.onYomi.length > 0) state.cards[cardKey(idx)].on = { level: PRETEST_LEVEL, nextReview, learning: true };
+    if (kd.kunYomi.length > 0) state.cards[cardKey(idx)].kun = { level: PRETEST_LEVEL, nextReview, learning: true };
     pretest.fastTracked++;
     tryUnlockNext(); // immediately open new lesson slots freed by this fast-track
   }
@@ -6457,7 +6491,7 @@ function skipPretestKanji() {
   pretest.results[idx].on = false;
   pretest.results[idx].kun = false;
   if (!state.pretestFailed) state.pretestFailed = [];
-  if (!state.pretestFailed.includes(idx)) state.pretestFailed.push(idx);
+  if (!state.pretestFailed.includes(cardKey(idx))) state.pretestFailed.push(cardKey(idx));
   saveState();
   // Move to next kanji
   pretest.pos++;
@@ -6489,7 +6523,7 @@ function confirmReset() {
     const startBatch = Math.min(5, KANJI_DATA.length);
     state.unlockedCount = startBatch;
     for (let i = 0; i < startBatch; i++) {
-      state.cards[i] = { meaning: createCardState(), on: createCardState(), kun: createCardState() };
+      state.cards[cardKey(i)] = { meaning: createCardState(), on: createCardState(), kun: createCardState() };
     }
     saveState();
     tryUnlockNext();
