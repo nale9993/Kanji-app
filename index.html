@@ -1101,6 +1101,26 @@
 
   .tooltip.show { opacity: 1; }
 
+
+  /* BROWSE PROGRESS BAR */
+  .browse-progress-wrap {
+    background: var(--paper-darker);
+    border-radius: 999px;
+    height: 10px;
+    overflow: hidden;
+    margin: 0 0 4px 0;
+  }
+  .browse-progress-fill {
+    height: 100%;
+    border-radius: 999px;
+    background: var(--gold);
+    transition: width 0.4s ease;
+  }
+  .browse-progress-label {
+    font-size: 12px;
+    color: var(--ink-light);
+    margin-bottom: 12px;
+  }
   /* MOBILE */
   @media (max-width: 480px) {
     .action-cards { grid-template-columns: 1fr; }
@@ -1214,7 +1234,8 @@
   <div class="screen" id="screen-browse">
     <button class="back-btn" onclick="goHome()">← Back</button>
     <h2 style="font-family:'DM Serif Display',serif; margin-bottom:8px;">Kanji Library</h2>
-    <p style="font-size:13px; color:var(--ink-light); margin-bottom:4px;">Tap any kanji to see details.</p>
+    <div class="browse-progress-wrap"><div class="browse-progress-fill" id="browse-progress-fill" style="width:0%"></div></div>
+    <div class="browse-progress-label" id="browse-progress-label">0 / 0 unlocked</div>
     <div class="browse-grid" id="browse-grid"></div>
   </div>
 
@@ -1240,12 +1261,16 @@
       <div class="complete-title" id="complete-title">Session Complete!</div>
       <div class="complete-stats">
         <div class="complete-stat">
-          <span class="complete-stat-value" id="complete-correct">0</span>
-          <span class="complete-stat-label">Correct</span>
+          <span class="complete-stat-value" id="complete-correct" style="color:var(--green)">0</span>
+          <span class="complete-stat-label">First Try ✓</span>
         </div>
         <div class="complete-stat">
-          <span class="complete-stat-value" id="complete-wrong">0</span>
-          <span class="complete-stat-label">Wrong</span>
+          <span class="complete-stat-value" id="complete-secondchance" style="color:var(--gold)">0</span>
+          <span class="complete-stat-label">Second Try ✓</span>
+        </div>
+        <div class="complete-stat">
+          <span class="complete-stat-value" id="complete-wrong" style="color:var(--red)">0</span>
+          <span class="complete-stat-label">Wrong ✗</span>
         </div>
       </div>
       <div class="complete-subtitle" id="complete-subtitle">Great work! Keep up the practice.</div>
@@ -4593,6 +4618,765 @@ const KANJI_DATA = [
     ],
     standalone:{on:false,kun:true}
   },
+  // ── New kanji ── appended in stroke order ──────────────────────────────
+  {
+    kanji: '夫',
+    meanings: ['husband', 'man', 'mister'],
+    onYomi: [{kana:'フウ',romaji:'fuu'},{kana:'フ',romaji:'fu'}],
+    kunYomi: [{kana:'おっと',romaji:'otto'}],
+    onWords: [
+      {word:'夫婦', reading:'ふうふ', targetReading:'ふう', meaning:'married couple'},
+      {word:'夫人', reading:'ふじん', targetReading:'ふ', meaning:'wife / madam'},
+    ],
+    kunWords: [
+      {word:'夫', reading:'おっと', targetReading:'おっと', meaning:'husband'},
+      {word:'夫婦', reading:'めおと', targetReading:'おっと', meaning:'husband and wife (alt reading)'},
+    ],
+    standalone:{on:false,kun:true}
+  },
+  {
+    kanji: '方',
+    meanings: ['direction', 'way', 'person (polite)'],
+    onYomi: [{kana:'ホウ',romaji:'hou'}],
+    kunYomi: [{kana:'かた',romaji:'kata'}],
+    onWords: [
+      {word:'方向', reading:'ほうこう', targetReading:'ほう', meaning:'direction'},
+      {word:'地方', reading:'ちほう', targetReading:'ほう', meaning:'region / local area'},
+    ],
+    kunWords: [
+      {word:'読み方', reading:'よみかた', targetReading:'かた', meaning:'way of reading'},
+      {word:'方', reading:'かた', targetReading:'かた', meaning:'person (polite) / way'},
+    ],
+    standalone:{on:false,kun:true}
+  },
+  {
+    kanji: '引',
+    meanings: ['pull', 'attract', 'subtract'],
+    onYomi: [{kana:'イン',romaji:'in'}],
+    kunYomi: [{kana:'ひ',romaji:'hi'}],
+    onWords: [
+      {word:'引力', reading:'いんりょく', targetReading:'いん', meaning:'gravitational force / attraction'},
+      {word:'引用', reading:'いんよう', targetReading:'いん', meaning:'quotation / citation'},
+    ],
+    kunWords: [
+      {word:'引く', reading:'ひく', targetReading:'ひ', meaning:'to pull / to play (string instrument)'},
+      {word:'引っ越し', reading:'ひっこし', targetReading:'ひ', meaning:'moving house'},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '他',
+    meanings: ['other', 'another', 'else'],
+    onYomi: [{kana:'タ',romaji:'ta'}],
+    kunYomi: [{kana:'ほか',romaji:'hoka'}],
+    onWords: [
+      {word:'他人', reading:'たにん', targetReading:'た', meaning:'other person / stranger'},
+      {word:'他国', reading:'たこく', targetReading:'た', meaning:'another country'},
+    ],
+    kunWords: [
+      {word:'他', reading:'ほか', targetReading:'ほか', meaning:'other / besides'},
+      {word:'その他', reading:'そのほか', targetReading:'ほか', meaning:'and others / besides that'},
+    ],
+    standalone:{on:false,kun:true}
+  },
+  {
+    kanji: '正',
+    meanings: ['correct', 'right', 'proper', 'official'],
+    onYomi: [{kana:'ショウ',romaji:'shou'},{kana:'セイ',romaji:'sei'}],
+    kunYomi: [{kana:'ただ',romaji:'tada'}],
+    onWords: [
+      {word:'正月', reading:'しょうがつ', targetReading:'しょう', meaning:'New Year / January'},
+      {word:'正直', reading:'しょうじき', targetReading:'しょう', meaning:'honest / frankly speaking'},
+    ],
+    kunWords: [
+      {word:'正しい', reading:'ただしい', targetReading:'ただ', meaning:'correct / right'},
+      {word:'正す', reading:'ただす', targetReading:'ただ', meaning:'to correct / to rectify'},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '末',
+    meanings: ['end', 'tip', 'close', 'powder'],
+    onYomi: [{kana:'マツ',romaji:'matsu'}],
+    kunYomi: [{kana:'すえ',romaji:'sue'}],
+    onWords: [
+      {word:'週末', reading:'しゅうまつ', targetReading:'まつ', meaning:'weekend'},
+      {word:'月末', reading:'げつまつ', targetReading:'まつ', meaning:'end of the month'},
+    ],
+    kunWords: [
+      {word:'末', reading:'すえ', targetReading:'すえ', meaning:'end / future / youngest'},
+      {word:'末っ子', reading:'すえっこ', targetReading:'すえ', meaning:'youngest child'},
+    ],
+    standalone:{on:false,kun:true}
+  },
+  {
+    kanji: '写',
+    meanings: ['copy', 'photograph', 'depict'],
+    onYomi: [{kana:'シャ',romaji:'sha'}],
+    kunYomi: [{kana:'うつ',romaji:'utsu'}],
+    onWords: [
+      {word:'写真', reading:'しゃしん', targetReading:'しゃ', meaning:'photograph'},
+      {word:'写生', reading:'しゃせい', targetReading:'しゃ', meaning:'sketching from life'},
+    ],
+    kunWords: [
+      {word:'写す', reading:'うつす', targetReading:'うつ', meaning:'to copy / to photograph'},
+      {word:'写る', reading:'うつる', targetReading:'うつ', meaning:'to appear in a photo / to be reflected'},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '回',
+    meanings: ['turn', 'rotate', 'times (counter)', 'round'],
+    onYomi: [{kana:'カイ',romaji:'kai'}],
+    kunYomi: [{kana:'まわ',romaji:'mawa'}],
+    onWords: [
+      {word:'今回', reading:'こんかい', targetReading:'かい', meaning:'this time'},
+      {word:'回転', reading:'かいてん', targetReading:'かい', meaning:'rotation / revolution'},
+    ],
+    kunWords: [
+      {word:'回る', reading:'まわる', targetReading:'まわ', meaning:'to turn / to go around'},
+      {word:'回す', reading:'まわす', targetReading:'まわ', meaning:'to spin / to rotate'},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '同',
+    meanings: ['same', 'identical', 'agree', 'with'],
+    onYomi: [{kana:'ドウ',romaji:'dou'}],
+    kunYomi: [{kana:'おな',romaji:'ona'}],
+    onWords: [
+      {word:'同士', reading:'どうし', targetReading:'どう', meaning:'fellow / companion'},
+      {word:'同級生', reading:'どうきゅうせい', targetReading:'どう', meaning:'classmate'},
+    ],
+    kunWords: [
+      {word:'同じ', reading:'おなじ', targetReading:'おな', meaning:'same / identical'},
+      {word:'同い年', reading:'おないどし', targetReading:'おな', meaning:'same age'},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '次',
+    meanings: ['next', 'second', 'following'],
+    onYomi: [{kana:'ジ',romaji:'ji'},{kana:'シ',romaji:'shi'}],
+    kunYomi: [{kana:'つぎ',romaji:'tsugi'}],
+    onWords: [
+      {word:'次回', reading:'じかい', targetReading:'じ', meaning:'next time'},
+      {word:'目次', reading:'もくじ', targetReading:'じ', meaning:'table of contents'},
+    ],
+    kunWords: [
+      {word:'次', reading:'つぎ', targetReading:'つぎ', meaning:'next / following'},
+      {word:'次々', reading:'つぎつぎ', targetReading:'つぎ', meaning:'one after another'},
+    ],
+    standalone:{on:false,kun:true}
+  },
+  {
+    kanji: '全',
+    meanings: ['all', 'complete', 'entire', 'whole'],
+    onYomi: [{kana:'ゼン',romaji:'zen'}],
+    kunYomi: [{kana:'すべ',romaji:'sube'},{kana:'まった',romaji:'matta'}],
+    onWords: [
+      {word:'全部', reading:'ぜんぶ', targetReading:'ぜん', meaning:'all / entirely'},
+      {word:'全国', reading:'ぜんこく', targetReading:'ぜん', meaning:'whole country / nationwide'},
+    ],
+    kunWords: [
+      {word:'全て', reading:'すべて', targetReading:'すべ', meaning:'everything / all'},
+      {word:'全く', reading:'まったく', targetReading:'まった', meaning:'entirely / completely / not at all'},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '安',
+    meanings: ['cheap', 'peaceful', 'safe', 'easy'],
+    onYomi: [{kana:'アン',romaji:'an'}],
+    kunYomi: [{kana:'やす',romaji:'yasu'}],
+    onWords: [
+      {word:'安全', reading:'あんぜん', targetReading:'あん', meaning:'safety / safe'},
+      {word:'不安', reading:'ふあん', targetReading:'あん', meaning:'anxiety / unease'},
+    ],
+    kunWords: [
+      {word:'安い', reading:'やすい', targetReading:'やす', meaning:'cheap / inexpensive'},
+      {word:'安らか', reading:'やすらか', targetReading:'やす', meaning:'peaceful / calm'},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '初',
+    meanings: ['first', 'beginning', 'original'],
+    onYomi: [{kana:'ショ',romaji:'sho'},{kana:'ハツ',romaji:'hatsu'}],
+    kunYomi: [{kana:'はじ',romaji:'haji'}],
+    onWords: [
+      {word:'最初', reading:'さいしょ', targetReading:'しょ', meaning:'first / the very beginning'},
+      {word:'初日', reading:'はつひ', targetReading:'はつ', meaning:'first day (of a performance)'},
+    ],
+    kunWords: [
+      {word:'初めて', reading:'はじめて', targetReading:'はじ', meaning:'for the first time'},
+      {word:'初め', reading:'はじめ', targetReading:'はじ', meaning:'beginning / start'},
+    ],
+    standalone:{on:false,kun:true}
+  },
+  {
+    kanji: '別',
+    meanings: ['separate', 'different', 'special', 'part'],
+    onYomi: [{kana:'ベツ',romaji:'betsu'}],
+    kunYomi: [{kana:'わか',romaji:'waka'}],
+    onWords: [
+      {word:'別々', reading:'べつべつ', targetReading:'べつ', meaning:'separately / each'},
+      {word:'区別', reading:'くべつ', targetReading:'べつ', meaning:'distinction / differentiation'},
+    ],
+    kunWords: [
+      {word:'別れる', reading:'わかれる', targetReading:'わか', meaning:'to part / to separate'},
+      {word:'別れ', reading:'わかれ', targetReading:'わか', meaning:'farewell / parting'},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '利',
+    meanings: ['profit', 'benefit', 'advantage', 'sharp'],
+    onYomi: [{kana:'リ',romaji:'ri'}],
+    kunYomi: [{kana:'き',romaji:'ki'}],
+    onWords: [
+      {word:'利用', reading:'りよう', targetReading:'り', meaning:'use / utilization'},
+      {word:'便利', reading:'べんり', targetReading:'り', meaning:'convenient / handy'},
+    ],
+    kunWords: [
+      {word:'利く', reading:'きく', targetReading:'き', meaning:'to work / to be effective'},
+      {word:'右利き', reading:'みぎきき', targetReading:'き', meaning:'right-handed'},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '返',
+    meanings: ['return', 'reply', 'restore'],
+    onYomi: [{kana:'ヘン',romaji:'hen'}],
+    kunYomi: [{kana:'かえ',romaji:'kae'}],
+    onWords: [
+      {word:'返事', reading:'へんじ', targetReading:'へん', meaning:'reply / answer'},
+      {word:'返信', reading:'へんしん', targetReading:'へん', meaning:'reply (message/email)'},
+    ],
+    kunWords: [
+      {word:'返す', reading:'かえす', targetReading:'かえ', meaning:'to return something / to give back'},
+      {word:'返る', reading:'かえる', targetReading:'かえ', meaning:'to return / to revert'},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '冷',
+    meanings: ['cold', 'cool', 'chill', 'freeze'],
+    onYomi: [{kana:'レイ',romaji:'rei'}],
+    kunYomi: [{kana:'つめ',romaji:'tsume'},{kana:'ひ',romaji:'hi'}],
+    onWords: [
+      {word:'冷蔵庫', reading:'れいぞうこ', targetReading:'れい', meaning:'refrigerator'},
+      {word:'冷凍', reading:'れいとう', targetReading:'れい', meaning:'freezing / frozen food'},
+    ],
+    kunWords: [
+      {word:'冷たい', reading:'つめたい', targetReading:'つめ', meaning:'cold (to the touch) / unfriendly'},
+      {word:'冷える', reading:'ひえる', targetReading:'ひ', meaning:'to get cold / to cool down'},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '忘',
+    meanings: ['forget', 'overlook', 'leave behind'],
+    onYomi: [{kana:'ボウ',romaji:'bou'}],
+    kunYomi: [{kana:'わす',romaji:'wasu'}],
+    onWords: [
+      {word:'忘年会', reading:'ぼうねんかい', targetReading:'ぼう', meaning:'year-end party'},
+      {word:'忘却', reading:'ぼうきゃく', targetReading:'ぼう', meaning:'oblivion / complete forgetting'},
+    ],
+    kunWords: [
+      {word:'忘れる', reading:'わすれる', targetReading:'わす', meaning:'to forget'},
+      {word:'忘れ物', reading:'わすれもの', targetReading:'わす', meaning:'forgotten item / lost property'},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '決',
+    meanings: ['decide', 'determine', 'settle'],
+    onYomi: [{kana:'ケツ',romaji:'ketsu'}],
+    kunYomi: [{kana:'き',romaji:'ki'}],
+    onWords: [
+      {word:'決定', reading:'けってい', targetReading:'けつ', meaning:'decision / determination'},
+      {word:'解決', reading:'かいけつ', targetReading:'けつ', meaning:'resolution / solution'},
+    ],
+    kunWords: [
+      {word:'決める', reading:'きめる', targetReading:'き', meaning:'to decide / to determine'},
+      {word:'決まり', reading:'きまり', targetReading:'き', meaning:'rule / custom / it\'s decided'},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '私',
+    meanings: ['I', 'me', 'private', 'personal'],
+    onYomi: [{kana:'シ',romaji:'shi'}],
+    kunYomi: [{kana:'わたし',romaji:'watashi'},{kana:'わたくし',romaji:'watakushi'}],
+    onWords: [
+      {word:'私立', reading:'しりつ', targetReading:'し', meaning:'private (school / institution)'},
+      {word:'私鉄', reading:'してつ', targetReading:'し', meaning:'private railway'},
+    ],
+    kunWords: [
+      {word:'私', reading:'わたし', targetReading:'わたし', meaning:'I / me'},
+      {word:'私たち', reading:'わたしたち', targetReading:'わたし', meaning:'we / us'},
+    ],
+    standalone:{on:false,kun:true}
+  },
+  {
+    kanji: '事',
+    meanings: ['thing', 'matter', 'affair', 'fact'],
+    onYomi: [{kana:'ジ',romaji:'ji'}],
+    kunYomi: [{kana:'こと',romaji:'koto'}],
+    onWords: [
+      {word:'食事', reading:'しょくじ', targetReading:'じ', meaning:'meal / dining'},
+      {word:'行事', reading:'ぎょうじ', targetReading:'じ', meaning:'event / function'},
+      {word:'大事', reading:'だいじ', targetReading:'じ', meaning:'important / precious'},
+    ],
+    kunWords: [
+      {word:'事', reading:'こと', targetReading:'こと', meaning:'thing / matter / fact'},
+      {word:'物事', reading:'ものごと', targetReading:'こと', meaning:'things / matters in general'},
+    ],
+    standalone:{on:false,kun:true}
+  },
+  {
+    kanji: '所',
+    meanings: ['place', 'location', 'spot'],
+    onYomi: [{kana:'ショ',romaji:'sho'},{kana:'ジョ',romaji:'jo'}],
+    kunYomi: [{kana:'ところ',romaji:'tokoro'}],
+    onWords: [
+      {word:'場所', reading:'ばしょ', targetReading:'しょ', meaning:'place / location / spot'},
+      {word:'住所', reading:'じゅうしょ', targetReading:'しょ', meaning:'address'},
+    ],
+    kunWords: [
+      {word:'所', reading:'ところ', targetReading:'ところ', meaning:'place / spot'},
+      {word:'台所', reading:'だいどころ', targetReading:'どころ', meaning:'kitchen'},
+    ],
+    standalone:{on:false,kun:true}
+  },
+  {
+    kanji: '受',
+    meanings: ['receive', 'accept', 'take', 'get'],
+    onYomi: [{kana:'ジュ',romaji:'ju'}],
+    kunYomi: [{kana:'う',romaji:'u'}],
+    onWords: [
+      {word:'受験', reading:'じゅけん', targetReading:'じゅ', meaning:'taking an exam / sitting a test'},
+      {word:'受信', reading:'じゅしん', targetReading:'じゅ', meaning:'receiving a message / reception'},
+    ],
+    kunWords: [
+      {word:'受ける', reading:'うける', targetReading:'う', meaning:'to receive / to take (an exam)'},
+      {word:'受かる', reading:'うかる', targetReading:'う', meaning:'to pass an exam'},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '和',
+    meanings: ['harmony', 'Japan', 'peace', 'sum'],
+    onYomi: [{kana:'ワ',romaji:'wa'}],
+    kunYomi: [{kana:'やわ',romaji:'yawa'},{kana:'なご',romaji:'nago'}],
+    onWords: [
+      {word:'和食', reading:'わしょく', targetReading:'わ', meaning:'Japanese food'},
+      {word:'和室', reading:'わしつ', targetReading:'わ', meaning:'Japanese-style room'},
+    ],
+    kunWords: [
+      {word:'和らぐ', reading:'やわらぐ', targetReading:'やわ', meaning:'to soften / to ease up'},
+      {word:'和む', reading:'なごむ', targetReading:'なご', meaning:'to feel relaxed / at ease'},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '物',
+    meanings: ['thing', 'object', 'matter', 'goods'],
+    onYomi: [{kana:'ブツ',romaji:'butsu'},{kana:'モツ',romaji:'motsu'}],
+    kunYomi: [{kana:'もの',romaji:'mono'}],
+    onWords: [
+      {word:'動物', reading:'どうぶつ', targetReading:'ぶつ', meaning:'animal'},
+      {word:'荷物', reading:'にもつ', targetReading:'もつ', meaning:'luggage / baggage'},
+    ],
+    kunWords: [
+      {word:'食べ物', reading:'たべもの', targetReading:'もの', meaning:'food'},
+      {word:'飲み物', reading:'のみもの', targetReading:'もの', meaning:'drink / beverage'},
+    ],
+    standalone:{on:false,kun:true}
+  },
+  {
+    kanji: '味',
+    meanings: ['taste', 'flavor', 'experience', 'relish'],
+    onYomi: [{kana:'ミ',romaji:'mi'}],
+    kunYomi: [{kana:'あじ',romaji:'aji'}],
+    onWords: [
+      {word:'趣味', reading:'しゅみ', targetReading:'み', meaning:'hobby / interest'},
+      {word:'意味', reading:'いみ', targetReading:'み', meaning:'meaning / significance'},
+    ],
+    kunWords: [
+      {word:'味', reading:'あじ', targetReading:'あじ', meaning:'taste / flavor'},
+      {word:'味わう', reading:'あじわう', targetReading:'あじ', meaning:'to taste / to savor'},
+    ],
+    standalone:{on:false,kun:true}
+  },
+  {
+    kanji: '若',
+    meanings: ['young', 'youth', 'or'],
+    onYomi: [{kana:'ジャク',romaji:'jaku'},{kana:'ニャク',romaji:'nyaku'}],
+    kunYomi: [{kana:'わか',romaji:'waka'}],
+    onWords: [
+      {word:'若干', reading:'じゃっかん', targetReading:'じゃく', meaning:'a few / some / a little'},
+      {word:'老若', reading:'ろうにゃく', targetReading:'にゃく', meaning:'old and young'},
+    ],
+    kunWords: [
+      {word:'若い', reading:'わかい', targetReading:'わか', meaning:'young'},
+      {word:'若者', reading:'わかもの', targetReading:'わか', meaning:'young person / youth'},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '者',
+    meanings: ['person', 'one who', 'expert'],
+    onYomi: [{kana:'シャ',romaji:'sha'}],
+    kunYomi: [{kana:'もの',romaji:'mono'}],
+    onWords: [
+      {word:'医者', reading:'いしゃ', targetReading:'しゃ', meaning:'doctor / physician'},
+      {word:'学者', reading:'がくしゃ', targetReading:'しゃ', meaning:'scholar / academic'},
+    ],
+    kunWords: [
+      {word:'若者', reading:'わかもの', targetReading:'もの', meaning:'young person / youth'},
+      {word:'者', reading:'もの', targetReading:'もの', meaning:'person'},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '妻',
+    meanings: ['wife'],
+    onYomi: [{kana:'サイ',romaji:'sai'}],
+    kunYomi: [{kana:'つま',romaji:'tsuma'}],
+    onWords: [
+      {word:'夫妻', reading:'ふさい', targetReading:'さい', meaning:'husband and wife / married couple'},
+      {word:'妻子', reading:'さいし', targetReading:'さい', meaning:'wife and children'},
+    ],
+    kunWords: [
+      {word:'妻', reading:'つま', targetReading:'つま', meaning:'wife'},
+    ],
+    standalone:{on:false,kun:true}
+  },
+  {
+    kanji: '指',
+    meanings: ['finger', 'toe', 'point to', 'indicate'],
+    onYomi: [{kana:'シ',romaji:'shi'}],
+    kunYomi: [{kana:'ゆび',romaji:'yubi'},{kana:'さ',romaji:'sa'}],
+    onWords: [
+      {word:'指定', reading:'してい', targetReading:'し', meaning:'designation / reserved'},
+      {word:'指示', reading:'しじ', targetReading:'し', meaning:'instruction / direction'},
+    ],
+    kunWords: [
+      {word:'指', reading:'ゆび', targetReading:'ゆび', meaning:'finger / toe'},
+      {word:'指輪', reading:'ゆびわ', targetReading:'ゆび', meaning:'ring (jewelry)'},
+    ],
+    standalone:{on:false,kun:true}
+  },
+  {
+    kanji: '洗',
+    meanings: ['wash', 'clean', 'investigate'],
+    onYomi: [{kana:'セン',romaji:'sen'}],
+    kunYomi: [{kana:'あら',romaji:'ara'}],
+    onWords: [
+      {word:'洗濯', reading:'せんたく', targetReading:'せん', meaning:'laundry / washing clothes'},
+      {word:'洗面', reading:'せんめん', targetReading:'せん', meaning:'washing one\'s face'},
+    ],
+    kunWords: [
+      {word:'洗う', reading:'あらう', targetReading:'あら', meaning:'to wash'},
+      {word:'洗い物', reading:'あらいもの', targetReading:'あら', meaning:'washing / dishes to wash'},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '送',
+    meanings: ['send', 'transmit', 'dispatch', 'escort'],
+    onYomi: [{kana:'ソウ',romaji:'sou'}],
+    kunYomi: [{kana:'おく',romaji:'oku'}],
+    onWords: [
+      {word:'送信', reading:'そうしん', targetReading:'そう', meaning:'sending a message / transmission'},
+      {word:'放送', reading:'ほうそう', targetReading:'そう', meaning:'broadcast / transmission'},
+    ],
+    kunWords: [
+      {word:'送る', reading:'おくる', targetReading:'おく', meaning:'to send / to see someone off'},
+      {word:'見送る', reading:'みおくる', targetReading:'おく', meaning:'to see someone off / to watch go'},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '飛',
+    meanings: ['fly', 'leap', 'jump', 'skip'],
+    onYomi: [{kana:'ヒ',romaji:'hi'}],
+    kunYomi: [{kana:'と',romaji:'to'}],
+    onWords: [
+      {word:'飛行機', reading:'ひこうき', targetReading:'ひ', meaning:'airplane'},
+      {word:'飛行', reading:'ひこう', targetReading:'ひ', meaning:'flight / aviation'},
+    ],
+    kunWords: [
+      {word:'飛ぶ', reading:'とぶ', targetReading:'と', meaning:'to fly / to jump'},
+      {word:'飛び出す', reading:'とびだす', targetReading:'と', meaning:'to fly out / to jump out'},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '負',
+    meanings: ['lose', 'defeat', 'bear', 'owe'],
+    onYomi: [{kana:'フ',romaji:'fu'}],
+    kunYomi: [{kana:'ま',romaji:'ma'},{kana:'お',romaji:'o'}],
+    onWords: [
+      {word:'負担', reading:'ふたん', targetReading:'ふ', meaning:'burden / charge / responsibility'},
+      {word:'勝負', reading:'しょうぶ', targetReading:'ぶ', meaning:'match / contest / game'},
+    ],
+    kunWords: [
+      {word:'負ける', reading:'まける', targetReading:'ま', meaning:'to lose / to be defeated'},
+      {word:'負け', reading:'まけ', targetReading:'ま', meaning:'defeat / loss'},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '便',
+    meanings: ['convenient', 'mail', 'service', 'stool'],
+    onYomi: [{kana:'ベン',romaji:'ben'},{kana:'ビン',romaji:'bin'}],
+    kunYomi: [{kana:'たよ',romaji:'tayo'}],
+    onWords: [
+      {word:'便利', reading:'べんり', targetReading:'べん', meaning:'convenient / handy'},
+      {word:'郵便', reading:'ゆうびん', targetReading:'びん', meaning:'mail / post'},
+    ],
+    kunWords: [
+      {word:'便り', reading:'たより', targetReading:'たよ', meaning:'news from someone / letter'},
+    ],
+    standalone:{on:false,kun:true}
+  },
+  {
+    kanji: '映',
+    meanings: ['reflect', 'project', 'shine', 'film'],
+    onYomi: [{kana:'エイ',romaji:'ei'}],
+    kunYomi: [{kana:'うつ',romaji:'utsu'},{kana:'は',romaji:'ha'}],
+    onWords: [
+      {word:'映画', reading:'えいが', targetReading:'えい', meaning:'movie / film'},
+      {word:'映像', reading:'えいぞう', targetReading:'えい', meaning:'image / video / footage'},
+    ],
+    kunWords: [
+      {word:'映る', reading:'うつる', targetReading:'うつ', meaning:'to be reflected / to appear on screen'},
+      {word:'映す', reading:'うつす', targetReading:'うつ', meaning:'to project / to reflect / to show'},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '通',
+    meanings: ['pass through', 'commute', 'notify', 'common'],
+    onYomi: [{kana:'ツウ',romaji:'tsuu'},{kana:'ツ',romaji:'tsu'}],
+    kunYomi: [{kana:'とお',romaji:'too'},{kana:'かよ',romaji:'kayo'}],
+    onWords: [
+      {word:'通学', reading:'つうがく', targetReading:'つう', meaning:'commuting to school'},
+      {word:'通知', reading:'つうち', targetReading:'つう', meaning:'notification / notice'},
+    ],
+    kunWords: [
+      {word:'通る', reading:'とおる', targetReading:'とお', meaning:'to pass through / to go along'},
+      {word:'通う', reading:'かよう', targetReading:'かよ', meaning:'to commute / to attend regularly'},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '借',
+    meanings: ['borrow', 'rent', 'have a debt'],
+    onYomi: [{kana:'シャク',romaji:'shaku'}],
+    kunYomi: [{kana:'か',romaji:'ka'}],
+    onWords: [
+      {word:'借金', reading:'しゃっきん', targetReading:'しゃく', meaning:'debt / borrowed money'},
+      {word:'借家', reading:'しゃくや', targetReading:'しゃく', meaning:'rented house'},
+    ],
+    kunWords: [
+      {word:'借りる', reading:'かりる', targetReading:'か', meaning:'to borrow / to rent'},
+      {word:'借り', reading:'かり', targetReading:'か', meaning:'a debt / borrowing'},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '悪',
+    meanings: ['bad', 'evil', 'wrong', 'harm'],
+    onYomi: [{kana:'アク',romaji:'aku'},{kana:'オ',romaji:'o'}],
+    kunYomi: [{kana:'わる',romaji:'waru'}],
+    onWords: [
+      {word:'最悪', reading:'さいあく', targetReading:'あく', meaning:'the worst'},
+      {word:'悪化', reading:'あっか', targetReading:'あく', meaning:'worsening / deterioration'},
+    ],
+    kunWords: [
+      {word:'悪い', reading:'わるい', targetReading:'わる', meaning:'bad / wrong / poor quality'},
+      {word:'悪口', reading:'わるくち', targetReading:'わる', meaning:'badmouthing / speaking ill of'},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '族',
+    meanings: ['family', 'tribe', 'clan', 'group'],
+    onYomi: [{kana:'ゾク',romaji:'zoku'}],
+    kunYomi: [],
+    onWords: [
+      {word:'家族', reading:'かぞく', targetReading:'ぞく', meaning:'family'},
+      {word:'民族', reading:'みんぞく', targetReading:'ぞく', meaning:'ethnic group / people / nation'},
+    ],
+    kunWords: [],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '勝',
+    meanings: ['win', 'victory', 'beat', 'surpass'],
+    onYomi: [{kana:'ショウ',romaji:'shou'}],
+    kunYomi: [{kana:'か',romaji:'ka'},{kana:'まさ',romaji:'masa'}],
+    onWords: [
+      {word:'勝利', reading:'しょうり', targetReading:'しょう', meaning:'victory / triumph'},
+      {word:'決勝', reading:'けっしょう', targetReading:'しょう', meaning:'final match / decisive game'},
+    ],
+    kunWords: [
+      {word:'勝つ', reading:'かつ', targetReading:'か', meaning:'to win / to beat'},
+      {word:'勝ち', reading:'かち', targetReading:'か', meaning:'win / victory'},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '最',
+    meanings: ['most', 'extreme', 'highest', 'best'],
+    onYomi: [{kana:'サイ',romaji:'sai'}],
+    kunYomi: [{kana:'もっと',romaji:'motto'}],
+    onWords: [
+      {word:'最近', reading:'さいきん', targetReading:'さい', meaning:'recently / these days'},
+      {word:'最初', reading:'さいしょ', targetReading:'さい', meaning:'first / the very beginning'},
+      {word:'最悪', reading:'さいあく', targetReading:'さい', meaning:'the worst'},
+    ],
+    kunWords: [
+      {word:'最も', reading:'もっとも', targetReading:'もっと', meaning:'most / extremely'},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '覚',
+    meanings: ['memorize', 'remember', 'wake up', 'realize'],
+    onYomi: [{kana:'カク',romaji:'kaku'}],
+    kunYomi: [{kana:'おぼ',romaji:'obo'},{kana:'さ',romaji:'sa'}],
+    onWords: [
+      {word:'感覚', reading:'かんかく', targetReading:'かく', meaning:'sense / sensation / feeling'},
+      {word:'自覚', reading:'じかく', targetReading:'かく', meaning:'self-awareness / realization'},
+    ],
+    kunWords: [
+      {word:'覚える', reading:'おぼえる', targetReading:'おぼ', meaning:'to memorize / to remember'},
+      {word:'覚ます', reading:'さます', targetReading:'さ', meaning:'to wake up / to sober up'},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '集',
+    meanings: ['gather', 'collect', 'assemble', 'accumulate'],
+    onYomi: [{kana:'シュウ',romaji:'shuu'}],
+    kunYomi: [{kana:'あつ',romaji:'atsu'}],
+    onWords: [
+      {word:'集合', reading:'しゅうごう', targetReading:'しゅう', meaning:'gathering / assembly'},
+      {word:'集中', reading:'しゅうちゅう', targetReading:'しゅう', meaning:'concentration / focus'},
+    ],
+    kunWords: [
+      {word:'集まる', reading:'あつまる', targetReading:'あつ', meaning:'to gather / to come together'},
+      {word:'集める', reading:'あつめる', targetReading:'あつ', meaning:'to collect / to gather together'},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '番',
+    meanings: ['number', 'order', 'turn', 'guard'],
+    onYomi: [{kana:'バン',romaji:'ban'}],
+    kunYomi: [],
+    onWords: [
+      {word:'番号', reading:'ばんごう', targetReading:'ばん', meaning:'number (phone, seat, etc.)'},
+      {word:'一番', reading:'いちばん', targetReading:'ばん', meaning:'number one / most / best'},
+    ],
+    kunWords: [],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '温',
+    meanings: ['warm', 'mild', 'lukewarm', 'hot spring'],
+    onYomi: [{kana:'オン',romaji:'on'}],
+    kunYomi: [{kana:'あたた',romaji:'atata'},{kana:'ぬる',romaji:'nuru'}],
+    onWords: [
+      {word:'温泉', reading:'おんせん', targetReading:'おん', meaning:'hot spring'},
+      {word:'気温', reading:'きおん', targetReading:'おん', meaning:'air temperature'},
+    ],
+    kunWords: [
+      {word:'温かい', reading:'あたたかい', targetReading:'あたた', meaning:'warm / caring (feelings or weather)'},
+      {word:'温める', reading:'あたためる', targetReading:'あたた', meaning:'to warm up / to heat'},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '痛',
+    meanings: ['painful', 'ache', 'sore', 'intense'],
+    onYomi: [{kana:'ツウ',romaji:'tsuu'}],
+    kunYomi: [{kana:'いた',romaji:'ita'}],
+    onWords: [
+      {word:'頭痛', reading:'ずつう', targetReading:'つう', meaning:'headache'},
+      {word:'腹痛', reading:'ふくつう', targetReading:'つう', meaning:'stomachache / abdominal pain'},
+    ],
+    kunWords: [
+      {word:'痛い', reading:'いたい', targetReading:'いた', meaning:'painful / ouch / sore'},
+      {word:'痛む', reading:'いたむ', targetReading:'いた', meaning:'to hurt / to ache / to feel pain'},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '数',
+    meanings: ['number', 'count', 'figure', 'several'],
+    onYomi: [{kana:'スウ',romaji:'suu'},{kana:'ス',romaji:'su'}],
+    kunYomi: [{kana:'かず',romaji:'kazu'},{kana:'かぞ',romaji:'kazo'}],
+    onWords: [
+      {word:'数学', reading:'すうがく', targetReading:'すう', meaning:'mathematics'},
+      {word:'数字', reading:'すうじ', targetReading:'すう', meaning:'numeral / digit / figure'},
+    ],
+    kunWords: [
+      {word:'数', reading:'かず', targetReading:'かず', meaning:'number / amount / count'},
+      {word:'数える', reading:'かぞえる', targetReading:'かぞ', meaning:'to count'},
+    ],
+    standalone:{on:false,kun:true}
+  },
+  {
+    kanji: '緑',
+    meanings: ['green', 'verdure'],
+    onYomi: [{kana:'リョク',romaji:'ryoku'},{kana:'ロク',romaji:'roku'}],
+    kunYomi: [{kana:'みどり',romaji:'midori'}],
+    onWords: [
+      {word:'緑茶', reading:'りょくちゃ', targetReading:'りょく', meaning:'green tea'},
+      {word:'緑地', reading:'りょくち', targetReading:'りょく', meaning:'green space / park area'},
+    ],
+    kunWords: [
+      {word:'緑', reading:'みどり', targetReading:'みどり', meaning:'green'},
+      {word:'緑色', reading:'みどりいろ', targetReading:'みどり', meaning:'green color'},
+    ],
+    standalone:{on:false,kun:true}
+  },
+  {
+    kanji: '熱',
+    meanings: ['heat', 'fever', 'hot', 'passionate'],
+    onYomi: [{kana:'ネツ',romaji:'netsu'}],
+    kunYomi: [{kana:'あつ',romaji:'atsu'}],
+    onWords: [
+      {word:'熱心', reading:'ねっしん', targetReading:'ねつ', meaning:'enthusiastic / eager / devoted'},
+      {word:'熱中', reading:'ねっちゅう', targetReading:'ねつ', meaning:'absorbed in / passionate about'},
+    ],
+    kunWords: [
+      {word:'熱い', reading:'あつい', targetReading:'あつ', meaning:'hot (to the touch)'},
+      {word:'熱さ', reading:'あつさ', targetReading:'あつ', meaning:'heat / hotness'},
+    ],
+    standalone:{on:false,kun:false}
+  },
+  {
+    kanji: '親',
+    meanings: ['parent', 'close', 'intimate', 'familiar'],
+    onYomi: [{kana:'シン',romaji:'shin'}],
+    kunYomi: [{kana:'おや',romaji:'oya'},{kana:'した',romaji:'shita'}],
+    onWords: [
+      {word:'親切', reading:'しんせつ', targetReading:'しん', meaning:'kind / helpful / considerate'},
+      {word:'両親', reading:'りょうしん', targetReading:'しん', meaning:'both parents / parents'},
+    ],
+    kunWords: [
+      {word:'親', reading:'おや', targetReading:'おや', meaning:'parent'},
+      {word:'親しい', reading:'したしい', targetReading:'した', meaning:'close / familiar / intimate'},
+    ],
+    standalone:{on:false,kun:true}
+  },
 ];
 
 // ===================================================
@@ -5173,6 +5957,7 @@ let session = {
   userAnswer: '',
   wordHistory: {}, // key: "idx-stage" → array of recently used word indices
   firstAttemptWrong: false, // two-chance mechanic for on/kun reading questions
+  secondChance: 0,  // correct on second try
 };
 
 // For lessons
@@ -5371,6 +6156,7 @@ function startReviews() {
   session.groupResults = {};
   session.stageWords = {};
   session.stageAnswers = {};
+  session.secondChance = 0;
   startQuiz();
 }
 
@@ -5775,13 +6561,15 @@ function gradeCurrentCard(wasCorrect) {
         c.meaning = { ...c.meaning, level: newLevel, nextReview: newNextReview };
         c.on = { ...c.on, level: newLevel, nextReview: newNextReview };
         if (kd.kunYomi.length > 0 && c.kun.learning) c.kun = { ...c.kun, level: newLevel, nextReview: newNextReview };
-        session.correct++;
+        if (gr.worstChance) session.secondChance++;
+        else session.correct++;
       }
       // Otherwise don't touch card state yet — waiting for remaining stages
     }
   } else {
     // Solo staged card — counts individually
-    if (wasCorrect) session.correct++;
+    if (wasCorrect && !secondChance) session.correct++;
+    else if (wasCorrect && secondChance) session.secondChance++;
     else session.wrong++;
     state.cards[cardKey(idx)][item.stage] = gradeCard(c[item.stage], wasCorrect, secondChance);
   }
@@ -5911,6 +6699,7 @@ function nextQuizItem() {
 
 function showComplete() {
   document.getElementById('complete-correct').textContent = session.correct;
+  document.getElementById('complete-secondchance').textContent = session.secondChance || 0;
   document.getElementById('complete-wrong').textContent = session.wrong;
   const pct = Math.round((session.correct / (session.correct + session.wrong)) * 100) || 0;
   document.getElementById('complete-subtitle').textContent = 
@@ -5950,22 +6739,22 @@ function buildBrowseGroups() {
 
   // Define groups by kanji character for reliability
   const groupDefs = [
-    { name: 'Numbers',            kanji: '一二三四五六七八九十百千万' },
-    { name: 'Colors',             kanji: '白黒赤青黄' },
+    { name: 'Numbers',            kanji: '一二三四五六七八九十百千万数番回' },
+    { name: 'Colors',             kanji: '白黒赤青黄緑' },
     { name: 'Nature & Weather',   kanji: '日月火水木金土山川田林森花草石雨雪風空海天地岩竹光星島' },
     { name: 'Animals',            kanji: '鳥魚牛犬馬' },
-    { name: 'Body & Mind',        kanji: '目口手足耳鼻頭体心力顔' },
-    { name: 'People & Family',    kanji: '人男女子父母兄姉弟妹友先' },
-    { name: 'Time & Seasons',     kanji: '年週曜毎朝昼夜春夏秋冬時間今半昨去' },
-    { name: 'Directions',         kanji: '東西南北上下左右中外内前後' },
-    { name: 'Places & Town',      kanji: '国都県市町村家道駅橋門池店屋部電車京公' },
-    { name: 'School & Learning',  kanji: '学生語言書読聞見話教習勉強弱考知思問答字名' },
-    { name: 'Food & Health',      kanji: '食飲肉米茶薬医病飯野酒暑寒' },
-    { name: 'Actions',            kanji: '来行帰出入立座起寝使作持買売切会話転運動止待始終急走歩泳開閉' },
-    { name: 'Descriptions',       kanji: '大小高低長短多少広細重軽早遅新古明暗好嫌近遠太速' },
-    { name: 'Arts & Media',       kanji: '音楽歌絵色形' },
-    { name: 'Work & Society',     kanji: '社仕働休力' },
-    { name: 'Language & Writing', kanji: '本何気紙' },
+    { name: 'Body & Mind',        kanji: '目口手足耳鼻頭体心力顔指痛' },
+    { name: 'People & Family',    kanji: '人男女子父母兄姉弟妹友先親夫妻族者若' },
+    { name: 'Time & Seasons',     kanji: '年週曜毎朝昼夜春夏秋冬時間今半昨去初末最' },
+    { name: 'Directions',         kanji: '東西南北上下左右中外内前後方' },
+    { name: 'Places & Town',      kanji: '国都県市町村家道駅橋門池店屋部電車京公所通' },
+    { name: 'School & Learning',  kanji: '学生語言書読聞見話教習勉強弱考知思問答字名受集覚' },
+    { name: 'Food & Health',      kanji: '食飲肉米茶薬医病飯野酒暑寒味' },
+    { name: 'Actions',            kanji: '来行帰出入立座起寝使作持買売切会話転運動止待始終急走歩泳開閉返決忘洗送飛負映借引勝' },
+    { name: 'Descriptions',       kanji: '大小高低長短多少広細重軽早遅新古明暗好嫌近遠太速正安全同別利悪冷温熱' },
+    { name: 'Arts & Media',       kanji: '音楽歌絵色形写' },
+    { name: 'Work & Society',     kanji: '社仕働休力私便' },
+    { name: 'Everyday Concepts',  kanji: '本何気紙事物他次和' },
   ];
 
   const kanjiToIdx = {};
@@ -6077,6 +6866,14 @@ function showSrsProgress() {
 function showBrowse() {
   const grid = document.getElementById('browse-grid');
   const groups = buildBrowseGroups();
+  // Update progress bar
+  const totalKanji = KANJI_DATA.length;
+  const learnedKanji = Object.values(state.cards).filter(c => c && c.meaning && c.meaning.learning).length;
+  const pct = totalKanji > 0 ? (learnedKanji / totalKanji) * 100 : 0;
+  const fillEl = document.getElementById('browse-progress-fill');
+  const labelEl = document.getElementById('browse-progress-label');
+  if (fillEl) fillEl.style.width = pct + '%';
+  if (labelEl) labelEl.textContent = learnedKanji + ' / ' + totalKanji + ' kanji unlocked';
 
   grid.innerHTML = groups.map((g, gi) => {
     const unlocked = g.indices.filter(i => state.cards[cardKey(i)] && state.cards[cardKey(i)].meaning.learning).length;
