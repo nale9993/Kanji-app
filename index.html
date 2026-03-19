@@ -6293,10 +6293,33 @@ function updateHomeStats() {
     if (isKanjiMastered(i)) mastered++;
   }
   document.getElementById('stat-lessons').textContent = lessons;
-  document.getElementById('stat-reviews').textContent = reviews;
+  // Display count mirrors the actual session size startReviews would build
+  let displayReviews = reviews;
+  if (reviews > 0) {
+    // Replicate the session-sizing logic to get the true batch size
+    const fullQueue = getReviewQueue();
+    const seenIdx = new Set();
+    const uniqueKanji = [];
+    for (const item of fullQueue) {
+      if (!seenIdx.has(item.idx)) {
+        seenIdx.add(item.idx);
+        uniqueKanji.push({ idx: item.idx, level: kanjiDisplayLevel(item.idx) });
+      }
+    }
+    const inCooldown = state.reviewCooldownUntil && Date.now() < state.reviewCooldownUntil;
+    if (inCooldown) {
+      displayReviews = uniqueKanji.filter(k => k.level === 0).length;
+    } else {
+      const lowLevel  = uniqueKanji.filter(k => k.level < 5);
+      const highLevel = uniqueKanji.filter(k => k.level >= 5);
+      const highSlots = Math.max(0, REVIEW_SESSION_CAP - lowLevel.length);
+      displayReviews = lowLevel.length + Math.min(highLevel.length, highSlots);
+    }
+  }
+  document.getElementById('stat-reviews').textContent = displayReviews;
   document.getElementById('stat-mastered').textContent = mastered;
   document.getElementById('home-lesson-count').textContent = lessons;
-  document.getElementById('home-review-count').textContent = reviews;
+  document.getElementById('home-review-count').textContent = displayReviews;
 
   const banner = document.getElementById('pretest-banner');
   const pretestTitle = document.getElementById('pretest-banner-title');
@@ -7411,8 +7434,6 @@ function renderPretestCard() {
   const total = pretest.queue.length * 3; // meaning + on + kun per kanji (approx)
   const done = pretest.pos * 3 + (['meaning','on','kun'].indexOf(pretest.stage));
   pretest.answered = false;
-  // Reset recall phase when starting a new kanji (meaning stage = new kanji)
-  if (pretest.stage === 'meaning') pretest.recallPhase = false;
 
   document.getElementById('pretest-progress-fill').style.width = (done / total * 100) + '%';
   document.getElementById('pretest-count').textContent = `${pretest.pos + 1}/${pretest.queue.length}`;
@@ -7590,6 +7611,7 @@ function advancePretestKanji() {
     goHome();
     return;
   }
+  pretest.recallPhase = false;
   pretest.stage = 'meaning';
   renderPretestCard();
 }
@@ -7648,6 +7670,7 @@ function advancePretestStage() {
     goHome();
     return;
   }
+  pretest.recallPhase = false;
   pretest.stage = 'meaning';
   renderPretestCard();
 }
