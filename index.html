@@ -5679,6 +5679,8 @@ const UNLOCK_THRESHOLD = 5;   // all 3 stages must reach this to unlock next kan
 const MASTER_THRESHOLD = 10;  // shown as "mastered" in stats
 const PRETEST_LEVEL = 6;      // fast-track level for passed pretest cards
 const MAX_IN_PROGRESS = 15;
+const REVIEW_SESSION_CAP = 35;         // max unique kanji per review session
+const REVIEW_COOLDOWN_MS = 20 * 60000; // 20-minute cooldown after a capped session
 
 // Color scale: light green (0) → teal → blue → deep purple (10)
 // Helper: returns the state.cards key for a given KANJI_DATA index
@@ -5748,6 +5750,7 @@ function isUnlockReady(card) {
 let state = {
   cards: {}, // kanji char -> { meaning, on, kun } each a card state
   unlockedSet: new Set(), // set of kanji chars that have been given a card slot
+  reviewCooldownUntil: 0, // timestamp — if in the future, cap next review batch
 };
 
 function initState() {
@@ -6253,6 +6256,8 @@ let session = {
   wordHistory: {}, // key: "idx-stage" → array of recently used word indices
   firstAttemptWrong: false, // two-chance mechanic for on/kun reading questions
   secondChance: 0,  // correct on second try
+  recallPhase: false, // true = showing recall screen before meaning choices
+  wasCapped: false,   // true = this session was batch-capped (triggers cooldown on complete)
 };
 
 // For lessons
@@ -6440,11 +6445,61 @@ function nextLesson() {
 // REVIEW FLOW
 // ===================================================
 function startReviews() {
-  const queue = getReviewQueue();
-  if (queue.length === 0) {
+  const fullQueue = getReviewQueue();
+  if (fullQueue.length === 0) {
     alert('No reviews due right now! Check back later.');
     return;
   }
+
+  // Collect unique due kanji with levels
+  const seenIdx = new Set();
+  const uniqueKanji = [];
+  for (const item of fullQueue) {
+    if (!seenIdx.has(item.idx)) {
+      seenIdx.add(item.idx);
+      uniqueKanji.push({ idx: item.idx, level: kanjiDisplayLevel(item.idx) });
+    }
+  }
+
+  const inCooldown = state.reviewCooldownUntil && Date.now() < state.reviewCooldownUntil;
+
+  if (inCooldown) {
+    // During cooldown: ONLY level-0 cards get through — everything else waits
+    const level0 = uniqueKanji.filter(k => k.level === 0);
+    if (level0.length === 0) {
+      const remaining = Math.ceil((state.reviewCooldownUntil - Date.now()) / 60000);
+      alert(`Next batch in ${remaining} minute${remaining !== 1 ? 's' : ''}. This gives your memory time to consolidate.`);
+      return;
+    }
+    const cappedSet = new Set(level0.map(k => k.idx));
+    const queue = fullQueue.filter(item => cappedSet.has(item.idx));
+    session.mode = 'review';
+    session.queue = queue;
+    session.currentIdx = 0;
+    session.correct = 0;
+    session.wrong = 0;
+    session.groupResults = {};
+    session.stageWords = {};
+    session.stageAnswers = {};
+    session.secondChance = 0;
+    session.wasCapped = false; // cooldown already running — don't reset or extend it
+    startQuiz();
+    return;
+  }
+
+  // Normal (no cooldown): level <5 fills first, then high-level fills remaining slots
+  const lowLevel  = uniqueKanji.filter(k => k.level < 5);
+  const highLevel = uniqueKanji.filter(k => k.level >= 5).sort((a,b) => a.level - b.level);
+
+  const highSlots = Math.max(0, REVIEW_SESSION_CAP - lowLevel.length);
+  const selectedHigh = highLevel.slice(0, highSlots);
+  const wasCapped = highLevel.length > selectedHigh.length;
+
+  const cappedSet = new Set([...lowLevel, ...selectedHigh].map(k => k.idx));
+  const queue = (wasCapped || lowLevel.length < uniqueKanji.length)
+    ? fullQueue.filter(item => cappedSet.has(item.idx))
+    : fullQueue;
+
   session.mode = 'review';
   session.queue = queue;
   session.currentIdx = 0;
@@ -6454,6 +6509,7 @@ function startReviews() {
   session.stageWords = {};
   session.stageAnswers = {};
   session.secondChance = 0;
+  session.wasCapped = wasCapped;
   startQuiz();
 }
 
@@ -6518,6 +6574,14 @@ function renderQuizCard() {
   let html = `<div class="stage-badge" style="--stage-color:${color}">${label}</div>`;
 
   if (item.stage === 'meaning') {
+    if (!session.recallPhase) {
+      // Recall screen — show kanji only, prompt user to think before seeing choices
+      html += `<div class="quiz-kanji">${kd.kanji}</div>`;
+      html += `<div class="quiz-prompt">Try to recall the meaning before seeing the choices</div>`;
+      html += `<button class="submit-btn" onclick="showMeaningChoices()" style="margin-top:20px;">Show Choices →</button>`;
+      card.innerHTML = html;
+      return;
+    }
     // Multiple choice
     html += `<div class="quiz-kanji">${kd.kanji}</div>`;
     html += `<div class="quiz-prompt">What does this kanji mean?</div>`;
@@ -6588,6 +6652,11 @@ function renderQuizCard() {
       if (inp) inp.focus({ preventScroll: true });
     }, 150);
   }
+}
+
+function showMeaningChoices() {
+  session.recallPhase = true;
+  renderQuizCard();
 }
 
 function toKatakana(romaji) {
@@ -6978,6 +7047,7 @@ function showReviewScreen() {
 }
 
 function nextQuizItem() {
+  session.recallPhase = false; // reset recall phase for the next card
   session.currentIdx++;
   // Skip any remaining stages for a kanji that was already demoted this session
   while (session.currentIdx < session.queue.length) {
@@ -7005,6 +7075,13 @@ function showComplete() {
     'Keep practicing — repetition is the key to kanji.';
   document.getElementById('complete-title').textContent = 
     session.mode === 'lesson' ? 'Lessons Complete!' : 'Reviews Complete!';
+
+  // If this review session was capped, start the 20-minute cooldown
+  if (session.mode === 'review' && session.wasCapped) {
+    state.reviewCooldownUntil = Date.now() + REVIEW_COOLDOWN_MS;
+    saveState();
+  }
+
   showScreen('complete');
 }
 
@@ -7292,6 +7369,7 @@ let pretest = {
   correct: null,
   answered: false,
   fastTracked: 0,
+  recallPhase: false, // true = showing recall screen before meaning choices
 };
 
 function startPretest() {
@@ -7333,6 +7411,8 @@ function renderPretestCard() {
   const total = pretest.queue.length * 3; // meaning + on + kun per kanji (approx)
   const done = pretest.pos * 3 + (['meaning','on','kun'].indexOf(pretest.stage));
   pretest.answered = false;
+  // Reset recall phase when starting a new kanji (meaning stage = new kanji)
+  if (pretest.stage === 'meaning') pretest.recallPhase = false;
 
   document.getElementById('pretest-progress-fill').style.width = (done / total * 100) + '%';
   document.getElementById('pretest-count').textContent = `${pretest.pos + 1}/${pretest.queue.length}`;
@@ -7345,6 +7425,15 @@ function renderPretestCard() {
   let html = `<div class="stage-badge" style="--stage-color:${color}">${stageLabel}</div>`;
 
   if (pretest.stage === 'meaning') {
+    if (!pretest.recallPhase) {
+      // Recall screen — show kanji only, prompt user to think before seeing choices
+      html += `<div class="quiz-kanji">${kd.kanji}</div>`;
+      html += `<div class="quiz-prompt">Try to recall the meaning before seeing the choices</div>`;
+      html += `<button class="submit-btn" style="background:var(--red); margin-top:20px;" onclick="showPretestMeaningChoices()">Show Choices →</button>`;
+      card.innerHTML = html;
+      card.className = 'quiz-card animate-in';
+      return;
+    }
     const {choices, correct} = getMeaningChoices(idx);
     pretest.meaningCorrect = correct;
     html += `<div class="quiz-kanji">${kd.kanji}</div>`;
@@ -7404,6 +7493,11 @@ function renderPretestCard() {
       if (i) i.focus({ preventScroll: true });
     }, 150);
   }
+}
+
+function showPretestMeaningChoices() {
+  pretest.recallPhase = true;
+  renderPretestCard();
 }
 
 function onPretestRomajiInput(input) {
@@ -7611,7 +7705,7 @@ function confirmReset() {
     localStorage.removeItem('sumi_state');
     localStorage.removeItem('sumi_pretest');
     // Reset all in-memory state
-    state = { cards: {}, unlockedSet: new Set(), pretestFailed: [], pretestDismissed: false, wordHistory: {} };
+    state = { cards: {}, unlockedSet: new Set(), pretestFailed: [], pretestDismissed: false, wordHistory: {}, reviewCooldownUntil: 0 };
     pretestInProgress = false;
     pretest.queue = [];
     pretest.pos = 0;
