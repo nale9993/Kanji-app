@@ -5750,7 +5750,8 @@ function isUnlockReady(card) {
 let state = {
   cards: {}, // kanji char -> { meaning, on, kun } each a card state
   unlockedSet: new Set(), // set of kanji chars that have been given a card slot
-  reviewCooldownUntil: 0, // timestamp — if in the future, cap next review batch
+  reviewCooldownUntil: 0,  // timestamp — if in the future, high-level batch is gated
+  reviewCooldownSet: [],   // the exact kanji indices selected when cooldown started
 };
 
 function initState() {
@@ -6284,42 +6285,47 @@ function getStageLabel(stage) {
   return "Kun'yomi";
 }
 
+// Returns how many unique kanji will actually appear in the next review session,
+// matching the startReviews() logic exactly so the home screen count is accurate.
+function getSessionReviewCount() {
+  const fullQueue = getReviewQueue();
+  if (fullQueue.length === 0) return 0;
+
+  const seenIdx = new Set();
+  const uniqueKanji = [];
+  for (const item of fullQueue) {
+    if (!seenIdx.has(item.idx)) {
+      seenIdx.add(item.idx);
+      uniqueKanji.push({ idx: item.idx, level: kanjiDisplayLevel(item.idx) });
+    }
+  }
+
+  const inCooldown = state.reviewCooldownUntil && Date.now() < state.reviewCooldownUntil;
+  if (inCooldown) {
+    if (!state.reviewCooldownSet || state.reviewCooldownSet.length === 0) return 0;
+    const cooldownSet = new Set(state.reviewCooldownSet);
+    return uniqueKanji.filter(k => cooldownSet.has(k.idx)).length;
+  }
+
+  const lowLevel  = uniqueKanji.filter(k => k.level < 5);
+  const highLevel = uniqueKanji.filter(k => k.level >= 5);
+  const highSlots = Math.max(0, REVIEW_SESSION_CAP - lowLevel.length);
+  return lowLevel.length + Math.min(highLevel.length, highSlots);
+}
+
 function updateHomeStats() {
   const lessons = getLessonQueue().length;
-  const reviews = getReviewCount();
+  const sessionReviews = getSessionReviewCount();
   let mastered = 0;
   for (let i = 0; i < KANJI_DATA.length; i++) {
     if (!state.unlockedSet.has(cardKey(i))) continue;
     if (isKanjiMastered(i)) mastered++;
   }
   document.getElementById('stat-lessons').textContent = lessons;
-  // Display count mirrors the actual session size startReviews would build
-  let displayReviews = reviews;
-  if (reviews > 0) {
-    // Replicate the session-sizing logic to get the true batch size
-    const fullQueue = getReviewQueue();
-    const seenIdx = new Set();
-    const uniqueKanji = [];
-    for (const item of fullQueue) {
-      if (!seenIdx.has(item.idx)) {
-        seenIdx.add(item.idx);
-        uniqueKanji.push({ idx: item.idx, level: kanjiDisplayLevel(item.idx) });
-      }
-    }
-    const inCooldown = state.reviewCooldownUntil && Date.now() < state.reviewCooldownUntil;
-    if (inCooldown) {
-      displayReviews = uniqueKanji.filter(k => k.level === 0).length;
-    } else {
-      const lowLevel  = uniqueKanji.filter(k => k.level < 5);
-      const highLevel = uniqueKanji.filter(k => k.level >= 5);
-      const highSlots = Math.max(0, REVIEW_SESSION_CAP - lowLevel.length);
-      displayReviews = lowLevel.length + Math.min(highLevel.length, highSlots);
-    }
-  }
-  document.getElementById('stat-reviews').textContent = displayReviews;
+  document.getElementById('stat-reviews').textContent = sessionReviews;
   document.getElementById('stat-mastered').textContent = mastered;
   document.getElementById('home-lesson-count').textContent = lessons;
-  document.getElementById('home-review-count').textContent = displayReviews;
+  document.getElementById('home-review-count').textContent = sessionReviews;
 
   const banner = document.getElementById('pretest-banner');
   const pretestTitle = document.getElementById('pretest-banner-title');
@@ -6474,53 +6480,53 @@ function startReviews() {
     return;
   }
 
-  // Collect unique due kanji with levels
+  // Collect unique due kanji with levels and next-review time
   const seenIdx = new Set();
   const uniqueKanji = [];
   for (const item of fullQueue) {
     if (!seenIdx.has(item.idx)) {
       seenIdx.add(item.idx);
-      uniqueKanji.push({ idx: item.idx, level: kanjiDisplayLevel(item.idx) });
+      const c = state.cards[cardKey(item.idx)];
+      const nextReview = c
+        ? Math.min(
+            c.meaning.learning ? c.meaning.nextReview : Infinity,
+            KANJI_DATA[item.idx].onYomi.length > 0 && c.on.learning ? c.on.nextReview : Infinity,
+            KANJI_DATA[item.idx].kunYomi.length > 0 && c.kun.learning ? c.kun.nextReview : Infinity
+          )
+        : Infinity;
+      uniqueKanji.push({ idx: item.idx, level: kanjiDisplayLevel(item.idx), nextReview });
     }
   }
 
   const inCooldown = state.reviewCooldownUntil && Date.now() < state.reviewCooldownUntil;
 
-  if (inCooldown) {
-    // During cooldown: ONLY level-0 cards get through — everything else waits
-    const level0 = uniqueKanji.filter(k => k.level === 0);
-    if (level0.length === 0) {
+  let selectedIdxSet;
+  let wasCapped;
+
+  if (inCooldown && state.reviewCooldownSet && state.reviewCooldownSet.length > 0) {
+    // During cooldown: serve the same batch that was selected when cooldown started,
+    // filtered to only those still actually due (user may have completed some already).
+    const cooldownSet = new Set(state.reviewCooldownSet);
+    const stillDue = uniqueKanji.filter(k => cooldownSet.has(k.idx));
+    if (stillDue.length === 0) {
       const remaining = Math.ceil((state.reviewCooldownUntil - Date.now()) / 60000);
       alert(`Next batch in ${remaining} minute${remaining !== 1 ? 's' : ''}. This gives your memory time to consolidate.`);
       return;
     }
-    const cappedSet = new Set(level0.map(k => k.idx));
-    const queue = fullQueue.filter(item => cappedSet.has(item.idx));
-    session.mode = 'review';
-    session.queue = queue;
-    session.currentIdx = 0;
-    session.correct = 0;
-    session.wrong = 0;
-    session.groupResults = {};
-    session.stageWords = {};
-    session.stageAnswers = {};
-    session.secondChance = 0;
-    session.wasCapped = false; // cooldown already running — don't reset or extend it
-    startQuiz();
-    return;
+    selectedIdxSet = new Set(stillDue.map(k => k.idx));
+    wasCapped = false; // cooldown already running — don't extend it
+  } else {
+    // Normal: low-level (<5) fills first, high-level fills remaining slots up to cap
+    const lowLevel  = uniqueKanji.filter(k => k.level < 5);
+    const highLevel = uniqueKanji.filter(k => k.level >= 5).sort((a, b) => a.nextReview - b.nextReview);
+    const highSlots    = Math.max(0, REVIEW_SESSION_CAP - lowLevel.length);
+    const selectedHigh = highLevel.slice(0, highSlots);
+    wasCapped = highLevel.length > selectedHigh.length;
+    selectedIdxSet = new Set([...lowLevel, ...selectedHigh].map(k => k.idx));
   }
 
-  // Normal (no cooldown): level <5 fills first, then high-level fills remaining slots
-  const lowLevel  = uniqueKanji.filter(k => k.level < 5);
-  const highLevel = uniqueKanji.filter(k => k.level >= 5).sort((a,b) => a.level - b.level);
-
-  const highSlots = Math.max(0, REVIEW_SESSION_CAP - lowLevel.length);
-  const selectedHigh = highLevel.slice(0, highSlots);
-  const wasCapped = highLevel.length > selectedHigh.length;
-
-  const cappedSet = new Set([...lowLevel, ...selectedHigh].map(k => k.idx));
-  const queue = (wasCapped || lowLevel.length < uniqueKanji.length)
-    ? fullQueue.filter(item => cappedSet.has(item.idx))
+  const queue = (wasCapped || selectedIdxSet.size < uniqueKanji.length)
+    ? fullQueue.filter(item => selectedIdxSet.has(item.idx))
     : fullQueue;
 
   session.mode = 'review';
@@ -6533,6 +6539,15 @@ function startReviews() {
   session.stageAnswers = {};
   session.secondChance = 0;
   session.wasCapped = wasCapped;
+
+  // Start cooldown immediately when a capped session begins —
+  // so it runs even if the user exits before finishing.
+  if (wasCapped) {
+    state.reviewCooldownUntil = Date.now() + REVIEW_COOLDOWN_MS;
+    state.reviewCooldownSet   = [...selectedIdxSet];
+    saveState();
+  }
+
   startQuiz();
 }
 
@@ -7098,12 +7113,6 @@ function showComplete() {
     'Keep practicing — repetition is the key to kanji.';
   document.getElementById('complete-title').textContent = 
     session.mode === 'lesson' ? 'Lessons Complete!' : 'Reviews Complete!';
-
-  // If this review session was capped, start the 20-minute cooldown
-  if (session.mode === 'review' && session.wasCapped) {
-    state.reviewCooldownUntil = Date.now() + REVIEW_COOLDOWN_MS;
-    saveState();
-  }
 
   showScreen('complete');
 }
@@ -7728,7 +7737,7 @@ function confirmReset() {
     localStorage.removeItem('sumi_state');
     localStorage.removeItem('sumi_pretest');
     // Reset all in-memory state
-    state = { cards: {}, unlockedSet: new Set(), pretestFailed: [], pretestDismissed: false, wordHistory: {}, reviewCooldownUntil: 0 };
+    state = { cards: {}, unlockedSet: new Set(), pretestFailed: [], pretestDismissed: false, wordHistory: {}, reviewCooldownUntil: 0, reviewCooldownSet: [] };
     pretestInProgress = false;
     pretest.queue = [];
     pretest.pos = 0;
