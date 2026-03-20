@@ -7321,13 +7321,19 @@ function openKanjiModal(idx) {
   const c = state.cards[cardKey(idx)];
   const unlocked = state.unlockedSet.has(cardKey(idx)) && c && c.meaning.learning;
 
-  // Level display
+  // Level + next review display
   let levelHtml = '';
   if (!unlocked) {
     levelHtml = `<div class="kanji-modal-level">Not yet unlocked</div>`;
   } else if (c && c.meaning.learning) {
     const lvl = kanjiDisplayLevel(idx);
-    levelHtml = `<div class="kanji-modal-level" style="color:${srsLevelColor(lvl)}">${lvl >= MAX_SRS_LEVEL ? '⭐ Mastered' : 'Level ' + lvl}</div>`;
+    const due = isDue(c.meaning);
+    const dueLabel = due ? `<span style="color:var(--green-light)">due now</span>`
+                         : `<span style="color:var(--ink-light)">${formatNextReview(c.meaning.nextReview)}</span>`;
+    levelHtml = `<div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;">
+      <div class="kanji-modal-level" style="color:${srsLevelColor(lvl)};margin-bottom:0;">${lvl >= MAX_SRS_LEVEL ? '⭐ Mastered' : 'Level ' + lvl}</div>
+      <div style="font-size:12px;">next review: ${dueLabel}</div>
+    </div>`;
   } else {
     levelHtml = `<div class="kanji-modal-level">In lessons</div>`;
   }
